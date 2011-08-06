@@ -1,0 +1,3 @@
+[submodule "cel"]
+	path = cel
+	url = git://github.com/matthewburk/cel.git
