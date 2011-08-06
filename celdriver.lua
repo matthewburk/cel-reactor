@@ -1,63 +1,31 @@
---This module takes reactor input and provides then to cel
 local cel = require 'cel' 
 
-local mouse = {
-  buttons = {
-    left = 1,
-    middle = 2,
-    right = 3,
+local driver = cel.installdriver(
+  {
+    buttons = { left = 1, middle = 2, right = 3, },
+    states = { unknown = 'unknown', normal = 'normal', pressed = 'pressed', },
+    wheeldirection = { up = 1, down = -1, },
   },
-  states = {
-    unknown = 'unknown',
-    normal = 'normal',
-    pressed = 'pressed',
-  },
-  wheeldirection = {
-    up = 1,
-    down = -1,
-  },
-}
-
-local keyboard = {
-  keys = setmetatable({}, {__index = function(t, k, v) return k end}),
-  keystates = {
-    unknown = 'unknown',
-    normal = 'normal',
-    pressed = 'pressed',
-  }
-}
-
-local driver = cel.installdriver(mouse, keyboard)
-
-reactor.cel = setmetatable({}, {__index = cel})
-
-function driver.clipboard(command, data)
-  if command == 'get' then
-    return reactor.clipboard.get()
-  elseif command == 'put' then
-    reactor.clipboard.put(data)
-  end
-end
-
-function reactor.cel.command(command)
-  driver.command(command)
-end
-
-function reactor.cel.mousepressed(x, y, button, alt, ctrl, shift)
+  {
+    keys = setmetatable({}, {__index = function(t, k, v) return k end}),
+    keystates = { unknown = 'unknown', normal = 'normal', pressed = 'pressed', }
+  })
+  
+function reactor.mousepressed(x, y, button, alt, ctrl, shift)
   driver.mousedown(x, y, button, alt, ctrl, shift)
 end
 
-function reactor.cel.mousereleased(x, y, button, alt, ctrl, shift)
+function reactor.mousereleased(x, y, button, alt, ctrl, shift)
   driver.mouseup(x, y, button, alt, ctrl, shift)
 end
 
-function reactor.cel.mousewheel(delta, step)
+function reactor.mousewheel(delta, step)
   local direction 
 
   if delta > 0 then
-    direction = mouse.wheeldirection.up
+    direction = cel.mouse.wheeldirection.up
   else
-    direction =  mouse.wheeldirection.down
+    direction =  cel.mouse.wheeldirection.down
   end
 
   local x, y = cel.mouse:xy()
@@ -68,11 +36,11 @@ function reactor.cel.mousewheel(delta, step)
   end
 end
 
-function reactor.cel.mousemove(x, y)
+function reactor.mousemove(x, y)
   driver.mousemove(x, y)
 end
 
-function reactor.cel.keypressed(key, alt, ctrl, shift, autorepeat)
+function reactor.keypressed(key, alt, ctrl, shift, autorepeat)
   if autorepeat then
     driver.keypress(key, alt, ctrl, shift)
   else
@@ -80,16 +48,19 @@ function reactor.cel.keypressed(key, alt, ctrl, shift, autorepeat)
   end
 end
 
-function reactor.cel.keyreleased(key)
+function reactor.keyreleased(key)
   driver.keyup(key)
 end
 
-function reactor.cel.character(c)
+function reactor.character(c)
   driver.char(c)
 end
 
+function reactor.command(c)
+  driver.command(c)
+end
+
 do
-  local lastfps
   local function initgraphics(w, h)
     if reactor.w ~= w or reactor.h ~= h then
       reactor.w = w
@@ -103,122 +74,50 @@ do
     end
   end
 
-  function reactor.cel.load()
+  function reactor.load()
     initgraphics(reactor.graphics.getwidth(), reactor.graphics.getheight())
     driver.root:resize(reactor.w, reactor.w)
+
+    if driver.hook.load then
+      driver.hook.load()
+    end
   end
 
-  function reactor.cel.resized(nw, nh)
+  function reactor.resized(nw, nh)
     initgraphics(nw, nh)
     driver.root:resize(nw, nh)
   end
+end
 
-  function reactor.cel.update(fps)
-    driver.timer(reactor.timermillis());
-    --if _G.showfps and fps ~= lastfps then
-      --lastfps = fps
-      --_G.showfps(string.format('fps %d', fps))
-    --end
-  end
+function reactor.draw()
+  local w, h = reactor.w, reactor.h
+  reactor.graphics.pushstate2d(w,h)
+  reactor.graphics.setcolor(1, 1, 1)
 
-  function reactor.cel.draw(cr)
-    local w, h = reactor.w, reactor.h
-    reactor.graphics.pushstate2d(w,h)
-    reactor.graphics.setcolor(1, 1, 1)
+  do
+    local t, altered = cel.describe()
+    if altered then
+      local cr = reactor.cr
+      cr:set_source_rgb(0, 0, 0)
+      cr:rectangle(0, 0, w, h)
+      cr:fill()
 
-    do
-      local t, altered = cel.describe()
-      if altered then
-        local cr = reactor.cr
-        cr:set_source_rgb(0, 0, 0)
-        cr:rectangle(0, 0, w, h)
-        cr:fill()
-
-        cr:save()
-        cr:set_line_width(1)
-        cel.face.get().cr = cr
-        t.drawtimestamp = cel.timer()
-        _G.drawtimestamp = t.drawtimestamp
-        t.description.face:draw(t.description)
-        cr:restore()
-        reactor.graphics.updatetexture(reactor.texture, reactor.surface)
-      end
+      cr:save()
+      cr:set_line_width(1)
+      cel.face.get().cr = cr
+      driver.hook.drawroot(cr, t)
+      cr:restore()
+      reactor.graphics.updatetexture(reactor.texture, reactor.surface)
     end
-
-    reactor.graphics.drawtexture(reactor.texture, 0, 0, w, h)
-    reactor.graphics.popstate()
   end
+
+  reactor.graphics.drawtexture(reactor.texture, 0, 0, w, h)
+  reactor.graphics.popstate()
 end
 
-
-
---Install hooks to pass events to cel
-if not reactor.mousepressed then
-  function reactor.mousepressed(...)
-    return reactor.cel.mousepressed(...)
-  end
+function reactor.update(fps)
+  driver.timer(reactor.timermillis());
 end
-
-if not reactor.mousereleased then
-  function reactor.mousereleased(...)
-    return reactor.cel.mousereleased(...)
-  end
-end
-
-if not reactor.mousewheel then
-  function reactor.mousewheel(delta, step)
-    reactor.cel.mousewheel(delta, step)
-  end
-end
-
-if not reactor.mousemove then
-  function reactor.mousemove(x, y)
-    return reactor.cel.mousemove(x, y) 
-  end
-end
-
-if not reactor.keypressed then
-  function reactor.keypressed(...)
-    return reactor.cel.keypressed(...)
-  end
-end
-
-if not reactor.keyreleased then
-  function reactor.keyreleased(...)
-    return reactor.cel.keyreleased(...)
-  end
-end
-
-if not reactor.resized then
-  function reactor.resized(w, h)
-    reactor.cel.resized(w,h)
-  end
-end
-
-if not reactor.draw then
-  function reactor.draw()
-    reactor.cel.draw()
-  end
-end
-
-if not reactor.charcater then
-  function reactor.character(c)
-    reactor.cel.character(c)
-  end
-end
-
-if not reactor.command then
-  function reactor.command(c)
-    reactor.cel.command(c)
-  end
-end
-
-if not reactor.update then
-  function reactor.update(fps)
-    reactor.cel.update(fps)
-  end
-end
-
 
 do
   local namemap = {
@@ -364,8 +263,83 @@ do
   end
 end
 
-reactor.celroot = driver.root:newroot():link(driver.root, 'edges')
+function driver.clipboard(command, data)
+  if command == 'get' then
+    return reactor.clipboard.get()
+  elseif command == 'put' then
+    reactor.clipboard.put(data)
+  end
+end
 
-require 'celfaces'
+do
+  local decodef = cel.color.decodef
 
-return cel
+  local function setcolor(cr, color)
+    if not color then return false end
+
+    local r, g, b, a = decodef(color)
+
+    if a == 0 then return false end
+
+    cr:set_source_rgba(r, g, b, a);
+    return true
+  end
+
+  local function clip(cr, t)  
+    cr:reset_clip(t.l, t.t, t.r, t.b)
+    cr:rectangle(t.l, t.t, t.r-t.l, t.b-t.t)
+    cr:clip()
+  end
+
+  local function strokerect(cr, x, y, w, h, r)
+    cr:rectangle(x+.5, y+.5, w-1, h-1);
+    cr:stroke()
+  end
+
+  local function fillrect(cr, x, y, w, h, r)
+    cr:rectangle(x, y, w, h);
+    cr:fill()
+  end
+
+  local function drawlinks(face, t)
+    for i = #t,1,-1 do
+      local t = t[i]
+      t.face:draw(t)
+    end
+  end
+
+  local face = cel.face {
+    font = cel.loadfont(),
+    textcolor = cel.color.encodef(1, 1, 1),
+    fillcolor = false,
+    linecolor = false,
+    draw = function(self, t)
+      local cr = self.cr
+      if setcolor(cr, self.fillcolor) then
+        clip(cr, t.clip)
+        fillrect(cr, t.x, t.y, t.w, t.h)
+      end
+      if setcolor(cr, self.linecolor) then
+        clip(cr, t.clip)
+        strokerect(cr, t.x, t.y, t.w, t.h)
+      end
+      return drawlinks(self, t)
+    end
+  }
+
+  driver.hook = {
+    root = driver.root:newroot():link(driver.root, 'edges');
+    drawroot = function(cr, t)
+      t.description.face:draw(t.description)
+    end;
+
+    graphics = {
+      setcolor = setcolor,
+      fillrect = fillrect,
+      strokerect = strokerect,
+      clip = clip,
+    };
+  }
+end
+
+return driver.hook

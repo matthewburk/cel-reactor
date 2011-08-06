@@ -16,19 +16,12 @@ do
   end
 end
 
-local cel = require 'celdriver'
+local celdriver = require 'celdriver'
+local cel = require 'cel'
+require 'celfaces'
 
-
---[[begtime = begtime = reactor.timermillis()
-function elapsedtime()
-  return (reactor.timermillis() - begtime)/1000
-end
---]]
-
-function reactor.load(...)
-  reactor.cel.load() 
-
-  local root = reactor.celroot
+function celdriver.load(...)
+  local root = celdriver.root
 
   local sandbox = cel.new(100, 100, cel.color.encode(1, 1, 1))
 

@@ -1,114 +1,17 @@
-local M = {}
-
+local celdriver = require 'celdriver'
 local cel = require 'cel'
 
-do
-  local decode = cel.color.decode
-  function M.setcolor(cr, color)
-    assert(type(cr) == 'userdata')
-    if not color then 
-      return false
-    end
-    local r, g, b, a = decode(color)
-    if a == 0 then
-      return false
-    end
+local setcolor = celdriver.graphics.setcolor
+local fillrect = celdriver.graphics.fillrect
+local strokerect = celdriver.graphics.strokerect
+local clip = celdriver.graphics.clip
+local encodef = cel.color.encodef
 
-    cr:set_source_rgba (r/255, g/255, b/255, a/255);
-    return true
-  end
-end
-
-function M.clip(cr, t)  
-  cr:reset_clip(t.l, t.t, t.r, t.b)
-  cr:rectangle(t.l, t.t, t.r-t.l, t.b-t.t)
-  cr:clip()
-end
-
-function M.strokerect(cr, x, y, w, h, r)
-  cr:rectangle(x+.5, y+.5, w-1, h-1);
-  cr:stroke()
-end
-
-function M.fillrect(cr, x, y, w, h, r)
-  cr:rectangle(x, y, w, h);
-  cr:fill()
-end
-
-function M.drawlinks(face, t)
+local drawlinks = function(face, t)
   for i = #t,1,-1 do
     local t = t[i]
     t.face:draw(t)
   end
-end
-
-local drawlinks = M.drawlinks
-local setcolor = M.setcolor
-local fillrect = M.fillrect
-local strokerect = M.strokerect
-local clip = M.clip
-
-local newcolor = cel.color.encode
-
-
-function reactor.cel.drawcolor(face, t)
-  local cr = face.cr
-  clip(cr, t.clip)
-  if setcolor(cr, face.fillcolor) then
-    fillrect(cr, t.x, t.y, t.w, t.h)
-  end
-  return drawlinks(face, t)
-end
-
-do --cel face
-  local center = function(hw, hh, x, y, w, h) return (hw - w)/2, (hh - h)/2, w, h end
-
-  local face = cel.face {
-    font = cel.loadfont(),
-    textcolor = newcolor(1, 1, 1),
-    fillcolor = newcolor(.7, .7, .7),
-    linecolor = newcolor(.5, .5, .5),
-  }
-
-  function face:draw(t)
-    local cr = self.cr
-    clip(cr, t.clip)
-    setcolor(cr, self.linecolor)
-    strokerect(cr, t.x, t.y, t.w, t.h)
-
-    local font = t.font or self.font
-    local string = t.metacel
-    local stringw, stringh = font:measure(string)
-    local stringh = font:height()
-    local x, y = center(t.w, t.h, 0, 0, stringw, stringh)
-    setcolor(cr, self.textcolor)
-    font:printlt(cr, t.x + math.floor(x), t.y + math.floor(y), string)
-    return drawlinks(self, t)
-  end
-
-  ---[[
-  function face:draw(t)
-    local cr = self.cr
-    if self.color then
-      if setcolor(cr, self.color) then
-        clip(cr, t.clip)
-        fillrect(cr, t.x, t.y, t.w, t.h)
-      else
-        if setcolor(cr, self.fillcolor) then
-          clip(cr, t.clip)
-          fillrect(cr, t.x, t.y, t.w, t.h)
-        end
-        if setcolor(cr, self.linecolor) then
-          clip(cr, t.clip)
-          strokerect(cr, t.x, t.y, t.w, t.h)
-        end
-      end
-    else
-
-    end
-    return drawlinks(self, t)
-  end
-  --]]
 end
 
 do --cel@circle
@@ -116,7 +19,7 @@ do --cel@circle
     name = '@circle',
     fillcolor = false,
     linecolor = false,
-    color = newcolor(0, 0, 0)
+    color = encodef(0, 0, 0)
   }
 
   function face:draw(t)
@@ -167,7 +70,7 @@ do --label
     metacel = 'label',
     fillcolor = false,
     linecolor = false, 
-    textcolor = cel.color.encode(0, 0, 0),
+    textcolor = cel.color.encodef(0, 0, 0),
     layout = {
       padding = {
         l = 1,
@@ -198,7 +101,7 @@ do --label
     metacel = 'label',
     name = cel.menu,
     font = cel.loadfont('arial', 10);
-    textcolor = newcolor(0, 0, 0),
+    textcolor = encodef(0, 0, 0),
   }
 
   --[[
@@ -206,8 +109,8 @@ do --label
     metacel = 'label',
     name = cel.root,
     font = cel.loadfont('arial', 12);
-    textcolor = newcolor(0, 0, 0),
-    fillcolor = newcolor(1, 1, 1),
+    textcolor = encodef(0, 0, 0),
+    fillcolor = encodef(1, 1, 1),
   }
   --]]
 end
@@ -217,7 +120,7 @@ do --text
     metacel = 'text',
     fillcolor = false,
     linecolor = false,
-    textcolor = newcolor(0, 0, 0),
+    textcolor = encodef(0, 0, 0),
     font = cel.loadfont('monospace', 10)
   }
 
@@ -254,10 +157,10 @@ end
 do --button
   local face = cel.face {
     metacel = 'button',
-    fillcolor = newcolor(.5, .5, .9),
-    lightcolor = newcolor(.8, .8, .8),
-    darkcolor = newcolor(.1, .1, .1),      
-    hovercolor = newcolor(.5, .8, .5),
+    fillcolor = encodef(.5, .5, .9),
+    lightcolor = encodef(.8, .8, .8),
+    darkcolor = encodef(.1, .1, .1),      
+    hovercolor = encodef(.5, .8, .5),
     cornerradius = 0,
     bordersize = 1,
   }
@@ -430,8 +333,8 @@ do --scroll
 
   cel.face {
     metacel = 'scroll.bar',
-    fillcolor = newcolor(118/255, 151/255, 193/255),
-    linecolor = newcolor(178/255, 208/255, 246/255),
+    fillcolor = encodef(118/255, 151/255, 193/255),
+    linecolor = encodef(178/255, 208/255, 246/255),
     draw = function(self, t)
       local cr = self.cr
       if setcolor(cr, self.fillcolor) then
@@ -456,8 +359,8 @@ do --scroll
   do
     local face = cel.face {
       metacel = 'scroll.bar.dec',
-      linecolor = newcolor(89/255, 105/255, 145/255),
-      fillcolor = newcolor(178/255, 208/255, 246/255),
+      linecolor = encodef(89/255, 105/255, 145/255),
+      fillcolor = encodef(178/255, 208/255, 246/255),
     }
 
     function face:draw(t)
@@ -496,8 +399,8 @@ do --scroll
   do
     local face = cel.face {
       metacel = 'scroll.bar.inc',
-      linecolor = newcolor(89/255, 105/255, 145/255),
-      fillcolor = newcolor(178/255, 208/255, 246/255),
+      linecolor = encodef(89/255, 105/255, 145/255),
+      fillcolor = encodef(178/255, 208/255, 246/255),
     }
 
     function face:draw(t)
@@ -535,8 +438,8 @@ do --scroll
 
   cel.face {
     metacel = 'scroll.bar.slider',
-    fillcolor = newcolor(189/255, 202/255, 219/255),
-    linecolor = newcolor(89/255, 105/255, 145/255),
+    fillcolor = encodef(189/255, 202/255, 219/255),
+    linecolor = encodef(89/255, 105/255, 145/255),
     
     draw = function(self, t)
       local size = t.host.host.size
@@ -564,10 +467,10 @@ end
 do --window
   local face = cel.face {
     metacel = 'window',
-    fillcolor = newcolor(1, 1, 1),
-    focuscolor = newcolor(0, 0, 1),
-    hovercolor = newcolor(.5, 1, .3),
-    linecolor = newcolor(1, 0, 0),
+    fillcolor = encodef(1, 1, 1),
+    focuscolor = encodef(0, 0, 1),
+    hovercolor = encodef(.5, 1, .3),
+    linecolor = encodef(1, 0, 0),
     flow = {
       minimize = cel.flows.linear(200),
       maximize = cel.flows.linear(200),
@@ -596,8 +499,8 @@ do --window
   do --window@handle
     local face = cel.face {
       metacel = 'window.handle',
-      fillcolor = newcolor(.1, .1, 1),
-      textcolor = newcolor(.5, .5, 1),
+      fillcolor = encodef(.1, .1, 1),
+      textcolor = encodef(.5, .5, 1),
     }
 
     function face:draw(t)
@@ -618,7 +521,7 @@ do --window
   do --window@border, window@corner
     local face = cel.face {
       metacels = {'window.border', 'window.corner'},
-      grabcolor = newcolor(123, 231, 132),
+      grabcolor = encodef(123, 231, 132),
 
       draw = function(self, t)
         local cr = self.cr
@@ -640,7 +543,7 @@ do --window
   do --window@client
     local face = cel.face { 
       metacel = 'window.client',
-      fillcolor = newcolor(1, 1, 1),
+      fillcolor = encodef(1, 1, 1),
     }
 
     function face:draw(t)
@@ -673,7 +576,7 @@ do --listbox
   do
     local face = cel.face {
       metacel = 'listbox.portal',
-      fillcolor = cel.color.encode(1, 1, 1),
+      fillcolor = cel.color.encodef(1, 1, 1),
       linecolor = false, 
     }
 
@@ -716,9 +619,9 @@ do --listbox
       metacel = 'listbox.itembox', --this metacel does not exist
       fillcolor = false,
       linecolor = false,
-      selectedcolor = cel.color.encode(0, 0, .7, .1),
-      currentcolor = cel.color.encode(0, 0, .7, .1),
-      hovercolor = cel.color.encode(0, 0, .7, .1),
+      selectedcolor = cel.color.encodef(0, 0, .7, .1),
+      currentcolor = cel.color.encodef(0, 0, .7, .1),
+      hovercolor = cel.color.encodef(0, 0, .7, .1),
     }
 
     function face:draw(t)
@@ -753,9 +656,9 @@ do --editbox
   local face = cel.face {
     metacel = 'editbox',
     fillcolor = false,
-    linecolor = cel.color.encode(0, 0, 0),
-    textcolor = newcolor(0, 0, 0),
-    selectedcolor = newcolor(0, 0, 1),
+    linecolor = cel.color.encodef(0, 0, 0),
+    textcolor = encodef(0, 0, 0),
+    selectedcolor = encodef(0, 0, 1),
     font = cel.loadfont('times new roman', 30),
     layout = {
       text = {
@@ -785,7 +688,7 @@ do --editbox
       metacel = 'editbox.text',
       fillcolor = false,
       linecolor = false,
-      textcolor = newcolor(0, 0, 0),
+      textcolor = encodef(0, 0, 0),
       font = cel.loadfont('monospace', 10)
     }
 
@@ -821,10 +724,10 @@ end
 do --editbox
   local face = cel.face {
     metacel = 'editbox',
-    fillcolor = newcolor(1, 1, 1),
-    linecolor = newcolor(1, 0, 1),
-    textcolor = newcolor(0, 0, 0),
-    selectedcolor = newcolor(0, 0, 1),
+    fillcolor = encodef(1, 1, 1),
+    linecolor = encodef(1, 0, 1),
+    textcolor = encodef(0, 0, 0),
+    selectedcolor = encodef(0, 0, 1),
   }
 
   function face:draw(t)
@@ -878,8 +781,8 @@ end
 do --border
   local face = cel.face {
     metacel = 'border',
-    fillcolor = newcolor(.7, .7, .7, .5),
-    linecolor = false, --reactor.graphics.newcolor(0, 0, 1),
+    fillcolor = encodef(.7, .7, .7, .5),
+    linecolor = false, --reactor.graphics.encodef(0, 0, 1),
     cornerradius = 4,
   }
 
@@ -906,7 +809,7 @@ end
 do --document.section
   local face = cel.face {
     metacel = 'document.section',
-    fillcolor = newcolor(.7, .7, .7, .5),
+    fillcolor = encodef(.7, .7, .7, .5),
     linecolor = false, 
     cornerradius = 4,
   }
@@ -947,8 +850,8 @@ end
 do --menu
     local menu = cel.face {
       metacel = 'menu',
-      fillcolor = newcolor(1, 1, 1),
-      linecolor = newcolor(0, 1, 1),
+      fillcolor = encodef(1, 1, 1),
+      linecolor = encodef(0, 1, 1),
       options = {
         showdelay = 200;
         hidedelay = 200;
@@ -991,8 +894,8 @@ do --menu
       local item = cel.face {
         metacel = 'menu.slot',
         font = cel.face.get().font,
-        altcolor = newcolor(1, 1, .5, .5),
-        textcolor = newcolor(0, 0, 0),
+        altcolor = encodef(1, 1, .5, .5),
+        textcolor = encodef(0, 0, 0),
       }
 
       function item:draw(t)
@@ -1019,7 +922,7 @@ do --menu
       local divider = cel.face {
         metacel = 'cel';
         name = cel.menu.divider;
-        fillcolor = newcolor(.8, .8, .8);
+        fillcolor = encodef(.8, .8, .8);
       }
 
       function divider:draw(t)
@@ -1031,4 +934,3 @@ do --menu
       end
     end
   end
-return M
