@@ -1,11 +1,34 @@
 local cel = require 'cel'
 
 return function(root)
-
   local cels = {}
 
+  local app = cel.newnamespace {
+    new = function(metacel, ...)
+      if metacel ~= 'cel' then
+        return cel[metacel].new(...)
+      else
+        return cel.new(...)
+      end
+    end,
+
+    compile = function(metacel, t)
+      if metacel ~= 'cel' then
+        local ret = cel[metacel](t)
+        if t.__name then cels[t.__name] = ret end
+        return ret
+      else
+        return cel(t)
+      end
+    end,
+  }
+
+  function app.find(name)
+    return cels[name]
+  end
+
   root {
-    cel.window {
+    app.window {
       link = {nil, 20, 20};
       w = 200, 
       h = 400, 
@@ -15,11 +38,11 @@ return function(root)
         window:adddefaultcontrols()
       end,
 
-      cel.listbox {
+      app.listbox {
         link = 'edges',
         function(lb)
           for i = 1, 20 do
-            local button = cel.textbutton.new('button in a listbox'):link(lb, 'width')
+            local button = app.textbutton.new('button in a listbox'):link(lb, 'width')
             button.onclick = button.unlink
           end
         end
@@ -36,14 +59,14 @@ return function(root)
         window:adddefaultcontrols()
       end,
 
-      cel.row {
+      app.row {
         link = 'edges';
         {
-          cel.sequence.y {
+          app.sequence.y {
             function(sequence)
-              local button = cel.textbutton.new('remove'):link(sequence, 'width')
+              local button = app.textbutton.new('remove'):link(sequence, 'width')
               function button:onclick()
-                local lb = cels['basic listbox']
+                local lb = app.find 'basic listbox'
                 
                 for item in lb:items('selected') do
                   print(item)
@@ -54,8 +77,8 @@ return function(root)
           }
         },
         { weight = 1,
-          cel.listbox {
-            function(self) cels['basic listbox'] = self end;
+          app.listbox {
+            __name = 'basic listbox';
 
             link = 'edges';
             'this',
@@ -68,7 +91,7 @@ return function(root)
             onmousedown = function(lb, button, x, y, intercepted)
               if not intercepted then
                 local item, index = lb:pick(x, y)
-                lb:select(index)
+                lb:select(item)
               end
             end,
             onchange = print,

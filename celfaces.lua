@@ -14,6 +14,13 @@ local drawlinks = function(face, t)
   end
 end
 
+_G.colorface = function(...)
+  local color = encodef(...)
+  return cel.face {
+    name = color .. '__#color_#__face',
+    fillcolor = color,
+  }
+end
 do --cel@circle
   local face = cel.face {
     name = '@circle',

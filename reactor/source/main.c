@@ -160,7 +160,8 @@ static int traceback (lua_State *L) {
 
 static int docall (lua_State *L, int narg, int nresults) {
   int status;
-  int base = lua_gettop(L) - narg;  /* function index */
+  int top = lua_gettop(L);
+  int base = top - narg;  /* function index */
   //TODO pushing traceback causes huge memory leak
   lua_pushcfunction(L, traceback);  /* push traceback function */
   lua_insert(L, base);  /* put it under chunk and args */
@@ -647,14 +648,19 @@ static int reactor_run(lua_State* L)
 		  reactor.fps = frames / 1;
 		frames = 0;
 		prevtime = currtime;
-	  }
-        
-        a = lua_gettop(L);
+    a = lua_gettop(L);
         reactor_update(L);    
         b = lua_gettop(L);
         reactor_render(L);
         c = lua_gettop(L);
         //DBG_PRINT(("lua_stack"), "a, b, c = %d, %d, %d\n", a, b, c);
+	  }
+    else {
+      reactor_update(L);
+      reactor_render(L);
+    }
+        
+        
       }     
     }
     else {

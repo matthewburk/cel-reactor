@@ -19,31 +19,67 @@ end
 local celdriver = require 'celdriver'
 local cel = require 'cel'
 require 'celfaces'
+local app
+
+do
+  local cels = {}
+
+  app = cel.newnamespace {
+    new = function(metacel, ...)
+      if metacel ~= 'cel' then
+        return cel[metacel].new(...)
+      else
+        return cel.new(...)
+      end
+    end,
+
+    compile = function(metacel, t)
+      if metacel ~= 'cel' then
+        local ret = cel[metacel](t)
+        if t.__name then cels[t.__name] = ret end
+        return ret
+      else
+        return cel(t)
+      end
+    end,
+  }
+
+  function app.find(name)
+    return cels[name]
+  end
+end
+
 
 function celdriver.load(...)
   local root = celdriver.root
 
-  local sandbox = cel.new(100, 100, cel.color.encode(1, 1, 1))
+  local sandbox = cel.mutexpanel.new(100, 100)
 
   local function addmodule(name)
     local button = cel.textbutton.new(name)
-    function button:onclick(b)
-      if sandbox.inner then
-        sandbox.inner:unlink()
+    function button:onclick()
+
+      if not self.subject then
+        self.subject =  root:newroot() 
+        sandbox:show(self.subject, 'edges')
+
+        local sub = require(name)
+
+        local begtime = reactor.timermillis()
+        sub(self.subject)
+        print('TIME = ', (reactor.timermillis() - begtime)/1000)
+      else
+        sandbox:show(self.subject, 'edges')
       end
 
-      sandbox.inner = root:newroot():link(sandbox, 'edges') 
-      local sub = require(name)
 
-      local begtime = reactor.timermillis()
-      sub(sandbox.inner)
-      print('TIME = ', (reactor.timermillis() - begtime)/1000)
     end
 
     return button
   end
 
   local modules = cel.sequence.y {
+    {link = 'width'; addmodule'demo.tabpanel.basic'},
     {link = 'width'; addmodule'demo.listbox.basic'},
     {link = 'width'; addmodule'demo.listbox.listboxtest'},
     {link = 'width'; addmodule'test.sequencetest'},

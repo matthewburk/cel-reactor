@@ -1,0 +1,2 @@
+TODO:
+1. Supply function to getwindowclient rect, another function to translate mouse coords into that rect
