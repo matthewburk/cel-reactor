@@ -68,7 +68,7 @@ return function(root)
               function button:onclick()
                 local lb = app.find 'basic listbox'
                 
-                for item in lb:items('selected') do
+                for item in lb:selecteditems() do
                   print(item)
                   item:unlink()
                 end
@@ -76,7 +76,7 @@ return function(root)
             end
           }
         },
-        { weight = 1,
+        { flex = 1,
           app.listbox {
             __name = 'basic listbox';
 

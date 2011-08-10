@@ -79,6 +79,7 @@ function celdriver.load(...)
   end
 
   local modules = cel.sequence.y {
+    {link = 'width'; addmodule'demo.col.basic'},
     {link = 'width'; addmodule'demo.tabpanel.basic'},
     {link = 'width'; addmodule'demo.listbox.basic'},
     {link = 'width'; addmodule'demo.listbox.listboxtest'},
@@ -123,7 +124,7 @@ function celdriver.load(...)
       { link = 'edges';
         modules 
       },
-      { link = 'edges'; weight=1,
+      { link = 'edges'; flex=1,
         sandbox,
       },
     },

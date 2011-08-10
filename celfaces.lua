@@ -310,8 +310,8 @@ do --scroll
     linecolor = false,
     flow = {
       scroll = cel.flows.linear(200);
-      --showybar = cel.flows.linear(500);
-      --hideybar = cel.flows.linear(100);
+      showybar = cel.flows.linear(500);
+      hideybar = cel.flows.linear(500);
       --showxbar = cel.flows.linear(500);
       --hidexbar = cel.flows.linear(100);
     };
@@ -941,3 +941,8 @@ do --menu
       end
     end
   end
+
+  cel.face {
+    metacel = 'printbuffer',
+    font = cel.loadfont('code', 12),
+  }
