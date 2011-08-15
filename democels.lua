@@ -16,9 +16,8 @@ do
   end
 end
 
-local celdriver = require 'celdriver'
+local celdriver = require 'celrender'
 local cel = require 'cel'
-require 'celfaces'
 local app
 
 do
@@ -59,6 +58,11 @@ function celdriver.load(...)
     local button = cel.textbutton.new(name)
     function button:onclick()
 
+      if self.subject then
+        sandbox:clear(self.subject)
+        self.subject = nil
+      end
+
       if not self.subject then
         self.subject =  root:newroot() 
         sandbox:show(self.subject, 'edges')
@@ -79,6 +83,7 @@ function celdriver.load(...)
   end
 
   local modules = cel.sequence.y {
+    {link = 'width'; addmodule'test.sequence.basic'},
     {link = 'width'; addmodule'demo.col.basic'},
     {link = 'width'; addmodule'demo.tabpanel.basic'},
     {link = 'width'; addmodule'demo.listbox.basic'},

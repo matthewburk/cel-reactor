@@ -7,9 +7,9 @@ return function(root)
     gap = 10,
   }:link(window, 'edges')
 
-  cel.window.new(100, 100, '4'):link(row, nil, nil, nil, function() return 0, 1 end)
-  cel.textbutton.new('3'):link(row, nil, nil, nil, function() return 0, 1 end)
-  cel.textbutton.new('2'):link(row, nil, nil, nil, function() return 0, 1 end)
-  cel.textbutton.new('1'):link(row, nil, nil, nil, function() return 0, 1 end)
+  local linker = cel.composelinker('width', 'center')
+  cel.text.new('hello this is some text that will hopefully wrap'):link(row, linker, nil, nil, {flex=1})
+  cel.window.new():link(row, 5, 20, {flex=1}):move(10, 10)
+
 end
 

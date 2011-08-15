@@ -65,10 +65,11 @@ do --root
   end
 end
 
-do --sequence
-  cel.face {
-    metacels = {'sequence.y', 'sequence.x'},
-    draw = drawlinks,
+--[====[
+do
+  local face = cel.face {
+    metacel = 'row.slot',
+    linecolor = cel.color.encodef(1, 0, 0),
   }
 end
 
@@ -122,44 +123,7 @@ do --label
   --]]
 end
 
-do --text
-  local face = cel.face {
-    metacel = 'text',
-    fillcolor = false,
-    linecolor = false,
-    textcolor = encodef(0, 0, 0),
-    font = cel.loadfont('monospace', 10)
-  }
 
-  function face:draw(t, cr)
-    local cr = self.cr
-    if setcolor(cr, self.fillcolor) then
-      clip(cr, t.clip)
-      fillrect(cr, t.x, t.y, t.w, t.h)
-    end
-    if setcolor(cr, self.textcolor) then
-      clip(cr, t.clip)
-      for i, line in ipairs(t.lines) do
-        --uncomment this optimization later
-        --if t.y + line.y < t.clip.b  and t.y + line.y + line.h > t.clip.t then
-          t.font:print(cr, t.x + line.penx, t.y + line.peny, t.text, line.i, line.j)
-        --end
-      end
-    end
-    if t.caret then 
-      local line = t.caretline
-      setcolor(cr, self.textcolor)
-      strokerect(cr, t.x + t.caretx - 1, t.y + line.y, 1, line.h)
-    end
-    
-    if setcolor(cr, self.linecolor) then
-      clip(cr, t.clip)
-      strokerect(cr, t.x, t.y, t.w, t.h)
-    end
-    
-    return drawlinks(self, t, cr)
-  end
-end
 
 do --button
   local face = cel.face {
@@ -266,6 +230,50 @@ do --textbutton
       end
     end
 
+    return drawlinks(self, t, cr)
+  end
+end
+
+do --text
+  local face = cel.face {
+    metacel = 'text',
+    fillcolor = false,
+    linecolor = cel.color.encodef(1, 0, 1),
+    textcolor = encodef(0, 0, 0),
+    font = cel.loadfont('monospace', 10),
+    layout = {
+      padding = {
+        l = function(w, h, font) return font.bbox.ymax * .1 end,
+      }
+    }
+  }
+
+  function face:draw(t, cr)
+    local cr = self.cr
+    if setcolor(cr, self.fillcolor) then
+      clip(cr, t.clip)
+      fillrect(cr, t.x, t.y, t.w, t.h)
+    end
+    if setcolor(cr, self.textcolor) then
+      clip(cr, t.clip)
+      for i, line in ipairs(t.lines) do
+        --uncomment this optimization later
+        --if t.y + line.y < t.clip.b  and t.y + line.y + line.h > t.clip.t then
+          t.font:print(cr, t.x + line.penx, t.y + line.peny, t.text, line.i, line.j)
+        --end
+      end
+    end
+    if t.caret then 
+      local line = t.caretline
+      setcolor(cr, self.textcolor)
+      strokerect(cr, t.x + t.caretx - 1, t.y + line.y, 1, line.h)
+    end
+    
+    if setcolor(cr, self.linecolor) then
+      clip(cr, t.clip)
+      strokerect(cr, t.x, t.y, t.w, t.h)
+    end
+    
     return drawlinks(self, t, cr)
   end
 end
@@ -470,6 +478,7 @@ do --scroll
     end,
   }
 end
+  --]====]
 
 do --window
   local face = cel.face {
