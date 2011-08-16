@@ -405,5 +405,6 @@ require('cel.faces.text')(driver.hook.graphics)
 require('cel.faces.grip')(driver.hook.graphics)
 require('cel.faces.scroll')(driver.hook.graphics)
 require('cel.faces.window')(driver.hook.graphics)
+require('cel.faces.menu')(driver.hook.graphics)
 
 return driver.hook
