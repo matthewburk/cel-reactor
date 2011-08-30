@@ -28,8 +28,8 @@ return function(root)
   end
 
   root {
+    link = {nil, 20, 20};
     app.window {
-      link = {nil, 20, 20};
       w = 200, 
       h = 400, 
       title = 'A simple listbox';
@@ -38,8 +38,8 @@ return function(root)
         window:adddefaultcontrols()
       end,
 
+      link = 'edges',
       app.listbox {
-        link = 'edges',
         function(lb)
           for i = 1, 20 do
             local button = app.textbutton.new('button in a listbox'):link(lb, 'width')
@@ -51,16 +51,16 @@ return function(root)
   }
 
   root {
+    link = {nil, 40, 40};
     cel.window {
-      link = {nil, 40, 40};
       w = 200, h = 400, title = 'A simple listbox';
 
       function(window)
         window:adddefaultcontrols()
       end,
 
+      link = 'edges';
       app.row {
-        link = 'edges';
         {
           app.sequence.y {
             function(sequence)

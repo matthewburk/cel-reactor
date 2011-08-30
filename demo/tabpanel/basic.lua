@@ -15,8 +15,8 @@ end
 
 return function(root)
   root {
+    link = {nil, 40, 40};
     cel.window {
-      link = {nil, 40, 40};
       w = 400, h = 400, title = 'tabs';
 
       function(window)

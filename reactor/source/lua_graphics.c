@@ -235,6 +235,18 @@ typedef struct image {
   cairo_t* cr;
 } image_t;
 
+
+//* size is the size of the area you would like to update
+//* sourceRes is the resolution of the entire source image (can be larger, but not smaller than size)
+//* sourceOfs is the offset into the source image
+//* destOfs is the offset into the destination texture
+
+//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//glPixelStorei(GL_UNPACK_ROW_LENGTH, sourceRes.width);
+//pixel_type *Source = SourceImage + sourceOfs.x + sourceOfs.y * sourceRes.width;
+//glTexSubImage2D(GL_TEXTURE_2D, 0, destOfs.x, destOfs.y, size.x, size.y, ..., Source);
+
+
 //upload surface data to texture
 static int graphics_update_texture(lua_State* L) {
   texture_t* texture = check_texture(L, 1);

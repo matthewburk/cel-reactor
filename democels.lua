@@ -9,7 +9,13 @@ do
   print(package.cpath)
 
   if jit then
-    jit.opt.start( 'maxside=10', 'hotloop=5', 'loopunroll=32', 'maxsnap=250', 'tryside=2')
+    jit.opt.start( 
+      'maxside=10',
+      'hotloop=5',
+      'loopunroll=32',
+      'maxsnap=500',
+      'tryside=5'
+      )
     print('JIT')
   else
     print('NO JIT')
@@ -54,26 +60,31 @@ function celdriver.load(...)
 
   local sandbox = cel.mutexpanel.new(100, 100)
 
+  local subject = nil
+
   local function addmodule(name)
     local button = cel.textbutton.new(name)
-    function button:onclick()
 
-      if self.subject then
-        sandbox:clear(self.subject)
-        self.subject = nil
+    function button:onclick()
+      if subject then
+        sandbox:clear(subject)
+        subject = nil
       end
 
-      if not self.subject then
-        self.subject =  root:newroot() 
-        sandbox:show(self.subject, 'edges')
+      if not subject then
+        subject =  root:newroot() 
+        sandbox:show(subject, 'edges')
 
         local sub = require(name)
 
+        --collectgarbage('stop')
         local begtime = reactor.timermillis()
-        sub(self.subject)
+        sub(subject)
         print('TIME = ', (reactor.timermillis() - begtime)/1000)
+        --collectgarbage('restart')
+        --collectgarbage('collect')
       else
-        sandbox:show(self.subject, 'edges')
+        sandbox:show(subject, 'edges')
       end
 
 
@@ -82,56 +93,62 @@ function celdriver.load(...)
     return button
   end
 
-  local modules = cel.sequence.y {
-    {link = 'width'; addmodule'test.sequence.basic'},
-    {link = 'width'; addmodule'demo.col.basic'},
-    {link = 'width'; addmodule'demo.tabpanel.basic'},
-    {link = 'width'; addmodule'demo.listbox.basic'},
-    {link = 'width'; addmodule'demo.listbox.listboxtest'},
-    {link = 'width'; addmodule'test.sequencetest'},
-    {link = 'width'; addmodule'test.rowtest'},
-    {link = 'width'; addmodule'test.gridtest'},
-    {link = 'width'; addmodule'test.menutest'},
-    {link = 'width'; addmodule'test.listboxtest'},
-    {link = 'width'; addmodule'test.windowtest'},
-    {link = 'width'; addmodule'test.printbuffertest'},
-    {link = 'width'; addmodule'tutorial.tut_cel'},
-    {link = 'width';
-      cel.textbutton {
-        text = 'PRINT';
-        onclick = function()
-          cel.printdescription()
-        end
-      }
-    };
-    {link = 'width';
-      cel.textbutton {
-        text = 'FULL GC';
-        onclick = function()
-          collectgarbage('collect')
-          print( tostring(collectgarbage('count') / 1000))
-        end
-      }
-    };
-    {link = 'width';
-      cel.textbutton {
-        text = 'MEM USAGE';
-        onclick = function()
-          print( tostring(collectgarbage('count') / 1000))
-        end
-      }
-    };
+  local modules = cel.col {
+    link = 'width';
+
+    addmodule'test.row.row',
+    addmodule'test.row.minw',
+    addmodule'test.row.flex',
+    addmodule'test.row.big',
+    addmodule'test.col.big',
+    addmodule'test.formations.withoutlimits',
+    addmodule'test.scroll.basic',
+    addmodule'test.listbox.basic',
+    addmodule'test.listbox.listboxtest',
+    addmodule'test.listbox.big',
+    addmodule'test.formations.basic',
+    addmodule'demo.col.basic',
+    addmodule'demo.tabpanel.basic',
+    addmodule'test.coltest',
+    addmodule'test.gridtest',
+    addmodule'test.menutest',
+    addmodule'test.listboxtest',
+    addmodule'test.windowtest',
+    addmodule'test.printbuffertest',
+    addmodule'tutorial.tut_cel',
+    cel.textbutton {
+      text = 'PRINT';
+      onclick = function()
+        cel.printdescription()
+      end
+    },
+    cel.textbutton {
+      text = 'FULL GC';
+      onclick = function()
+        collectgarbage('collect')
+        print( tostring(collectgarbage('count') / 1024))
+      end,
+      onhold = function()
+        collectgarbage('collect')
+        print( tostring(collectgarbage('count') / 1024))
+      end
+    },
+    cel.textbutton {
+      text = 'MEM USAGE';
+      onclick = function()
+        print( tostring(collectgarbage('count') / 1024))
+      end,
+      onhold = function()
+        print( tostring(collectgarbage('count') / 1024))
+      end
+    },
   }
 
   root {
+    link = 'edges';
     cel.row {
-      link = 'edges';
-      { link = 'edges';
-        modules 
-      },
-      { link = 'edges'; flex=1,
-        sandbox,
-      },
+      { modules, link = 'edges'; },
+      { sandbox, link = 'edges'; flex=1; },
     },
   }
 end

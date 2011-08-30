@@ -163,7 +163,8 @@ static int docall (lua_State *L, int narg, int nresults) {
   int top = lua_gettop(L);
   int base = top - narg;  /* function index */
   //TODO pushing traceback causes huge memory leak
-  lua_pushcfunction(L, traceback);  /* push traceback function */
+  lua_getglobal(L, "errorfunc");
+  //lua_pushcfunction(L, traceback);  /* push traceback function */
   lua_insert(L, base);  /* put it under chunk and args */
   status = lua_pcall(L, narg, nresults, base);
   lua_remove(L, base);  /* remove traceback function */
@@ -534,6 +535,8 @@ static void reactor_update(lua_State* L)
     lua_pop(L, 2);
   }
 
+  //printf("from C %d\n", lua_gc(L, LUA_GCCOUNT, 0));
+
   DBG_RETURN_VOID();
 }
 
@@ -722,6 +725,9 @@ int main( int argc, char* argv[] )
 
   L = lua_open(); 
   luaL_openlibs(L);
+
+  lua_pushcfunction(L, traceback);
+  lua_setglobal(L, "errorfunc");
 
   {
     lua_pushcfunction(L, luaopen_reactor);    

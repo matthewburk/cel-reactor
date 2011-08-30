@@ -279,8 +279,14 @@ function reactor.draw()
   reactor.graphics.popstate()
 end
 
-function reactor.update(fps)
-  driver.timer(reactor.timermillis());
+do
+  local lastfps
+  function reactor.update(fps)
+    if fps ~= lastfps then
+      lastfps = fps
+    end
+    driver.timer(reactor.timermillis());
+  end
 end
 
 function driver.clipboard(command, data)
