@@ -996,6 +996,17 @@ static int cairo_rotate_L(lua_State* L) {
   DBG_RETURN(0);
 }
 
+static int cairo_identity_matrix_L(lua_State* L) {    
+  reactor_cairo_t* rcr = 0;
+  cairo_t* cr = 0;
+  DBG_ENTER();
+  checkself_cairo(L, &rcr, &cr);
+  {
+    cairo_identity_matrix(cr);
+  }
+  DBG_RETURN(0);
+}
+
 
 void luaopen_cairo(lua_State* L) 
 {
@@ -1068,7 +1079,8 @@ void luaopen_cairo(lua_State* L)
       {"text_extents", cairo_text_extents_L}, 
       {"scale", cairo_scale_L}, 
       {"translate", cairo_translate_L}, 
-      {"rotate", cairo_rotate_L},     
+      {"rotate", cairo_rotate_L},    
+      {"identity_matrix", cairo_identity_matrix_L},  
       {0, 0}
     };
 
@@ -1139,7 +1151,8 @@ void luaopen_cairo(lua_State* L)
       {"text_extents", cairo_text_extents_L}, 
       {"scale", cairo_scale_L}, 
       {"translate", cairo_translate_L}, 
-      {"rotate", cairo_rotate_L},     
+      {"rotate", cairo_rotate_L},  
+      {"identity_matrix", cairo_identity_matrix_L},  
       {NULL, NULL}
     };
     luaL_newmetatable(L, "reactor_cairo_t");

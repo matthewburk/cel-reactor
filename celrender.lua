@@ -18,14 +18,12 @@ end
 local decodef = cel.color.decodef
 local function setcolor(color)
   if not color then return false end
-  local r, g, b, a = decodef(color)
-  if a == 0 then return false end
-  cr:set_source_rgba(r, g, b, a);
+  cr:set_source_rgba(decodef(color))
   return true
 end
 
 local function clip(t)  
-  cr:reset_clip(t.l, t.t, t.r, t.b)
+  cr:reset_clip()
   cr:rectangle(t.l, t.t, t.r-t.l, t.b-t.t)
   cr:clip()
 end
@@ -409,8 +407,11 @@ require('cel.faces.textbutton')(driver.hook.graphics)
 require('cel.faces.label')(driver.hook.graphics)
 require('cel.faces.text')(driver.hook.graphics)
 require('cel.faces.grip')(driver.hook.graphics)
-require('cel.faces.scroll')(driver.hook.graphics)
 require('cel.faces.window')(driver.hook.graphics)
+require('cel.faces.scroll')(driver.hook.graphics)
+require('cel.faces.listbox')(driver.hook.graphics)
+--[[
 require('cel.faces.menu')(driver.hook.graphics)
+--]]
 
 return driver.hook

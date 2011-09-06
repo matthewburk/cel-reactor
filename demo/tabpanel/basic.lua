@@ -1,16 +1,16 @@
 local cel = require 'cel'
 
-local function newtabhandle(tabs, name)
-  local button = cel.textbutton.new(name)
-  function button:onmousedown()
-    tabs:selecttab(name)
-  end
-  return button
-end
-
 local function newtabsubject(name)
   local window = cel.window.new(300, 300, name)
   return window
+end
+
+local function newtabselect(tabpanel, name)
+  local b =  cel.textbutton.new(name)
+  function b:onmousedown()
+    tabpanel:selecttab(name)
+  end
+  return b
 end
 
 return function(root)
@@ -22,13 +22,24 @@ return function(root)
       function(window)
         window:adddefaultcontrols()
 
-        local tabs = cel.tabpanel.new()
+        local tabpanel = cel.tabpanel.new()
 
-        tabs:link(window, 'edges')
 
-        tabs:addtab('a', newtabhandle(tabs, 'a'), newtabsubject('a') )
-        tabs:addtab('b', newtabhandle(tabs, 'b'), newtabsubject('b') )
-        tabs:addtab('c', newtabhandle(tabs, 'c'), newtabsubject('c') )
+        tabpanel:addtab('a', newtabsubject('a') )
+        tabpanel:addtab('b', newtabsubject('b') )
+        tabpanel:addtab('c', newtabsubject('c') )
+
+        cel.col {
+          link = 'edges',
+          cel.row {
+            newtabselect(tabpanel, 'a'),
+            newtabselect(tabpanel, 'b'),
+            newtabselect(tabpanel, 'c'),
+          },
+          { flex = 1,
+            tabpanel,
+          },
+        }:link(window, 'edges')
       end,
     }
   }

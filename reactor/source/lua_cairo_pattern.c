@@ -113,12 +113,39 @@ static int cairo_pattern_destroy_L(lua_State* L) {
   DBG_RETURN(0);
 }
 
+static int cairo_pattern_add_color_stop_L(lua_State* L) {
+  cairo_pattern_t* pattern = check_cairo_pattern(L, 1);
+  double alpha = luaL_optnumber(L, 6, -3);
+
+  if (alpha == -3) {
+    cairo_pattern_add_color_stop_rgb(
+      pattern,
+      luaL_checknumber(L, 2),
+      luaL_checknumber(L, 3),
+      luaL_checknumber(L, 4),
+      luaL_checknumber(L, 5));
+  }
+  else {
+    cairo_pattern_add_color_stop_rgba(
+      pattern,
+      luaL_checknumber(L, 2),
+      luaL_checknumber(L, 3),
+      luaL_checknumber(L, 4),
+      luaL_checknumber(L, 5),
+      alpha);
+  }
+
+  return 0;
+}
+
+
 void luaopen_cairo_pattern(lua_State* L) {
   DBG_ENTER();
   {  
     static const luaL_reg pattern_functions[] = {
       {"__gc", cairo_pattern__gc_L},
-      {"destroy", cairo_pattern_destroy_L},    
+      {"destroy", cairo_pattern_destroy_L},  
+      {"add_color_stop", cairo_pattern_add_color_stop_L},
       {NULL, NULL}
     }; 
 

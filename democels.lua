@@ -72,8 +72,9 @@ function celdriver.load(...)
       end
 
       if not subject then
-        subject =  root:newroot() 
-        sandbox:show(subject, 'edges')
+        subject =  root:newroot()
+        subject:link(sandbox, 'edges')
+        sandbox:show(subject)
 
         local sub = require(name)
 
@@ -84,7 +85,7 @@ function celdriver.load(...)
         --collectgarbage('restart')
         --collectgarbage('collect')
       else
-        sandbox:show(subject, 'edges')
+        sandbox:show(subject)
       end
 
 
@@ -107,7 +108,7 @@ function celdriver.load(...)
     addmodule'test.listbox.listboxtest',
     addmodule'test.listbox.big',
     addmodule'test.formations.basic',
-    addmodule'demo.col.basic',
+    addmodule'demo.cairo.buttons',
     addmodule'demo.tabpanel.basic',
     addmodule'test.coltest',
     addmodule'test.gridtest',
