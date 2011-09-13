@@ -108,8 +108,7 @@ function celdriver.load(...)
     addmodule'test.listbox.listboxtest',
     addmodule'test.listbox.big',
     addmodule'test.formations.basic',
-    addmodule'demo.cairo.buttons',
-    addmodule'demo.tabpanel.basic',
+    addmodule'test.tabpanel.basic',
     addmodule'test.coltest',
     addmodule'test.gridtest',
     addmodule'test.menutest',
@@ -117,6 +116,7 @@ function celdriver.load(...)
     addmodule'test.windowtest',
     addmodule'test.printbuffertest',
     addmodule'tutorial.tut_cel',
+    addmodule'demo.cairo.buttons',
     cel.textbutton {
       text = 'PRINT';
       onclick = function()
@@ -152,6 +152,28 @@ function celdriver.load(...)
       { sandbox, link = 'edges'; flex=1; },
     },
   }
+
+  --[[
+  local function memusage()
+    print( tostring(collectgarbage('count') / 1024))
+    cel.doafter(100, memusage)
+  end
+  cel.doafter(1000, memusage)
+  --]]
+
+  do
+    local _update = reactor.update
+    local i = 0
+    function reactor.update(...)
+      _update(...)
+      i = i + 1
+
+      if i % 10000 == 0 then
+        print( tostring(collectgarbage('count') / 1024))
+        i = 0
+      end
+    end
+  end
 end
 
 
