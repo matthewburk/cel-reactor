@@ -8,7 +8,7 @@ local function clip(t, cr)
 end
 
 do
-  local face = cel.getmetaface('button'):new()
+  local face = cel.getface('button'):new()
 
   face.color = cel.color.encodef(0, 1, 1)
 

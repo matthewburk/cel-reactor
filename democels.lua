@@ -5,8 +5,8 @@ do
   end
 
   package.path = 'cel/?.lua;cel/?/init.lua;' .. package.path
-  print(package.path)
-  print(package.cpath)
+  print('PATH=', package.path)
+  print('CPATH=', package.cpath)
 
   if jit then
     jit.opt.start( 
@@ -21,6 +21,8 @@ do
     print('NO JIT')
   end
 end
+
+local lfs = require 'lfs'
 
 local celdriver = require 'celrender'
 local cel = require 'cel'
@@ -97,16 +99,19 @@ function celdriver.load(...)
   local modules = cel.col {
     link = 'width';
 
+    addmodule'test.col.flux',
+    addmodule'test.col.sort',
+    addmodule'test.col.big',
     addmodule'test.row.row',
     addmodule'test.row.minw',
     addmodule'test.row.flex',
     addmodule'test.row.big',
-    addmodule'test.col.big',
     addmodule'test.formations.withoutlimits',
     addmodule'test.scroll.basic',
     addmodule'test.listbox.basic',
     addmodule'test.listbox.listboxtest',
     addmodule'test.listbox.big',
+    addmodule'test.listbox.sort',
     addmodule'test.formations.basic',
     addmodule'test.tabpanel.basic',
     addmodule'test.coltest',
@@ -173,6 +178,10 @@ function celdriver.load(...)
         i = 0
       end
     end
+  end
+
+  for name in lfs.dir(lfs.currentdir()) do
+    print(name)
   end
 end
 
