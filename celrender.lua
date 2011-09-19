@@ -378,7 +378,7 @@ function driver.loadfont(name, weight, slant, size)
 end
 
 driver.hook = {
-  root = driver.root:newroot():link(driver.root, 'edges');
+  root = driver.root:newroot():link(driver.root, 'edges'),
 
   drawroot = function(t)
     t.description.face:draw(t.description)
@@ -400,6 +400,8 @@ driver.hook = {
     restore = restore,
   };
 }
+
+driver.hook.root:takefocus()
 
 require('cel.faces.cel')(driver.hook.graphics)
 require('cel.faces.button')(driver.hook.graphics)

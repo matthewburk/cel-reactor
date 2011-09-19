@@ -23,6 +23,7 @@
 #include "lua_cairo.h"
 #include <signal.h>
 #include <math.h>
+#include <windows.h>
 
 #define M_PI           3.14159265358979323846
 
@@ -182,7 +183,7 @@ static int docall (lua_State *L, int narg, int nresults) {
 
 static void appeventreactor( const app_event_t* event, void* userdata )
 {
-  app_bounds_t bounds = {200, 200, 800, 600};
+  app_bounds_t bounds = {0, 0, 1280, 1024};
   int nargs = 0;
   int ltop;
 
@@ -590,7 +591,7 @@ static void resizeviewport( uint32_t width, uint32_t height )
 static int reactor_timermillis(lua_State* L)
 {
   DBG_ENTER();
-  lua_pushnumber(L, sys_timer_milliseconds(reactor.timer ));  
+  lua_pushnumber(L, timeGetTime());  
   DBG_RETURN(1);
 }
 
@@ -602,10 +603,21 @@ static int reactor_quit(lua_State* L)
   DBG_RETURN(0);
 }
 
+static int reactor_localtime(lua_State* L) {
+  SYSTEMTIME time;
+  GetLocalTime(&time);
+
+  lua_pushnumber(L, time.wHour);
+  lua_pushnumber(L, time.wMinute);
+  lua_pushnumber(L, time.wSecond);
+  lua_pushnumber(L, time.wMilliseconds);
+  return 4;
+}
+
 
 static int reactor_run(lua_State* L) 
 {
-  app_bounds_t bounds = {200, 200, 800, 600};
+  app_bounds_t bounds = {0, 0, 1280, 1024};
   app_pixelformat_t format = {8, 8, 8, 8, 32};
   size_t currtime = 0;
   size_t prevtime = 0;
@@ -617,8 +629,7 @@ static int reactor_run(lua_State* L)
   DBG_ENTER();
 
   reactor.window = app_window_create( "reactor", APP_WINDOWSTYLE_RESIZEBORDER, &bounds, &format );
-  reactor.context = app_context_create( reactor.window );
-//  reactor.font = gfx_font_create( "data/fonts/default.ttf", 12 );
+  reactor.context = app_context_create( reactor.window );  
   reactor.timer = sys_timer_create();
 
   app_window_addlistener( reactor.window, appeventreactor, &reactor );
@@ -637,51 +648,27 @@ static int reactor_run(lua_State* L)
 
   while ( app_window_listen( reactor.window ) ) {
     if ( app_window_isactive( reactor.window ) ) {
-      {
-        int a, b, c;
-        if (reactor.device) {
-          //aud_device_update(reactor.device);
-        }
+      frames++;
 
-		frames++;
+      currtime = timeGetTime();
 
-		currtime = sys_timer_milliseconds( reactor.timer );
+      if ( 1000 < ( currtime - prevtime ) ) {
+        reactor.fps = frames / 1;
+        frames = 0;
+        prevtime = currtime;
+      }
 
-	  if ( 1000 < ( currtime - prevtime ) ) {
-		  reactor.fps = frames / 1;
-		frames = 0;
-		prevtime = currtime;
-    a = lua_gettop(L);
-        reactor_update(L);    
-        b = lua_gettop(L);
-        reactor_render(L);
-        c = lua_gettop(L);
-        //DBG_PRINT(("lua_stack"), "a, b, c = %d, %d, %d\n", a, b, c);
-	  }
-    else {
       reactor_update(L);
       reactor_render(L);
-    }
-        
-        
-      }     
     }
     else {
       if ( !app_window_wait( reactor.window ) ) {
         break;
       }
     }    
-  }
+  } 
 
-  //TODO call reactor.onunload
-
-  if (reactor.device) {
-    //aud_device_destroy(reactor.device);
-    reactor.device = 0;
-  }
-
-  sys_timer_destroy(reactor.timer);
-//  gfx_font_destroy( reactor.font );
+  sys_timer_destroy(reactor.timer);  
   app_context_destroy( reactor.context );
   app_window_destroy( reactor.window );
 
@@ -693,6 +680,7 @@ static int luaopen_reactor(lua_State* L)
   static const luaL_reg reactor_L[] = {
     {"quit", reactor_quit},  
     {"timermillis", reactor_timermillis},
+    {"localtime", reactor_localtime},    
     {0, 0}
   };
 
@@ -735,9 +723,11 @@ int main( int argc, char* argv[] )
   }
   
   {
+    timeBeginPeriod(1);
     lua_pushcfunction(L, reactor_run);
     lua_pushstring(L, argv[1]);
     docall(L, 1, 0);
+    timeEndPeriod(1);
   }
 
   lua_close(L);

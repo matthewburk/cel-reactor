@@ -850,6 +850,9 @@ static int cairo_set_font_options_L(lua_State* L) {
     if (luaL_optstring(L, 2, 0))
       cairo_font_options_set_antialias(options, luaL_checkoption(L, 2, "default", antialias_options));
 
+
+    //cairo_font_options_set_hint_metrics (options, CAIRO_HINT_METRICS_OFF);
+
     cairo_set_font_options(cr, options);
     cairo_font_options_destroy(options);
   }

@@ -146,7 +146,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="cairo.lib lua51.lib tk-dbg.lib tk-sys.lib tk-mat.lib tk-app.lib tk-gfx.lib opengl32.lib"
+				AdditionalDependencies="Winmm.lib cairo.lib lua51.lib tk-dbg.lib tk-sys.lib tk-mat.lib tk-app.lib tk-gfx.lib opengl32.lib"
 				OutputFile="$(ProjectDir)\..\bin\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib"

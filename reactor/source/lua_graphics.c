@@ -181,6 +181,8 @@ static int graphics_clear(lua_State* L) {
   return 0;
 }
 
+static GLuint lastid = -1;
+
 //texture or texturerect
 //x -] destination rect
 //y
@@ -201,7 +203,11 @@ static int graphics_draw_texture(lua_State* L) {
   glLoadIdentity ();
   glPushMatrix ();
 
-  glBindTexture (GL_TEXTURE_2D, texture->id);
+  if (texture->id != lastid) {
+    glBindTexture (GL_TEXTURE_2D, texture->id);
+  }
+
+  lastid = texture->id;
 
   glBegin( GL_QUADS ); {
     float x1, y1, x2, y2;
@@ -252,11 +258,43 @@ static int graphics_update_texture(lua_State* L) {
   texture_t* texture = check_texture(L, 1);
   reactor_cairo_surface_t* surface = check_reactor_cairo_surface(L, 2);
 
-  glBindTexture (GL_TEXTURE_2D, texture->id);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->w, surface->h, GL_BGRA, GL_UNSIGNED_BYTE, surface->data);
+  if (texture->id != lastid) {
+    glBindTexture (GL_TEXTURE_2D, texture->id);
+  }
+
+  lastid = texture->id;
+
+  if lua_isnoneornil(L, 3) {
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->w, surface->h, GL_BGRA, GL_UNSIGNED_BYTE, surface->data);
+  }
+  else{
+    int imagex, imagey, w, h, texturex, texturey;
+    unsigned char* data;
+
+    imagex = luaL_checkint(L, 3);
+    imagey = luaL_checkint(L, 4);
+    w = luaL_checkint(L, 5);
+    h = luaL_checkint(L, 6);
+    texturex = luaL_optint(L, 7, imagex);
+    texturey = luaL_optint(L, 8, imagey);
+
+    if ( w < 1 || h < 1 ) {
+      return 0;
+    }
+
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, surface->w);
+    data = surface->data + (imagex + (imagey * surface->w))*4;
+
+    glTexSubImage2D(GL_TEXTURE_2D, 0, texturex, texturey, w, h, GL_BGRA, GL_UNSIGNED_BYTE, data);
+
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+  }
 
   return 0;
 }
+
 
 int luaopen_reactor_graphics(lua_State* L) {
   DBG_ENTER();

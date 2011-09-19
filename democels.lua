@@ -76,7 +76,7 @@ function celdriver.load(...)
       if not subject then
         subject =  root:newroot()
         subject:link(sandbox, 'edges')
-        sandbox:show(subject)
+        sandbox:select(subject)
 
         local sub = require(name)
 
@@ -87,7 +87,7 @@ function celdriver.load(...)
         --collectgarbage('restart')
         --collectgarbage('collect')
       else
-        sandbox:show(subject)
+        sandbox:select(subject)
       end
 
 
@@ -99,6 +99,7 @@ function celdriver.load(...)
   local modules = cel.col {
     link = 'width';
 
+    addmodule'test.document.basic',
     addmodule'test.col.flux',
     addmodule'test.col.sort',
     addmodule'test.col.big',
@@ -180,8 +181,22 @@ function celdriver.load(...)
     end
   end
 
+  --[[
   for name in lfs.dir(lfs.currentdir()) do
     print(name)
+  end
+  --]]
+
+  function root:onkeydown(key, ...)
+    if key == ' ' then
+      cel.printdescription()
+    elseif key == 'f1' then
+      reactor.fullscreen(true)
+    elseif key == 'f2' then
+      reactor.fullscreen(false)
+    elseif key == 'escape' then
+      reactor.quit()
+    end
   end
 end
 
