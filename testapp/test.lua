@@ -3,62 +3,32 @@ do
   function print(...)
     _print(...) io.flush() 
   end
+end
 
-  package.path = 'cel/?.lua;cel/?/init.lua;' .. package.path
-  print('PATH=', package.path)
-  print('CPATH=', package.cpath)
+for i, v in ipairs{'..', '../cel'} do
+  package.path = v .. '/?.lua;' .. v .. '/?/init.lua;' .. package.path
+end
 
-  if jit then
-    jit.opt.start( 
-      'maxside=10',
-      'hotloop=5',
-      'loopunroll=32',
-      'maxsnap=500',
-      'tryside=5'
-      )
-    print('JIT')
-  else
-    print('NO JIT')
-  end
+if jit then
+  print('JIT')
+  jit.opt.start( 
+    'maxside=10',
+    'hotloop=5',
+    'loopunroll=32',
+    'maxsnap=500',
+    'tryside=5'
+    )
+else
+  print('NO JIT')
 end
 
 local lfs = require 'lfs'
-
-local celdriver = require 'celrender'
 local cel = require 'cel'
-local app
+local driver = require 'driver'
+local faces = require 'faces'
 
-do
-  local cels = {}
-
-  app = cel.newnamespace {
-    new = function(metacel, ...)
-      if metacel ~= 'cel' then
-        return cel[metacel].new(...)
-      else
-        return cel.new(...)
-      end
-    end,
-
-    compile = function(metacel, t)
-      if metacel ~= 'cel' then
-        local ret = cel[metacel](t)
-        if t.__name then cels[t.__name] = ret end
-        return ret
-      else
-        return cel(t)
-      end
-    end,
-  }
-
-  function app.find(name)
-    return cels[name]
-  end
-end
-
-
-function celdriver.load(...)
-  local root = celdriver.root
+function driver.load(...)
+  local root = driver.root
 
   local sandbox = cel.mutexpanel.new(100, 100)
 
@@ -99,6 +69,8 @@ function celdriver.load(...)
   local modules = cel.col {
     link = 'width';
 
+    addmodule'airspeedtest',
+    addmodule'altimetertest',
     addmodule'test.document.basic',
     addmodule'test.col.flux',
     addmodule'test.col.sort',
@@ -198,6 +170,10 @@ function celdriver.load(...)
       reactor.quit()
     end
   end
+end
+
+function driver.draw(t, changed)
+  return faces.draw(t, changed)
 end
 
 

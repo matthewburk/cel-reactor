@@ -192,16 +192,18 @@ static GLuint lastid = -1;
 //y position in texture, from topleft
 static int graphics_draw_texture(lua_State* L) {
   texture_t* texture = check_texture(L, 1);
-  int x = luaL_checkint(L, 2);
-  int y = luaL_checkint(L, 3);
-  int w = luaL_checkint(L, 4);
-  int h = luaL_checkint(L, 5);
+  double x = luaL_checknumber(L, 2);
+  double y = luaL_checknumber(L, 3);
+  double w = luaL_checknumber(L, 4);
+  double h = luaL_checknumber(L, 5);
   int tx = luaL_optint(L, 6, 0);
   int ty = luaL_optint(L, 7, 0);
+  int tw = luaL_optint(L, 8, texture->w);
+  int th = luaL_optint(L, 9, texture->h);
   
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
-  glPushMatrix ();
+  //glMatrixMode (GL_MODELVIEW);
+  //glLoadIdentity ();
+  //glPushMatrix ();
 
   if (texture->id != lastid) {
     glBindTexture (GL_TEXTURE_2D, texture->id);
@@ -213,23 +215,23 @@ static int graphics_draw_texture(lua_State* L) {
     float x1, y1, x2, y2;
     x1 = (float)tx/texture->w;
     y1 = (float)ty/texture->h;
-    x2 = ((float)(tx + w))/texture->w;
-    y2 = (float)(ty + h)/texture->h;
+    x2 = ((float)(tx + tw))/texture->w;
+    y2 = (float)(ty + th)/texture->h;
 
-    glTexCoord2f (x1, y1);
-    glVertex2i( x, y );
+    glTexCoord2f(x1, y1);
+    glVertex2d( x, y );
 
     glTexCoord2f (x1, y2);
-    glVertex2i( x, y + h );
+    glVertex2d( x, y + h );
 
     glTexCoord2f (x2, y2);
-    glVertex2i( x + w, y + h );
+    glVertex2d( x + w, y + h );
 
     glTexCoord2f (x2, y1);
-    glVertex2i( x + w, y );	
+    glVertex2d( x + w, y );	
   } glEnd();
 
-  glPopMatrix();
+  //glPopMatrix();
   return 0;
 }
 
@@ -295,6 +297,44 @@ static int graphics_update_texture(lua_State* L) {
   return 0;
 }
 
+static int glRotate_L(lua_State* L) {
+  GLdouble angle = luaL_checknumber(L, 1);
+  GLdouble x = luaL_optnumber(L, 2, 0);
+  GLdouble y = luaL_optnumber(L, 3, 0);
+  GLdouble z = luaL_optnumber(L, 4, 1);
+  glRotated(angle, x, y, z);
+  return 0;
+}
+
+static int glTranslate_L(lua_State* L) {  
+  GLdouble x = luaL_checknumber(L, 1, 0);
+  GLdouble y = luaL_checknumber(L, 2, 0);  
+  glTranslated(x, y, 0);
+  return 0;
+}
+
+static int glScale_L(lua_State* L) {  
+  GLdouble x = luaL_checknumber(L, 1, 0);
+  GLdouble y = luaL_checknumber(L, 2, 0);  
+  glScaled(x, y, 1);
+  return 0;
+}
+
+static int glPushMatrix_L(lua_State* L) {
+  glPushMatrix();
+  return 0;
+}
+
+static int glPopMatrix_L(lua_State* L) {
+  glPopMatrix();
+  return 0;
+}
+
+static int glLoadIdentity_L(lua_State* L) {
+  glLoadIdentity();
+  return 0;
+}
+
 
 int luaopen_reactor_graphics(lua_State* L) {
   DBG_ENTER();
@@ -313,6 +353,12 @@ int luaopen_reactor_graphics(lua_State* L) {
       {"clear", graphics_clear},        
       {"drawtexture", graphics_draw_texture},
       {"updatetexture", graphics_update_texture},
+      {"rotate", glRotate_L},
+      {"translate", glTranslate_L},
+      {"scale", glScale_L},
+      {"pushmatrix", glPushMatrix_L},
+      {"popmatrix", glPopMatrix_L},
+      {"loadidentity", glLoadIdentity_L},      
       {NULL, NULL}
     };
 

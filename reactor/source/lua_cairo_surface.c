@@ -72,18 +72,29 @@ static int cairo_surface_destroy_L(lua_State* L) {
   DBG_RETURN(0);
 }
 
+static int cairo_surface_get_size_L(lua_State* L) {
+  cairo_surface_t* surface = check_cairo_surface(L, 1);
+  
+  lua_pushnumber(L, cairo_image_surface_get_width(surface));
+  lua_pushnumber(L, cairo_image_surface_get_height(surface));
+  return 2;  
+}
+
+
 void luaopen_cairo_surface(lua_State* L) {
   DBG_ENTER();
   {  
     static const luaL_reg surface_functions[] = {
       {"__gc", cairo_surface__gc_L},
       {"destroy", cairo_surface_destroy_L},    
+      {"get_size", cairo_surface_get_size_L},    
       {NULL, NULL}
     }; 
 
     static const luaL_reg module_functions[] = {
       {"create", cairo_image_surface_create_L}, 
-      {"destroy", cairo_surface_destroy_L},       
+      {"destroy", cairo_surface_destroy_L},      
+      {"get_size", cairo_surface_get_size_L},    
       {NULL, NULL}
     };
 
