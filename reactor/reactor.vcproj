@@ -127,7 +127,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="include;include/lua;include/cairo"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_BIND_TO_CURRENT_CRT_VERSION"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_BIND_TO_CURRENT_CRT_VERSION;$(NOINHERIT)"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -146,7 +146,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Winmm.lib cairo.lib lua51.lib tk-dbg.lib tk-sys.lib tk-mat.lib tk-app.lib tk-gfx.lib opengl32.lib"
+				AdditionalDependencies="Winmm.lib cairo.lib lua51.lib tk-dbg.lib opengl32.lib"
 				OutputFile="$(ProjectDir)\..\bin\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib"
@@ -188,7 +188,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\source\lua_audio.c"
+				RelativePath=".\source\driver.c"
+				>
+			</File>
+			<File
+				RelativePath=".\source\gl.c"
 				>
 			</File>
 			<File
@@ -220,7 +224,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\source\main.c"
+				RelativePath=".\source\reactor.c"
 				>
 			</File>
 		</Filter>
@@ -230,11 +234,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\source\gl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\source\lua_cairo.h"
 				>
 			</File>
 			<File
 				RelativePath=".\source\reactor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\source\reactor_graphics.h"
 				>
 			</File>
 		</Filter>

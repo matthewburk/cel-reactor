@@ -5,52 +5,37 @@
 extern "C" {
 #endif
 
-#include <toolkits/dbg/debug.h>
-#include <toolkits/app/context.h>
-#include <toolkits/gfx/graphics.h>
-#include <toolkits/sys/timer.h>
-#include <toolkits/aud/audio.h>
-#include <toolkits/aud/device.h>
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+extern void reactor_driver_get_windowrect(int* x, int* y, int* w, int* h);
+extern int reactor_driver_quit(void);
+extern int reactor_driver_fullscreen(int fullscreen);
+extern unsigned long reactor_driver_millis(void);
+extern void reactor_driver_systemtime(int* hour, int* min, int* sec, int* milli);
+extern void reactor_driver_localtime(int* hour, int* min, int* sec, int* milli);
 
-struct reactor
-{
-  app_window_t* window;
-  app_context_t* context;
-  sys_timer_t* timer;
-  aud_device_t* device;
-  int loaded; 
-  int w;
-  int h;
-  double fps;
-};
+void reactor_winevent(const char* name);
+void reactor_command(const char* command);
+void reactor_mousedblclick(int x, int y, const char* button, int alt, int ctrl, int shift);
+void reactor_mousedown(int x, int y, const char* button, int alt, int ctrl, int shift);
+void reactor_mouseup(int x, int y, const char* button, int alt, int ctrl, int shift);
+void reactor_mousewheel(int x, int y, int delta, int step, int alt, int ctrl, int shift);
+void reactor_mousemove(int x, int y, int alt, int ctrl, int shift);
+void reactor_char(int c);
+void reactor_mouseexit(void);
+void reactor_mouseenter(void);
+void reactor_keydown(const char* key, int alt, int ctrl, int shift);
+void reactor_keypress(const char* key, int alt, int ctrl, int shift);
+void reactor_keyup(const char* key, int alt, int ctrl, int shift);
+void reactor_init(int argc, char* argv[]);
+void reactor_exit(void);
+void reactor_paint(void);
+void reactor_update(void);
 
-extern struct reactor reactor;
-
-typedef struct texture {
-  GLuint id;
-  int w;
-  int h;
-} texture_t;
-
-typedef struct texture_rect {
-  texture_t* source;
+extern struct reactor {
   int x;
   int y;
   int w;
   int h;
-} texture_rect_t;
-
-
-void checkself_texture(lua_State* L, texture_t** rpp);
-
-texture_t* check_texture(lua_State* L, int arg);
-
-int luaopen_reactor_clipboard(lua_State* L);
-int luaopen_reactor_graphics(lua_State* L);
-int luaopen_reactor_audio(lua_State* L);
+} reactor;
 
 #ifdef __cplusplus
 }

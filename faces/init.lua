@@ -101,9 +101,9 @@ do --cel face
 
   face.font = cel.loadfont('arial')
   face.textcolor = cel.color.encodef(1, 1, 1)
-  face.fillcolor = cel.color.encodef(0, 0, 0)
+  face.fillcolor = false --cel.color.encodef(0, 0, 0)
   face.linecolor = cel.color.encodef(1, 1, 1)
-  face.linewidth = 1
+  face.linewidth = 1 
   face.radius = false
 
   function face.draw(f, t)
@@ -118,7 +118,8 @@ do --cel face
     if f.linewidth and f.linecolor then
       cairo.set_line_width(cr, f.linewidth)
       cairo.cel_set_source_rgba(cr, f.linecolor)
-      cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+      local _, offset = math.modf(f.linewidth/2)
+      cairo.cel_roundrect(cr, 0 +offset, 0 + offset, t.w, t.h, f.radius)
       cairo.stroke(cr)
     end
 
@@ -126,6 +127,8 @@ do --cel face
   end
 end
 
+cel.getface('col').draw = function(f, t) return drawlinks(t) end
+cel.getface('row').draw = function(f, t) return drawlinks(t) end
 cel.getface('col.slot').draw = function(f, t) return drawlinks(t) end
 cel.getface('row.slot').draw = function(f, t) return drawlinks(t) end
 
@@ -152,7 +155,11 @@ local function init(f, w, h)
 end
 
 local function lerp(a, b, p)
-  return a + p * (b -a)
+  return a + p * (b - a)
+end
+
+local function smoothstep(a, b, p)
+  return lerp(a, b, p*p*(3-2*p))
 end
 
 local function rlerp(a, b, c)
@@ -160,6 +167,7 @@ local function rlerp(a, b, c)
 end
 
 function root.draw(f, t)
+  local tbeg = reactor.timermillis()
   init(f, t.w, t.h)
   local cr = f.cr
 
@@ -187,9 +195,14 @@ function root.draw(f, t)
   cairo.set_line_width(cr, 4)
   cairo.fill(cr)
   --]]
+  --
+
+   print('cairo took', reactor.timermillis() - tbeg)
 
 
+  local tbeg = reactor.timermillis()
   reactor.graphics.updatetexture(f.texture, f.surface, ur.l, ur.t, ur.r-ur.l, ur.b-ur.t)
+  print('updatetexture took', reactor.timermillis() - tbeg)
 
 
 
@@ -200,6 +213,7 @@ function root.draw(f, t)
   reactor.graphics.scale(t.w, t.h)
   reactor.graphics.drawtexture(f.texture, -.5, -.5, 1, 1, 0, 0, t.w, t.h)
   reactor.graphics.popmatrix()
+
 end
 
 require('faces.button')(_ENV)
@@ -218,7 +232,7 @@ require('faces.airspeed')(_ENV)
 return {
   draw = function(t, changed)
     _ENV.description = t
-    if changed or true then
+    if changed then
       root.draw(root, t.description)
     end
   end

@@ -1,10 +1,7 @@
 #include <stdlib.h>
-#include <toolkits/dbg/debug.h>
-#include <toolkits/app/gl.h>
-#include <toolkits/gfx/graphics.h>
-#include <toolkits/gfx/texture.h>
-#include "reactor.h"
 #include <math.h>
+#include <debug.h>
+#include "reactor_graphics.h"
 #include "lua_cairo.h"
 
 static char* drawmodes[] = {
@@ -52,117 +49,151 @@ static int clamp(int v, int min, int max) {
 
 #define M_PI 3.14159f
 
-static void drawroundrect2d(int x,int y,int w,int h,int radius)
-{
-  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_COLOR_BUFFER_BIT);
-  glDisable(GL_TEXTURE_2D);
-  glShadeModel(GL_SMOOTH);
-  glEnable(GL_POLYGON_SMOOTH);
-  glHint(GL_POLYGON_SMOOTH, GL_NICEST);
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  //glColor4ub(clrColor.r,clrColor.g,clrColor.b,clrColor.a);
-
-  glBegin(GL_POLYGON);
-  glVertex2i(x+radius,y);
-  glVertex2i(x+w-radius,y);
-
-  {
-    float i;
-    for(i=(float)M_PI*1.5f; i<M_PI*2; i+=0.1f ) {
-      glVertex2f(x+w-radius+cos(i)*radius,y+radius+sin(i)*radius);
-    }
-    glVertex2i(x+w,y+radius);
-    glVertex2i(x+w,y+h-radius);
-    for(i=0;i<(float)M_PI*0.5f;i+=0.1f)
-      glVertex2f(x+w-radius+cos(i)*radius,y+h-radius+sin(i)*radius);
-    glVertex2i(x+w-radius,y+h);
-    glVertex2i(x+radius,y+h);
-    for(i=(float)M_PI*0.5f;i<M_PI;i+=0.1f)
-      glVertex2f(x+radius+cos(i)*radius,y+h-radius+sin(i)*radius);
-    glVertex2i(x,y+h-radius);
-    glVertex2i(x,y+radius);
-    for(i=(float)M_PI;i<M_PI*1.5f;i+=0.1f)
-      glVertex2f(x+radius+cos(i)*radius,y+radius+sin(i)*radius);
-  }
-  glEnd();
-
-  glPopAttrib();
-}
-
-static void strokeroundrect2d(int x,int y,int w,int h,int radius) 
-{  
-  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_COLOR_BUFFER_BIT);
-  glDisable(GL_TEXTURE_2D);
-  glShadeModel(GL_SMOOTH);
-  glHint(GL_LINE_SMOOTH, GL_NICEST);
-  glEnable(GL_LINE_SMOOTH);
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);	
-  glLineWidth((GLfloat)1);
-
-  w--;
-  h--;
-  glBegin(GL_LINE_STRIP);
-  {
-    float i;
-    for(i=(float)M_PI;i<=1.5f*M_PI;i+=0.1f)
-      glVertex2f(radius*cos(i)+x+radius,radius*sin(i)+y+radius);
-    for(i=1.5f*(float)M_PI;i<=2*M_PI; i+=0.1f)
-      glVertex2f(radius*cos(i)+x+w-radius,radius*sin(i)+y+radius);
-    for(i=0;i<=0.5f*M_PI; i+=0.1f)
-      glVertex2f(radius*cos(i)+x+w-radius,radius*sin(i)+y+h-radius);
-    for(i=0.5f*(float)M_PI;i<=M_PI;i+=0.1f) 
-      glVertex2f(radius*cos(i)+x+radius,radius*sin(i)+y+h-radius);
-    glVertex2i(x,y+radius);
-  }
-  glEnd();
-
-  glPopAttrib();
-}
-
-static int graphics_rect(lua_State* L, gfx_drawmode2d_t mode) {
-  int32_t x = luaL_checkint(L, 1);
-  int32_t y = luaL_checkint(L, 2);
-  int32_t w = clamp(luaL_checkint(L, 3), 0, 0x7fffffff);
-  int32_t h = clamp(luaL_checkint(L, 4), 0, 0x7fffffff);
-  uint32_t radius = luaL_optint(L, 5, 0);
-
-  if (radius > 0) {
-    if (mode == GFX_DRAWMODE2D_FILL) {
-      drawroundrect2d(x, y, w, h, radius);  
-    }
-    else {
-      strokeroundrect2d(x, y, w, h, radius);
-    }
-  }
-  else {
-    gfx_drawrectangle2d(x, y, w, h, mode);
-  }   
-  return 0;
-}
-
-static int graphics_strokerect(lua_State* L) {
-  return graphics_rect(L, GFX_DRAWMODE2D_LINE);
-}
-
-static int graphics_fillrect(lua_State* L) {
-  return graphics_rect(L, GFX_DRAWMODE2D_FILL);
-}
+//static void drawroundrect2d(int x,int y,int w,int h,int radius)
+//{
+//  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_COLOR_BUFFER_BIT);
+//  glDisable(GL_TEXTURE_2D);
+//  glShadeModel(GL_SMOOTH);
+//  glEnable(GL_POLYGON_SMOOTH);
+//  glHint(GL_POLYGON_SMOOTH, GL_NICEST);
+//
+//  glEnable(GL_BLEND);
+//  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+//  //glColor4ub(clrColor.r,clrColor.g,clrColor.b,clrColor.a);
+//
+//  glBegin(GL_POLYGON);
+//  glVertex2i(x+radius,y);
+//  glVertex2i(x+w-radius,y);
+//
+//  {
+//    float i;
+//    for(i=(float)M_PI*1.5f; i<M_PI*2; i+=0.1f ) {
+//      glVertex2f(x+w-radius+cos(i)*radius,y+radius+sin(i)*radius);
+//    }
+//    glVertex2i(x+w,y+radius);
+//    glVertex2i(x+w,y+h-radius);
+//    for(i=0;i<(float)M_PI*0.5f;i+=0.1f)
+//      glVertex2f(x+w-radius+cos(i)*radius,y+h-radius+sin(i)*radius);
+//    glVertex2i(x+w-radius,y+h);
+//    glVertex2i(x+radius,y+h);
+//    for(i=(float)M_PI*0.5f;i<M_PI;i+=0.1f)
+//      glVertex2f(x+radius+cos(i)*radius,y+h-radius+sin(i)*radius);
+//    glVertex2i(x,y+h-radius);
+//    glVertex2i(x,y+radius);
+//    for(i=(float)M_PI;i<M_PI*1.5f;i+=0.1f)
+//      glVertex2f(x+radius+cos(i)*radius,y+radius+sin(i)*radius);
+//  }
+//  glEnd();
+//
+//  glPopAttrib();
+//}
+//
+//static void strokeroundrect2d(int x,int y,int w,int h,int radius) 
+//{  
+//  glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT|GL_COLOR_BUFFER_BIT);
+//  glDisable(GL_TEXTURE_2D);
+//  glShadeModel(GL_SMOOTH);
+//  glHint(GL_LINE_SMOOTH, GL_NICEST);
+//  glEnable(GL_LINE_SMOOTH);
+//  glEnable(GL_BLEND);
+//  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);	
+//  glLineWidth((GLfloat)1);
+//
+//  w--;
+//  h--;
+//  glBegin(GL_LINE_STRIP);
+//  {
+//    float i;
+//    for(i=(float)M_PI;i<=1.5f*M_PI;i+=0.1f)
+//      glVertex2f(radius*cos(i)+x+radius,radius*sin(i)+y+radius);
+//    for(i=1.5f*(float)M_PI;i<=2*M_PI; i+=0.1f)
+//      glVertex2f(radius*cos(i)+x+w-radius,radius*sin(i)+y+radius);
+//    for(i=0;i<=0.5f*M_PI; i+=0.1f)
+//      glVertex2f(radius*cos(i)+x+w-radius,radius*sin(i)+y+h-radius);
+//    for(i=0.5f*(float)M_PI;i<=M_PI;i+=0.1f) 
+//      glVertex2f(radius*cos(i)+x+radius,radius*sin(i)+y+h-radius);
+//    glVertex2i(x,y+radius);
+//  }
+//  glEnd();
+//
+//  glPopAttrib();
+//}
+//
+//static int graphics_rect(lua_State* L, gfx_drawmode2d_t mode) {
+//  int32_t x = luaL_checkint(L, 1);
+//  int32_t y = luaL_checkint(L, 2);
+//  int32_t w = clamp(luaL_checkint(L, 3), 0, 0x7fffffff);
+//  int32_t h = clamp(luaL_checkint(L, 4), 0, 0x7fffffff);
+//  uint32_t radius = luaL_optint(L, 5, 0);
+//
+//  if (radius > 0) {
+//    if (mode == GFX_DRAWMODE2D_FILL) {
+//      drawroundrect2d(x, y, w, h, radius);  
+//    }
+//    else {
+//      strokeroundrect2d(x, y, w, h, radius);
+//    }
+//  }
+//  else {
+//    gfx_drawrectangle2d(x, y, w, h, mode);
+//  }   
+//  return 0;
+//}
+//
+//static int graphics_strokerect(lua_State* L) {
+//  return graphics_rect(L, GFX_DRAWMODE2D_LINE);
+//}
+//
+//static int graphics_fillrect(lua_State* L) {
+//  return graphics_rect(L, GFX_DRAWMODE2D_FILL);
+//}
 
 static int graphics_pushstate2d(lua_State* L) {
-  gfx_pushstate2d(luaL_checkint(L, 1),luaL_checkint(L, 2));
-  return 0;
-}
+  GLdouble width = luaL_checknumber(L, 1);
+  GLdouble height = luaL_checknumber(L, 2);
+  glPushAttrib( GL_COLOR_BUFFER_BIT | GL_ENABLE_BIT | GL_HINT_BIT | GL_SCISSOR_BIT | GL_TRANSFORM_BIT | GL_VIEWPORT_BIT );
 
-static int graphics_pushstate3d(lua_State* L) {
-  gfx_pushstate3d(luaL_checknumber(L, 1),luaL_checknumber(L, 2),luaL_checknumber(L, 3),luaL_checknumber(L, 4), luaL_checknumber(L, 5));
+  glDisable( GL_DEPTH_TEST );
+  glDisable( GL_LIGHTING );
+
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glDisable(GL_BLEND);
+
+  glEnable( GL_LINE_SMOOTH );
+  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+
+  glEnable( GL_POINT_SMOOTH );
+  glHint( GL_POINT_SMOOTH_HINT, GL_NICEST );
+
+  glEnable( GL_SCISSOR_TEST );
+  glScissor( 0, 0, (GLsizei)width, (GLsizei)height );
+
+  glEnable( GL_TEXTURE_2D );
+
+  glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+
+  glViewport( 0, 0, (GLsizei)width, (GLsizei)height );
+
+  glMatrixMode( GL_PROJECTION );
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho( 0.0f, width, height, 0.0f, -1.0f, 1.0f );
+
+  glMatrixMode( GL_MODELVIEW );
+  glPushMatrix();
+  glLoadIdentity();
   return 0;
 }
 
 static int graphics_popstate(lua_State* L) {
-  gfx_popstate();
+  glMatrixMode( GL_MODELVIEW );
+  glPopMatrix();
+
+  glMatrixMode( GL_PROJECTION );
+  glPopMatrix();
+
+  glPopAttrib();
   return 0;
 }
 
@@ -307,15 +338,15 @@ static int glRotate_L(lua_State* L) {
 }
 
 static int glTranslate_L(lua_State* L) {  
-  GLdouble x = luaL_checknumber(L, 1, 0);
-  GLdouble y = luaL_checknumber(L, 2, 0);  
+  GLdouble x = luaL_checknumber(L, 1);
+  GLdouble y = luaL_checknumber(L, 2);  
   glTranslated(x, y, 0);
   return 0;
 }
 
 static int glScale_L(lua_State* L) {  
-  GLdouble x = luaL_checknumber(L, 1, 0);
-  GLdouble y = luaL_checknumber(L, 2, 0);  
+  GLdouble x = luaL_checknumber(L, 1);
+  GLdouble y = luaL_checknumber(L, 2);  
   glScaled(x, y, 1);
   return 0;
 }
@@ -336,6 +367,7 @@ static int glLoadIdentity_L(lua_State* L) {
 }
 
 
+extern void luaopen_reactor_graphics_texture(lua_State* L);
 int luaopen_reactor_graphics(lua_State* L) {
   DBG_ENTER();
   { 
@@ -345,10 +377,10 @@ int luaopen_reactor_graphics(lua_State* L) {
       {"setcolor", graphics_setcolor},    
       {"clipxywh", graphics_clip_xywh},
       {"clipltrb", graphics_clip_ltrb},    
-      {"fillrect", graphics_fillrect},
-      {"strokerect", graphics_strokerect},
+      //{"fillrect", graphics_fillrect},
+      //{"strokerect", graphics_strokerect},
       {"pushstate2d", graphics_pushstate2d},
-      {"pushstate3d", graphics_pushstate3d},
+      //{"pushstate3d", graphics_pushstate3d},
       {"popstate", graphics_popstate},
       {"clear", graphics_clear},        
       {"drawtexture", graphics_draw_texture},

@@ -1,27 +1,18 @@
-
-#ifndef APP_GL_H
-#define APP_GL_H
-
-
-/*============================================================================================================================================================*/
-/*                                                                                                                                                           * /
-/*============================================================================================================================================================*/
-/*       1         2         3         4         5         6         7         8         9         0         1         2         3         4         5       * /
-/*345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678*/
-/*============================================================================================================================================================*/
-
-
-#include <toolkits/app/application.h>
-
+#ifndef EGL_GL_H
+#define EGL_GL_H
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stddef.h>
+
+#define SYS_API
+#define SYS_APIENTRY __stdcall
 
 #ifndef GL_VERSION_1_1
   #define GL_VERSION_1_1 1
-  #define APP_GL_VERSION_1_1_DEFINED
+  #define EGL_GL_VERSION_1_1_DEFINED
 
   #define GL_ACCUM                                                             0x0100
   #define GL_LOAD                                                              0x0101
@@ -906,7 +897,7 @@ extern "C" {
 
 #ifndef GL_VERSION_1_2
   #define GL_VERSION_1_2 1
-  #define APP_GL_VERSION_1_2_DEFINED
+  #define EGL_GL_VERSION_1_2_DEFINED
 
   #define GL_SMOOTH_POINT_SIZE_RANGE                                           0x0B12
   #define GL_SMOOTH_POINT_SIZE_GRANULARITY                                     0x0B13
@@ -950,24 +941,24 @@ extern "C" {
   #define GL_ALIASED_POINT_SIZE_RANGE                                          0x846D
   #define GL_ALIASED_LINE_WIDTH_RANGE                                          0x846E
 
-  typedef void (SYS_APIENTRY *app_glblendcolor_t)( GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha );
-  typedef void (SYS_APIENTRY *app_glblendequation_t)( GLenum mode );
-  typedef void (SYS_APIENTRY *app_glcopytexsubimage3d_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height );
-  typedef void (SYS_APIENTRY *app_gldrawrangeelements_t)( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices );
-  typedef void (SYS_APIENTRY *app_glteximage3d_t)( GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels );
-  typedef void (SYS_APIENTRY *app_gltexsubimage3d_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels );
+  typedef void (SYS_APIENTRY *EGL_glblendcolor_t)( GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha );
+  typedef void (SYS_APIENTRY *EGL_glblendequation_t)( GLenum mode );
+  typedef void (SYS_APIENTRY *EGL_glcopytexsubimage3d_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height );
+  typedef void (SYS_APIENTRY *EGL_gldrawrangeelements_t)( GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid* indices );
+  typedef void (SYS_APIENTRY *EGL_glteximage3d_t)( GLenum target, GLint level, GLint internalFormat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLenum format, GLenum type, const GLvoid* pixels );
+  typedef void (SYS_APIENTRY *EGL_gltexsubimage3d_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid* pixels );
 
-  SYS_API extern app_glblendcolor_t glBlendColor;
-  SYS_API extern app_glblendequation_t glBlendEquation;
-  SYS_API extern app_glcopytexsubimage3d_t glCopyTexSubImage3D;
-  SYS_API extern app_gldrawrangeelements_t glDrawRangeElements;
-  SYS_API extern app_glteximage3d_t glTexImage3D;
-  SYS_API extern app_gltexsubimage3d_t glTexSubImage3D;
+  SYS_API extern EGL_glblendcolor_t glBlendColor;
+  SYS_API extern EGL_glblendequation_t glBlendEquation;
+  SYS_API extern EGL_glcopytexsubimage3d_t glCopyTexSubImage3D;
+  SYS_API extern EGL_gldrawrangeelements_t glDrawRangeElements;
+  SYS_API extern EGL_glteximage3d_t glTexImage3D;
+  SYS_API extern EGL_gltexsubimage3d_t glTexSubImage3D;
 #endif
 
 #ifndef GL_VERSION_1_3
   #define GL_VERSION_1_3 1
-  #define APP_GL_VERSION_1_3_DEFINED
+  #define EGL_GL_VERSION_1_3_DEFINED
 
   #define GL_MULTISAMPLE                                                       0x809D
   #define GL_SAMPLE_ALPHA_TO_COVERAGE                                          0x809E
@@ -1066,104 +1057,104 @@ extern "C" {
   #define GL_DOT3_RGBA                                                         0x86AF
   #define GL_MULTISAMPLE_BIT                                                   0x20000000
 
-  typedef void (SYS_APIENTRY *app_glActiveTexture_t)( GLenum texture );
-  typedef void (SYS_APIENTRY *app_glClientActiveTexture_t)( GLenum texture );
-  typedef void (SYS_APIENTRY *app_glCompressedTexImage1D_t)( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glCompressedTexImage2D_t)( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glCompressedTexImage3D_t)( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glCompressedTexSubImage1D_t)( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glCompressedTexSubImage2D_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glCompressedTexSubImage3D_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glGetCompressedTexImage_t)( GLenum target, GLint level, GLvoid* img );
-  typedef void (SYS_APIENTRY *app_glLoadTransposeMatrixd_t)( const GLdouble* m );
-  typedef void (SYS_APIENTRY *app_glLoadTransposeMatrixf_t)( const GLfloat* m );
-  typedef void (SYS_APIENTRY *app_glMultTransposeMatrixd_t)( const GLdouble* m );
-  typedef void (SYS_APIENTRY *app_glMultTransposeMatrixf_t)( const GLfloat* m );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1d_t)( GLenum target, GLdouble s );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1dv_t)( GLenum target, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1f_t)( GLenum target, GLfloat s );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1fv_t)( GLenum target, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1i_t)( GLenum target, GLint s );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1iv_t)( GLenum target, const GLint* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1s_t)( GLenum target, GLshort s );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord1sv_t)( GLenum target, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2d_t)( GLenum target, GLdouble s, GLdouble t );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2dv_t)( GLenum target, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2f_t)( GLenum target, GLfloat s, GLfloat t );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2fv_t)( GLenum target, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2i_t)( GLenum target, GLint s, GLint t );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2iv_t)( GLenum target, const GLint* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2s_t)( GLenum target, GLshort s, GLshort t );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord2sv_t)( GLenum target, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3d_t)( GLenum target, GLdouble s, GLdouble t, GLdouble r );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3dv_t)( GLenum target, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3f_t)( GLenum target, GLfloat s, GLfloat t, GLfloat r );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3fv_t)( GLenum target, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3i_t)( GLenum target, GLint s, GLint t, GLint r );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3iv_t)( GLenum target, const GLint* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3s_t)( GLenum target, GLshort s, GLshort t, GLshort r );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord3sv_t)( GLenum target, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4d_t)( GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4dv_t)( GLenum target, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4f_t)( GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4fv_t)( GLenum target, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4i_t)( GLenum target, GLint s, GLint t, GLint r, GLint q );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4iv_t)( GLenum target, const GLint* v );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4s_t)( GLenum target, GLshort s, GLshort t, GLshort r, GLshort q );
-  typedef void (SYS_APIENTRY *app_glMultiTexCoord4sv_t)( GLenum target, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glSampleCoverage_t)( GLclampf value, GLboolean invert );
+  typedef void (SYS_APIENTRY *EGL_glActiveTexture_t)( GLenum texture );
+  typedef void (SYS_APIENTRY *EGL_glClientActiveTexture_t)( GLenum texture );
+  typedef void (SYS_APIENTRY *EGL_glCompressedTexImage1D_t)( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glCompressedTexImage2D_t)( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glCompressedTexImage3D_t)( GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glCompressedTexSubImage1D_t)( GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glCompressedTexSubImage2D_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glCompressedTexSubImage3D_t)( GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glGetCompressedTexImage_t)( GLenum target, GLint level, GLvoid* img );
+  typedef void (SYS_APIENTRY *EGL_glLoadTransposeMatrixd_t)( const GLdouble* m );
+  typedef void (SYS_APIENTRY *EGL_glLoadTransposeMatrixf_t)( const GLfloat* m );
+  typedef void (SYS_APIENTRY *EGL_glMultTransposeMatrixd_t)( const GLdouble* m );
+  typedef void (SYS_APIENTRY *EGL_glMultTransposeMatrixf_t)( const GLfloat* m );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1d_t)( GLenum target, GLdouble s );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1dv_t)( GLenum target, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1f_t)( GLenum target, GLfloat s );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1fv_t)( GLenum target, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1i_t)( GLenum target, GLint s );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1iv_t)( GLenum target, const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1s_t)( GLenum target, GLshort s );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord1sv_t)( GLenum target, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2d_t)( GLenum target, GLdouble s, GLdouble t );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2dv_t)( GLenum target, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2f_t)( GLenum target, GLfloat s, GLfloat t );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2fv_t)( GLenum target, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2i_t)( GLenum target, GLint s, GLint t );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2iv_t)( GLenum target, const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2s_t)( GLenum target, GLshort s, GLshort t );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord2sv_t)( GLenum target, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3d_t)( GLenum target, GLdouble s, GLdouble t, GLdouble r );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3dv_t)( GLenum target, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3f_t)( GLenum target, GLfloat s, GLfloat t, GLfloat r );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3fv_t)( GLenum target, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3i_t)( GLenum target, GLint s, GLint t, GLint r );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3iv_t)( GLenum target, const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3s_t)( GLenum target, GLshort s, GLshort t, GLshort r );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord3sv_t)( GLenum target, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4d_t)( GLenum target, GLdouble s, GLdouble t, GLdouble r, GLdouble q );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4dv_t)( GLenum target, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4f_t)( GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4fv_t)( GLenum target, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4i_t)( GLenum target, GLint s, GLint t, GLint r, GLint q );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4iv_t)( GLenum target, const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4s_t)( GLenum target, GLshort s, GLshort t, GLshort r, GLshort q );
+  typedef void (SYS_APIENTRY *EGL_glMultiTexCoord4sv_t)( GLenum target, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glSampleCoverage_t)( GLclampf value, GLboolean invert );
 
-  SYS_API extern app_glActiveTexture_t glActiveTexture;
-  SYS_API extern app_glClientActiveTexture_t glClientActiveTexture;
-  SYS_API extern app_glCompressedTexImage1D_t glCompressedTexImage1D;
-  SYS_API extern app_glCompressedTexImage2D_t glCompressedTexImage2D;
-  SYS_API extern app_glCompressedTexImage3D_t glCompressedTexImage3D;
-  SYS_API extern app_glCompressedTexSubImage1D_t glCompressedTexSubImage1D;
-  SYS_API extern app_glCompressedTexSubImage2D_t glCompressedTexSubImage2D;
-  SYS_API extern app_glCompressedTexSubImage3D_t glCompressedTexSubImage3D;
-  SYS_API extern app_glGetCompressedTexImage_t glGetCompressedTexImage;
-  SYS_API extern app_glLoadTransposeMatrixd_t glLoadTransposeMatrixd;
-  SYS_API extern app_glLoadTransposeMatrixf_t glLoadTransposeMatrixf;
-  SYS_API extern app_glMultTransposeMatrixd_t glMultTransposeMatrixd;
-  SYS_API extern app_glMultTransposeMatrixf_t glMultTransposeMatrixf;
-  SYS_API extern app_glMultiTexCoord1d_t glMultiTexCoord1d;
-  SYS_API extern app_glMultiTexCoord1dv_t glMultiTexCoord1dv;
-  SYS_API extern app_glMultiTexCoord1f_t glMultiTexCoord1f;
-  SYS_API extern app_glMultiTexCoord1fv_t glMultiTexCoord1fv;
-  SYS_API extern app_glMultiTexCoord1i_t glMultiTexCoord1i;
-  SYS_API extern app_glMultiTexCoord1iv_t glMultiTexCoord1iv;
-  SYS_API extern app_glMultiTexCoord1s_t glMultiTexCoord1s;
-  SYS_API extern app_glMultiTexCoord1sv_t glMultiTexCoord1sv;
-  SYS_API extern app_glMultiTexCoord2d_t glMultiTexCoord2d;
-  SYS_API extern app_glMultiTexCoord2dv_t glMultiTexCoord2dv;
-  SYS_API extern app_glMultiTexCoord2f_t glMultiTexCoord2f;
-  SYS_API extern app_glMultiTexCoord2fv_t glMultiTexCoord2fv;
-  SYS_API extern app_glMultiTexCoord2i_t glMultiTexCoord2i;
-  SYS_API extern app_glMultiTexCoord2iv_t glMultiTexCoord2iv;
-  SYS_API extern app_glMultiTexCoord2s_t glMultiTexCoord2s;
-  SYS_API extern app_glMultiTexCoord2sv_t glMultiTexCoord2sv;
-  SYS_API extern app_glMultiTexCoord3d_t glMultiTexCoord3d;
-  SYS_API extern app_glMultiTexCoord3dv_t glMultiTexCoord3dv;
-  SYS_API extern app_glMultiTexCoord3f_t glMultiTexCoord3f;
-  SYS_API extern app_glMultiTexCoord3fv_t glMultiTexCoord3fv;
-  SYS_API extern app_glMultiTexCoord3i_t glMultiTexCoord3i;
-  SYS_API extern app_glMultiTexCoord3iv_t glMultiTexCoord3iv;
-  SYS_API extern app_glMultiTexCoord3s_t glMultiTexCoord3s;
-  SYS_API extern app_glMultiTexCoord3sv_t glMultiTexCoord3sv;
-  SYS_API extern app_glMultiTexCoord4d_t glMultiTexCoord4d;
-  SYS_API extern app_glMultiTexCoord4dv_t glMultiTexCoord4dv;
-  SYS_API extern app_glMultiTexCoord4f_t glMultiTexCoord4f;
-  SYS_API extern app_glMultiTexCoord4fv_t glMultiTexCoord4fv;
-  SYS_API extern app_glMultiTexCoord4i_t glMultiTexCoord4i;
-  SYS_API extern app_glMultiTexCoord4iv_t glMultiTexCoord4iv;
-  SYS_API extern app_glMultiTexCoord4s_t glMultiTexCoord4s;
-  SYS_API extern app_glMultiTexCoord4sv_t glMultiTexCoord4sv;
-  SYS_API extern app_glSampleCoverage_t glSampleCoverage;
+  SYS_API extern EGL_glActiveTexture_t glActiveTexture;
+  SYS_API extern EGL_glClientActiveTexture_t glClientActiveTexture;
+  SYS_API extern EGL_glCompressedTexImage1D_t glCompressedTexImage1D;
+  SYS_API extern EGL_glCompressedTexImage2D_t glCompressedTexImage2D;
+  SYS_API extern EGL_glCompressedTexImage3D_t glCompressedTexImage3D;
+  SYS_API extern EGL_glCompressedTexSubImage1D_t glCompressedTexSubImage1D;
+  SYS_API extern EGL_glCompressedTexSubImage2D_t glCompressedTexSubImage2D;
+  SYS_API extern EGL_glCompressedTexSubImage3D_t glCompressedTexSubImage3D;
+  SYS_API extern EGL_glGetCompressedTexImage_t glGetCompressedTexImage;
+  SYS_API extern EGL_glLoadTransposeMatrixd_t glLoadTransposeMatrixd;
+  SYS_API extern EGL_glLoadTransposeMatrixf_t glLoadTransposeMatrixf;
+  SYS_API extern EGL_glMultTransposeMatrixd_t glMultTransposeMatrixd;
+  SYS_API extern EGL_glMultTransposeMatrixf_t glMultTransposeMatrixf;
+  SYS_API extern EGL_glMultiTexCoord1d_t glMultiTexCoord1d;
+  SYS_API extern EGL_glMultiTexCoord1dv_t glMultiTexCoord1dv;
+  SYS_API extern EGL_glMultiTexCoord1f_t glMultiTexCoord1f;
+  SYS_API extern EGL_glMultiTexCoord1fv_t glMultiTexCoord1fv;
+  SYS_API extern EGL_glMultiTexCoord1i_t glMultiTexCoord1i;
+  SYS_API extern EGL_glMultiTexCoord1iv_t glMultiTexCoord1iv;
+  SYS_API extern EGL_glMultiTexCoord1s_t glMultiTexCoord1s;
+  SYS_API extern EGL_glMultiTexCoord1sv_t glMultiTexCoord1sv;
+  SYS_API extern EGL_glMultiTexCoord2d_t glMultiTexCoord2d;
+  SYS_API extern EGL_glMultiTexCoord2dv_t glMultiTexCoord2dv;
+  SYS_API extern EGL_glMultiTexCoord2f_t glMultiTexCoord2f;
+  SYS_API extern EGL_glMultiTexCoord2fv_t glMultiTexCoord2fv;
+  SYS_API extern EGL_glMultiTexCoord2i_t glMultiTexCoord2i;
+  SYS_API extern EGL_glMultiTexCoord2iv_t glMultiTexCoord2iv;
+  SYS_API extern EGL_glMultiTexCoord2s_t glMultiTexCoord2s;
+  SYS_API extern EGL_glMultiTexCoord2sv_t glMultiTexCoord2sv;
+  SYS_API extern EGL_glMultiTexCoord3d_t glMultiTexCoord3d;
+  SYS_API extern EGL_glMultiTexCoord3dv_t glMultiTexCoord3dv;
+  SYS_API extern EGL_glMultiTexCoord3f_t glMultiTexCoord3f;
+  SYS_API extern EGL_glMultiTexCoord3fv_t glMultiTexCoord3fv;
+  SYS_API extern EGL_glMultiTexCoord3i_t glMultiTexCoord3i;
+  SYS_API extern EGL_glMultiTexCoord3iv_t glMultiTexCoord3iv;
+  SYS_API extern EGL_glMultiTexCoord3s_t glMultiTexCoord3s;
+  SYS_API extern EGL_glMultiTexCoord3sv_t glMultiTexCoord3sv;
+  SYS_API extern EGL_glMultiTexCoord4d_t glMultiTexCoord4d;
+  SYS_API extern EGL_glMultiTexCoord4dv_t glMultiTexCoord4dv;
+  SYS_API extern EGL_glMultiTexCoord4f_t glMultiTexCoord4f;
+  SYS_API extern EGL_glMultiTexCoord4fv_t glMultiTexCoord4fv;
+  SYS_API extern EGL_glMultiTexCoord4i_t glMultiTexCoord4i;
+  SYS_API extern EGL_glMultiTexCoord4iv_t glMultiTexCoord4iv;
+  SYS_API extern EGL_glMultiTexCoord4s_t glMultiTexCoord4s;
+  SYS_API extern EGL_glMultiTexCoord4sv_t glMultiTexCoord4sv;
+  SYS_API extern EGL_glSampleCoverage_t glSampleCoverage;
 #endif
 
 #ifndef GL_VERSION_1_4
   #define GL_VERSION_1_4 1
-  #define APP_GL_VERSION_1_4_DEFINED
+  #define EGL_GL_VERSION_1_4_DEFINED
 
   #define GL_BLEND_DST_RGB                                                     0x80C8
   #define GL_BLEND_SRC_RGB                                                     0x80C9
@@ -1205,102 +1196,102 @@ extern "C" {
   #define GL_TEXTURE_COMPARE_FUNC                                              0x884D
   #define GL_COMPARE_R_TO_TEXTURE                                              0x884E
 
-  typedef void (SYS_APIENTRY *app_glBlendFuncSeparate_t)( GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha );
-  typedef void (SYS_APIENTRY *app_glFogCoordd_t)( GLdouble coord );
-  typedef void (SYS_APIENTRY *app_glFogCoorddv_t)( const GLdouble* coord );
-  typedef void (SYS_APIENTRY *app_glFogCoordf_t)( GLfloat coord );
-  typedef void (SYS_APIENTRY *app_glFogCoordfv_t)( const GLfloat* coord );
-  typedef void (SYS_APIENTRY *app_glFogCoordPointer_t)( GLenum type, GLsizei stride, const GLvoid* pointer );
-  typedef void (SYS_APIENTRY *app_glMultiDrawArrays_t)( GLenum mode, GLint* first, GLsizei* count, GLsizei primcount );
-  typedef void (SYS_APIENTRY *app_glMultiDrawElements_t)( GLenum mode, const GLsizei* count, GLenum type, const GLvoid** indices, GLsizei primcount );
-  typedef void (SYS_APIENTRY *app_glPointParameterf_t)( GLenum pname, GLfloat param );
-  typedef void (SYS_APIENTRY *app_glPointParameterfv_t)( GLenum pname, const GLfloat* params );
-  typedef void (SYS_APIENTRY *app_glPointParameteri_t)( GLenum pname, GLint param );
-  typedef void (SYS_APIENTRY *app_glPointParameteriv_t)( GLenum pname, const GLint* params );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3b_t)( GLbyte red, GLbyte green, GLbyte blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3bv_t)( const GLbyte* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3d_t)( GLdouble red, GLdouble green, GLdouble blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3dv_t)( const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3f_t)( GLfloat red, GLfloat green, GLfloat blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3fv_t)( const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3i_t)( GLint red, GLint green, GLint blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3iv_t)( const GLint* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3s_t)( GLshort red, GLshort green, GLshort blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3sv_t)( const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3ub_t)( GLubyte red, GLubyte green, GLubyte blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3ubv_t)( const GLubyte* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3ui_t)( GLuint red, GLuint green, GLuint blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3uiv_t)( const GLuint* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3us_t)( GLushort red, GLushort green, GLushort blue );
-  typedef void (SYS_APIENTRY *app_glSecondaryColor3usv_t)( const GLushort* v );
-  typedef void (SYS_APIENTRY *app_glSecondaryColorPointer_t)( GLint size, GLenum type, GLsizei stride, const GLvoid *pointer );
-  typedef void (SYS_APIENTRY *app_glWindowPos2d_t)( GLdouble x, GLdouble y );
-  typedef void (SYS_APIENTRY *app_glWindowPos2dv_t)( const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos2f_t)( GLfloat x, GLfloat y );
-  typedef void (SYS_APIENTRY *app_glWindowPos2fv_t)( const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos2i_t)( GLint x, GLint y );
-  typedef void (SYS_APIENTRY *app_glWindowPos2iv_t)( const GLint* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos2s_t)( GLshort x, GLshort y );
-  typedef void (SYS_APIENTRY *app_glWindowPos2sv_t)( const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos3d_t)( GLdouble x, GLdouble y, GLdouble z );
-  typedef void (SYS_APIENTRY *app_glWindowPos3dv_t)( const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos3f_t)( GLfloat x, GLfloat y, GLfloat z );
-  typedef void (SYS_APIENTRY *app_glWindowPos3fv_t)( const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos3i_t)( GLint x, GLint y, GLint z );
-  typedef void (SYS_APIENTRY *app_glWindowPos3iv_t)( const GLint* v );
-  typedef void (SYS_APIENTRY *app_glWindowPos3s_t)( GLshort x, GLshort y, GLshort z );
-  typedef void (SYS_APIENTRY *app_glWindowPos3sv_t)( const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glBlendFuncSeparate_t)( GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha );
+  typedef void (SYS_APIENTRY *EGL_glFogCoordd_t)( GLdouble coord );
+  typedef void (SYS_APIENTRY *EGL_glFogCoorddv_t)( const GLdouble* coord );
+  typedef void (SYS_APIENTRY *EGL_glFogCoordf_t)( GLfloat coord );
+  typedef void (SYS_APIENTRY *EGL_glFogCoordfv_t)( const GLfloat* coord );
+  typedef void (SYS_APIENTRY *EGL_glFogCoordPointer_t)( GLenum type, GLsizei stride, const GLvoid* pointer );
+  typedef void (SYS_APIENTRY *EGL_glMultiDrawArrays_t)( GLenum mode, GLint* first, GLsizei* count, GLsizei primcount );
+  typedef void (SYS_APIENTRY *EGL_glMultiDrawElements_t)( GLenum mode, const GLsizei* count, GLenum type, const GLvoid** indices, GLsizei primcount );
+  typedef void (SYS_APIENTRY *EGL_glPointParameterf_t)( GLenum pname, GLfloat param );
+  typedef void (SYS_APIENTRY *EGL_glPointParameterfv_t)( GLenum pname, const GLfloat* params );
+  typedef void (SYS_APIENTRY *EGL_glPointParameteri_t)( GLenum pname, GLint param );
+  typedef void (SYS_APIENTRY *EGL_glPointParameteriv_t)( GLenum pname, const GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3b_t)( GLbyte red, GLbyte green, GLbyte blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3bv_t)( const GLbyte* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3d_t)( GLdouble red, GLdouble green, GLdouble blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3dv_t)( const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3f_t)( GLfloat red, GLfloat green, GLfloat blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3fv_t)( const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3i_t)( GLint red, GLint green, GLint blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3iv_t)( const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3s_t)( GLshort red, GLshort green, GLshort blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3sv_t)( const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3ub_t)( GLubyte red, GLubyte green, GLubyte blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3ubv_t)( const GLubyte* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3ui_t)( GLuint red, GLuint green, GLuint blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3uiv_t)( const GLuint* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3us_t)( GLushort red, GLushort green, GLushort blue );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColor3usv_t)( const GLushort* v );
+  typedef void (SYS_APIENTRY *EGL_glSecondaryColorPointer_t)( GLint size, GLenum type, GLsizei stride, const GLvoid *pointer );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2d_t)( GLdouble x, GLdouble y );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2dv_t)( const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2f_t)( GLfloat x, GLfloat y );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2fv_t)( const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2i_t)( GLint x, GLint y );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2iv_t)( const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2s_t)( GLshort x, GLshort y );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos2sv_t)( const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3d_t)( GLdouble x, GLdouble y, GLdouble z );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3dv_t)( const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3f_t)( GLfloat x, GLfloat y, GLfloat z );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3fv_t)( const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3i_t)( GLint x, GLint y, GLint z );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3iv_t)( const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3s_t)( GLshort x, GLshort y, GLshort z );
+  typedef void (SYS_APIENTRY *EGL_glWindowPos3sv_t)( const GLshort* v );
 
-  SYS_API extern app_glBlendFuncSeparate_t glBlendFuncSeparate;
-  SYS_API extern app_glFogCoordd_t glFogCoordd;
-  SYS_API extern app_glFogCoorddv_t glFogCoorddv;
-  SYS_API extern app_glFogCoordf_t glFogCoordf;
-  SYS_API extern app_glFogCoordfv_t glFogCoordfv;
-  SYS_API extern app_glFogCoordPointer_t glFogCoordPointer;
-  SYS_API extern app_glMultiDrawArrays_t glMultiDrawArrays;
-  SYS_API extern app_glMultiDrawElements_t glMultiDrawElements;
-  SYS_API extern app_glPointParameterf_t glPointParameterf;
-  SYS_API extern app_glPointParameterfv_t glPointParameterfv;
-  SYS_API extern app_glPointParameteri_t glPointParameteri;
-  SYS_API extern app_glPointParameteriv_t glPointParameteriv;
-  SYS_API extern app_glSecondaryColor3b_t glSecondaryColor3b;
-  SYS_API extern app_glSecondaryColor3bv_t glSecondaryColor3bv;
-  SYS_API extern app_glSecondaryColor3d_t glSecondaryColor3d;
-  SYS_API extern app_glSecondaryColor3dv_t glSecondaryColor3dv;
-  SYS_API extern app_glSecondaryColor3f_t glSecondaryColor3f;
-  SYS_API extern app_glSecondaryColor3fv_t glSecondaryColor3fv;
-  SYS_API extern app_glSecondaryColor3i_t glSecondaryColor3i;
-  SYS_API extern app_glSecondaryColor3iv_t glSecondaryColor3iv;
-  SYS_API extern app_glSecondaryColor3s_t glSecondaryColor3s;
-  SYS_API extern app_glSecondaryColor3sv_t glSecondaryColor3sv;
-  SYS_API extern app_glSecondaryColor3ub_t glSecondaryColor3ub;
-  SYS_API extern app_glSecondaryColor3ubv_t glSecondaryColor3ubv;
-  SYS_API extern app_glSecondaryColor3ui_t glSecondaryColor3ui;
-  SYS_API extern app_glSecondaryColor3uiv_t glSecondaryColor3uiv;
-  SYS_API extern app_glSecondaryColor3us_t glSecondaryColor3us;
-  SYS_API extern app_glSecondaryColor3usv_t glSecondaryColor3usv;
-  SYS_API extern app_glSecondaryColorPointer_t glSecondaryColorPointer;
-  SYS_API extern app_glWindowPos2d_t glWindowPos2d;
-  SYS_API extern app_glWindowPos2dv_t glWindowPos2dv;
-  SYS_API extern app_glWindowPos2f_t glWindowPos2f;
-  SYS_API extern app_glWindowPos2fv_t glWindowPos2fv;
-  SYS_API extern app_glWindowPos2i_t glWindowPos2i;
-  SYS_API extern app_glWindowPos2iv_t glWindowPos2iv;
-  SYS_API extern app_glWindowPos2s_t glWindowPos2s;
-  SYS_API extern app_glWindowPos2sv_t glWindowPos2sv;
-  SYS_API extern app_glWindowPos3d_t glWindowPos3d;
-  SYS_API extern app_glWindowPos3dv_t glWindowPos3dv;
-  SYS_API extern app_glWindowPos3f_t glWindowPos3f;
-  SYS_API extern app_glWindowPos3fv_t glWindowPos3fv;
-  SYS_API extern app_glWindowPos3i_t glWindowPos3i;
-  SYS_API extern app_glWindowPos3iv_t glWindowPos3iv;
-  SYS_API extern app_glWindowPos3s_t glWindowPos3s;
-  SYS_API extern app_glWindowPos3sv_t glWindowPos3sv;
+  SYS_API extern EGL_glBlendFuncSeparate_t glBlendFuncSeparate;
+  SYS_API extern EGL_glFogCoordd_t glFogCoordd;
+  SYS_API extern EGL_glFogCoorddv_t glFogCoorddv;
+  SYS_API extern EGL_glFogCoordf_t glFogCoordf;
+  SYS_API extern EGL_glFogCoordfv_t glFogCoordfv;
+  SYS_API extern EGL_glFogCoordPointer_t glFogCoordPointer;
+  SYS_API extern EGL_glMultiDrawArrays_t glMultiDrawArrays;
+  SYS_API extern EGL_glMultiDrawElements_t glMultiDrawElements;
+  SYS_API extern EGL_glPointParameterf_t glPointParameterf;
+  SYS_API extern EGL_glPointParameterfv_t glPointParameterfv;
+  SYS_API extern EGL_glPointParameteri_t glPointParameteri;
+  SYS_API extern EGL_glPointParameteriv_t glPointParameteriv;
+  SYS_API extern EGL_glSecondaryColor3b_t glSecondaryColor3b;
+  SYS_API extern EGL_glSecondaryColor3bv_t glSecondaryColor3bv;
+  SYS_API extern EGL_glSecondaryColor3d_t glSecondaryColor3d;
+  SYS_API extern EGL_glSecondaryColor3dv_t glSecondaryColor3dv;
+  SYS_API extern EGL_glSecondaryColor3f_t glSecondaryColor3f;
+  SYS_API extern EGL_glSecondaryColor3fv_t glSecondaryColor3fv;
+  SYS_API extern EGL_glSecondaryColor3i_t glSecondaryColor3i;
+  SYS_API extern EGL_glSecondaryColor3iv_t glSecondaryColor3iv;
+  SYS_API extern EGL_glSecondaryColor3s_t glSecondaryColor3s;
+  SYS_API extern EGL_glSecondaryColor3sv_t glSecondaryColor3sv;
+  SYS_API extern EGL_glSecondaryColor3ub_t glSecondaryColor3ub;
+  SYS_API extern EGL_glSecondaryColor3ubv_t glSecondaryColor3ubv;
+  SYS_API extern EGL_glSecondaryColor3ui_t glSecondaryColor3ui;
+  SYS_API extern EGL_glSecondaryColor3uiv_t glSecondaryColor3uiv;
+  SYS_API extern EGL_glSecondaryColor3us_t glSecondaryColor3us;
+  SYS_API extern EGL_glSecondaryColor3usv_t glSecondaryColor3usv;
+  SYS_API extern EGL_glSecondaryColorPointer_t glSecondaryColorPointer;
+  SYS_API extern EGL_glWindowPos2d_t glWindowPos2d;
+  SYS_API extern EGL_glWindowPos2dv_t glWindowPos2dv;
+  SYS_API extern EGL_glWindowPos2f_t glWindowPos2f;
+  SYS_API extern EGL_glWindowPos2fv_t glWindowPos2fv;
+  SYS_API extern EGL_glWindowPos2i_t glWindowPos2i;
+  SYS_API extern EGL_glWindowPos2iv_t glWindowPos2iv;
+  SYS_API extern EGL_glWindowPos2s_t glWindowPos2s;
+  SYS_API extern EGL_glWindowPos2sv_t glWindowPos2sv;
+  SYS_API extern EGL_glWindowPos3d_t glWindowPos3d;
+  SYS_API extern EGL_glWindowPos3dv_t glWindowPos3dv;
+  SYS_API extern EGL_glWindowPos3f_t glWindowPos3f;
+  SYS_API extern EGL_glWindowPos3fv_t glWindowPos3fv;
+  SYS_API extern EGL_glWindowPos3i_t glWindowPos3i;
+  SYS_API extern EGL_glWindowPos3iv_t glWindowPos3iv;
+  SYS_API extern EGL_glWindowPos3s_t glWindowPos3s;
+  SYS_API extern EGL_glWindowPos3sv_t glWindowPos3sv;
 #endif
 
 #ifndef GL_VERSION_1_5
   #define GL_VERSION_1_5 1
-  #define APP_GL_VERSION_1_5_DEFINED
+  #define EGL_GL_VERSION_1_5_DEFINED
 
   #define GL_FOG_COORD_SRC                                                     0x8450
   #define GL_FOG_COORD                                                         0x8451
@@ -1356,50 +1347,50 @@ extern "C" {
   typedef ptrdiff_t GLintptr;
   typedef ptrdiff_t GLsizeiptr;
 
-  typedef void (SYS_APIENTRY *app_glBeginQuery_t)( GLenum target, GLuint id );
-  typedef void (SYS_APIENTRY *app_glBindBuffer_t)( GLenum target, GLuint buffer );
-  typedef void (SYS_APIENTRY *app_glBufferData_t)( GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage );
-  typedef void (SYS_APIENTRY *app_glBufferSubData_t)( GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glDeleteBuffers_t)( GLsizei n, const GLuint* buffers );
-  typedef void (SYS_APIENTRY *app_glDeleteQueries_t)( GLsizei n, const GLuint* ids );
-  typedef void (SYS_APIENTRY *app_glEndQuery_t)( GLenum target );
-  typedef void (SYS_APIENTRY *app_glGenBuffers_t)( GLsizei n, GLuint* buffers );
-  typedef void (SYS_APIENTRY *app_glGenQueries_t)( GLsizei n, GLuint* ids );
-  typedef void (SYS_APIENTRY *app_glGetBufferParameteriv_t)( GLenum target, GLenum pname, GLint* params );
-  typedef void (SYS_APIENTRY *app_glGetBufferPointerv_t)( GLenum target, GLenum pname, GLvoid** params );
-  typedef void (SYS_APIENTRY *app_glGetBufferSubData_t)( GLenum target, GLintptr offset, GLsizeiptr size, GLvoid* data );
-  typedef void (SYS_APIENTRY *app_glGetQueryObjectiv_t)( GLuint id, GLenum pname, GLint* params );
-  typedef void (SYS_APIENTRY *app_glGetQueryObjectuiv_t)( GLuint id, GLenum pname, GLuint* params );
-  typedef void (SYS_APIENTRY *app_glGetQueryiv_t)( GLenum target, GLenum pname, GLint* params );
-  typedef GLboolean (SYS_APIENTRY *app_glIsBuffer_t)( GLuint buffer );
-  typedef GLboolean (SYS_APIENTRY *app_glIsQuery_t)( GLuint id );
-  typedef GLvoid* (SYS_APIENTRY *app_glMapBuffer_t)( GLenum target, GLenum access );
-  typedef GLboolean (SYS_APIENTRY *app_glUnmapBuffer_t)( GLenum target );
+  typedef void (SYS_APIENTRY *EGL_glBeginQuery_t)( GLenum target, GLuint id );
+  typedef void (SYS_APIENTRY *EGL_glBindBuffer_t)( GLenum target, GLuint buffer );
+  typedef void (SYS_APIENTRY *EGL_glBufferData_t)( GLenum target, GLsizeiptr size, const GLvoid* data, GLenum usage );
+  typedef void (SYS_APIENTRY *EGL_glBufferSubData_t)( GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glDeleteBuffers_t)( GLsizei n, const GLuint* buffers );
+  typedef void (SYS_APIENTRY *EGL_glDeleteQueries_t)( GLsizei n, const GLuint* ids );
+  typedef void (SYS_APIENTRY *EGL_glEndQuery_t)( GLenum target );
+  typedef void (SYS_APIENTRY *EGL_glGenBuffers_t)( GLsizei n, GLuint* buffers );
+  typedef void (SYS_APIENTRY *EGL_glGenQueries_t)( GLsizei n, GLuint* ids );
+  typedef void (SYS_APIENTRY *EGL_glGetBufferParameteriv_t)( GLenum target, GLenum pname, GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetBufferPointerv_t)( GLenum target, GLenum pname, GLvoid** params );
+  typedef void (SYS_APIENTRY *EGL_glGetBufferSubData_t)( GLenum target, GLintptr offset, GLsizeiptr size, GLvoid* data );
+  typedef void (SYS_APIENTRY *EGL_glGetQueryObjectiv_t)( GLuint id, GLenum pname, GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetQueryObjectuiv_t)( GLuint id, GLenum pname, GLuint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetQueryiv_t)( GLenum target, GLenum pname, GLint* params );
+  typedef GLboolean (SYS_APIENTRY *EGL_glIsBuffer_t)( GLuint buffer );
+  typedef GLboolean (SYS_APIENTRY *EGL_glIsQuery_t)( GLuint id );
+  typedef GLvoid* (SYS_APIENTRY *EGL_glMapBuffer_t)( GLenum target, GLenum access );
+  typedef GLboolean (SYS_APIENTRY *EGL_glUnmapBuffer_t)( GLenum target );
 
-  SYS_API extern app_glBeginQuery_t glBeginQuery;
-  SYS_API extern app_glBindBuffer_t glBindBuffer;
-  SYS_API extern app_glBufferData_t glBufferData;
-  SYS_API extern app_glBufferSubData_t glBufferSubData;
-  SYS_API extern app_glDeleteBuffers_t glDeleteBuffers;
-  SYS_API extern app_glDeleteQueries_t glDeleteQueries;
-  SYS_API extern app_glEndQuery_t glEndQuery;
-  SYS_API extern app_glGenBuffers_t glGenBuffers;
-  SYS_API extern app_glGenQueries_t glGenQueries;
-  SYS_API extern app_glGetBufferParameteriv_t glGetBufferParameteriv;
-  SYS_API extern app_glGetBufferPointerv_t glGetBufferPointerv;
-  SYS_API extern app_glGetBufferSubData_t glGetBufferSubData;
-  SYS_API extern app_glGetQueryObjectiv_t glGetQueryObjectiv;
-  SYS_API extern app_glGetQueryObjectuiv_t glGetQueryObjectuiv;
-  SYS_API extern app_glGetQueryiv_t glGetQueryiv;
-  SYS_API extern app_glIsBuffer_t glIsBuffer;
-  SYS_API extern app_glIsQuery_t glIsQuery;
-  SYS_API extern app_glMapBuffer_t glMapBuffer;
-  SYS_API extern app_glUnmapBuffer_t glUnmapBuffer;
+  SYS_API extern EGL_glBeginQuery_t glBeginQuery;
+  SYS_API extern EGL_glBindBuffer_t glBindBuffer;
+  SYS_API extern EGL_glBufferData_t glBufferData;
+  SYS_API extern EGL_glBufferSubData_t glBufferSubData;
+  SYS_API extern EGL_glDeleteBuffers_t glDeleteBuffers;
+  SYS_API extern EGL_glDeleteQueries_t glDeleteQueries;
+  SYS_API extern EGL_glEndQuery_t glEndQuery;
+  SYS_API extern EGL_glGenBuffers_t glGenBuffers;
+  SYS_API extern EGL_glGenQueries_t glGenQueries;
+  SYS_API extern EGL_glGetBufferParameteriv_t glGetBufferParameteriv;
+  SYS_API extern EGL_glGetBufferPointerv_t glGetBufferPointerv;
+  SYS_API extern EGL_glGetBufferSubData_t glGetBufferSubData;
+  SYS_API extern EGL_glGetQueryObjectiv_t glGetQueryObjectiv;
+  SYS_API extern EGL_glGetQueryObjectuiv_t glGetQueryObjectuiv;
+  SYS_API extern EGL_glGetQueryiv_t glGetQueryiv;
+  SYS_API extern EGL_glIsBuffer_t glIsBuffer;
+  SYS_API extern EGL_glIsQuery_t glIsQuery;
+  SYS_API extern EGL_glMapBuffer_t glMapBuffer;
+  SYS_API extern EGL_glUnmapBuffer_t glUnmapBuffer;
 #endif
 
 #ifndef GL_VERSION_2_0
   #define GL_VERSION_2_0 1
-  #define APP_GL_VERSION_2_0_DEFINED
+  #define EGL_GL_VERSION_2_0_DEFINED
 
   #define GL_BLEND_EQUATION_RGB                                                0x8009
   #define GL_VERTEX_ATTRIB_ARRAY_ENABLED                                       0x8622
@@ -1488,198 +1479,198 @@ extern "C" {
 
   typedef char GLchar;
 
-  typedef void (SYS_APIENTRY *app_glAttachShader_t)( GLuint program, GLuint shader );
-  typedef void (SYS_APIENTRY *app_glBindAttribLocation_t)( GLuint program, GLuint index, const GLchar* name );
-  typedef void (SYS_APIENTRY *app_glBlendEquationSeparate_t)( GLenum modeRGB, GLenum modeAlpha );
-  typedef void (SYS_APIENTRY *app_glCompileShader_t)( GLuint shader );
-  typedef GLuint (SYS_APIENTRY *app_glCreateProgram_t)( void );
-  typedef GLuint (SYS_APIENTRY *app_glCreateShader_t)( GLenum type );
-  typedef void (SYS_APIENTRY *app_glDeleteProgram_t)( GLuint program );
-  typedef void (SYS_APIENTRY *app_glDeleteShader_t)( GLuint shader );
-  typedef void (SYS_APIENTRY *app_glDetachShader_t)( GLuint program, GLuint shader );
-  typedef void (SYS_APIENTRY *app_glDisableVertexAttribArray_t)( GLuint index );
-  typedef void (SYS_APIENTRY *app_glDrawBuffers_t)( GLsizei n, const GLenum* bufs );
-  typedef void (SYS_APIENTRY *app_glEnableVertexAttribArray_t)( GLuint index );
-  typedef void (SYS_APIENTRY *app_glGetActiveAttrib_t)( GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLint* size, GLenum* type, GLchar* name );
-  typedef void (SYS_APIENTRY *app_glGetActiveUniform_t)( GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLint* size, GLenum* type, GLchar* name );
-  typedef void (SYS_APIENTRY *app_glGetAttachedShaders_t)( GLuint program, GLsizei maxCount, GLsizei* count, GLuint* obj );
-  typedef GLint (SYS_APIENTRY *app_glGetAttribLocation_t)( GLuint program, const GLchar* name );
-  typedef void (SYS_APIENTRY *app_glGetProgramInfoLog_t)( GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog );
-  typedef void (SYS_APIENTRY *app_glGetProgramiv_t)( GLuint program, GLenum pname, GLint* params );
-  typedef void (SYS_APIENTRY *app_glGetShaderInfoLog_t)( GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog );
-  typedef void (SYS_APIENTRY *app_glGetShaderiv_t)( GLuint shader, GLenum pname, GLint* params );
-  typedef void (SYS_APIENTRY *app_glGetShaderSource_t)( GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* source );
-  typedef GLint (SYS_APIENTRY *app_glGetUniformLocation_t)( GLuint program, const GLchar* name );
-  typedef void (SYS_APIENTRY *app_glGetUniformfv_t)( GLuint program, GLint location, GLfloat* params );
-  typedef void (SYS_APIENTRY *app_glGetUniformiv_t)( GLuint program, GLint location, GLint* params );
-  typedef void (SYS_APIENTRY *app_glGetVertexAttribdv_t)( GLuint index, GLenum pname, GLdouble* params );
-  typedef void (SYS_APIENTRY *app_glGetVertexAttribfv_t)( GLuint index, GLenum pname, GLfloat* params );
-  typedef void (SYS_APIENTRY *app_glGetVertexAttribiv_t)( GLuint index, GLenum pname, GLint* params );
-  typedef void (SYS_APIENTRY *app_glGetVertexAttribPointerv_t)( GLuint index, GLenum pname, GLvoid** pointer );
-  typedef GLboolean (SYS_APIENTRY *app_glIsProgram_t)( GLuint program );
-  typedef GLboolean (SYS_APIENTRY *app_glIsShader_t)( GLuint shader );
-  typedef void (SYS_APIENTRY *app_glLinkProgram_t)( GLuint program );
-  typedef void (SYS_APIENTRY *app_glShaderSource_t)( GLuint shader, GLsizei count, const GLchar** string, const GLint* length );
-  typedef void (SYS_APIENTRY *app_glStencilFuncSeparate_t)( GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask );
-  typedef void (SYS_APIENTRY *app_glStencilMaskSeparate_t)( GLenum face, GLuint mask );
-  typedef void (SYS_APIENTRY *app_glStencilOpSeparate_t)( GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass );
-  typedef void (SYS_APIENTRY *app_glUniform1f_t)( GLint location, GLfloat v0 );
-  typedef void (SYS_APIENTRY *app_glUniform1fv_t)( GLint location, GLsizei count, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniform1i_t)( GLint location, GLint v0 );
-  typedef void (SYS_APIENTRY *app_glUniform1iv_t)( GLint location, GLsizei count, const GLint* value );
-  typedef void (SYS_APIENTRY *app_glUniform2f_t)( GLint location, GLfloat v0, GLfloat v1 );
-  typedef void (SYS_APIENTRY *app_glUniform2fv_t)( GLint location, GLsizei count, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniform2i_t)( GLint location, GLint v0, GLint v1 );
-  typedef void (SYS_APIENTRY *app_glUniform2iv_t)( GLint location, GLsizei count, const GLint* value );
-  typedef void (SYS_APIENTRY *app_glUniform3f_t)( GLint location, GLfloat v0, GLfloat v1, GLfloat v2 );
-  typedef void (SYS_APIENTRY *app_glUniform3fv_t)( GLint location, GLsizei count, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniform3i_t)( GLint location, GLint v0, GLint v1, GLint v2 );
-  typedef void (SYS_APIENTRY *app_glUniform3iv_t)( GLint location, GLsizei count, const GLint* value );
-  typedef void (SYS_APIENTRY *app_glUniform4f_t)( GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3 );
-  typedef void (SYS_APIENTRY *app_glUniform4fv_t)( GLint location, GLsizei count, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniform4i_t)( GLint location, GLint v0, GLint v1, GLint v2, GLint v3 );
-  typedef void (SYS_APIENTRY *app_glUniform4iv_t)( GLint location, GLsizei count, const GLint* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix2fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix3fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix4fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUseProgram_t)( GLuint program );
-  typedef void (SYS_APIENTRY *app_glValidateProgram_t)( GLuint program );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib1d_t)( GLuint index, GLdouble x );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib1dv_t)( GLuint index, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib1f_t)( GLuint index, GLfloat x );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib1fv_t)( GLuint index, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib1s_t)( GLuint index, GLshort x );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib1sv_t)( GLuint index, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib2d_t)( GLuint index, GLdouble x, GLdouble y );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib2dv_t)( GLuint index, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib2f_t)( GLuint index, GLfloat x, GLfloat y );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib2fv_t)( GLuint index, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib2s_t)( GLuint index, GLshort x, GLshort y );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib2sv_t)( GLuint index, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib3d_t)( GLuint index, GLdouble x, GLdouble y, GLdouble z );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib3dv_t)( GLuint index, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib3f_t)( GLuint index, GLfloat x, GLfloat y, GLfloat z );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib3fv_t)( GLuint index, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib3s_t)( GLuint index, GLshort x, GLshort y, GLshort z );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib3sv_t)( GLuint index, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Nbv_t)( GLuint index, const GLbyte* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Niv_t)( GLuint index, const GLint* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Nsv_t)( GLuint index, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Nub_t)( GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Nubv_t)( GLuint index, const GLubyte* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Nuiv_t)( GLuint index, const GLuint* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4Nusv_t)( GLuint index, const GLushort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4bv_t)( GLuint index, const GLbyte* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4d_t)( GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4dv_t)( GLuint index, const GLdouble* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4f_t)( GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4fv_t)( GLuint index, const GLfloat* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4iv_t)( GLuint index, const GLint* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4s_t)( GLuint index, GLshort x, GLshort y, GLshort z, GLshort w );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4sv_t)( GLuint index, const GLshort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4ubv_t)( GLuint index, const GLubyte* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4uiv_t)( GLuint index, const GLuint* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttrib4usv_t)( GLuint index, const GLushort* v );
-  typedef void (SYS_APIENTRY *app_glVertexAttribPointer_t)( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer );
+  typedef void (SYS_APIENTRY *EGL_glAttachShader_t)( GLuint program, GLuint shader );
+  typedef void (SYS_APIENTRY *EGL_glBindAttribLocation_t)( GLuint program, GLuint index, const GLchar* name );
+  typedef void (SYS_APIENTRY *EGL_glBlendEquationSeparate_t)( GLenum modeRGB, GLenum modeAlpha );
+  typedef void (SYS_APIENTRY *EGL_glCompileShader_t)( GLuint shader );
+  typedef GLuint (SYS_APIENTRY *EGL_glCreateProgram_t)( void );
+  typedef GLuint (SYS_APIENTRY *EGL_glCreateShader_t)( GLenum type );
+  typedef void (SYS_APIENTRY *EGL_glDeleteProgram_t)( GLuint program );
+  typedef void (SYS_APIENTRY *EGL_glDeleteShader_t)( GLuint shader );
+  typedef void (SYS_APIENTRY *EGL_glDetachShader_t)( GLuint program, GLuint shader );
+  typedef void (SYS_APIENTRY *EGL_glDisableVertexAttribArray_t)( GLuint index );
+  typedef void (SYS_APIENTRY *EGL_glDrawBuffers_t)( GLsizei n, const GLenum* bufs );
+  typedef void (SYS_APIENTRY *EGL_glEnableVertexAttribArray_t)( GLuint index );
+  typedef void (SYS_APIENTRY *EGL_glGetActiveAttrib_t)( GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLint* size, GLenum* type, GLchar* name );
+  typedef void (SYS_APIENTRY *EGL_glGetActiveUniform_t)( GLuint program, GLuint index, GLsizei bufSize, GLsizei* length, GLint* size, GLenum* type, GLchar* name );
+  typedef void (SYS_APIENTRY *EGL_glGetAttachedShaders_t)( GLuint program, GLsizei maxCount, GLsizei* count, GLuint* obj );
+  typedef GLint (SYS_APIENTRY *EGL_glGetAttribLocation_t)( GLuint program, const GLchar* name );
+  typedef void (SYS_APIENTRY *EGL_glGetProgramInfoLog_t)( GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog );
+  typedef void (SYS_APIENTRY *EGL_glGetProgramiv_t)( GLuint program, GLenum pname, GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetShaderInfoLog_t)( GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog );
+  typedef void (SYS_APIENTRY *EGL_glGetShaderiv_t)( GLuint shader, GLenum pname, GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetShaderSource_t)( GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* source );
+  typedef GLint (SYS_APIENTRY *EGL_glGetUniformLocation_t)( GLuint program, const GLchar* name );
+  typedef void (SYS_APIENTRY *EGL_glGetUniformfv_t)( GLuint program, GLint location, GLfloat* params );
+  typedef void (SYS_APIENTRY *EGL_glGetUniformiv_t)( GLuint program, GLint location, GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetVertexAttribdv_t)( GLuint index, GLenum pname, GLdouble* params );
+  typedef void (SYS_APIENTRY *EGL_glGetVertexAttribfv_t)( GLuint index, GLenum pname, GLfloat* params );
+  typedef void (SYS_APIENTRY *EGL_glGetVertexAttribiv_t)( GLuint index, GLenum pname, GLint* params );
+  typedef void (SYS_APIENTRY *EGL_glGetVertexAttribPointerv_t)( GLuint index, GLenum pname, GLvoid** pointer );
+  typedef GLboolean (SYS_APIENTRY *EGL_glIsProgram_t)( GLuint program );
+  typedef GLboolean (SYS_APIENTRY *EGL_glIsShader_t)( GLuint shader );
+  typedef void (SYS_APIENTRY *EGL_glLinkProgram_t)( GLuint program );
+  typedef void (SYS_APIENTRY *EGL_glShaderSource_t)( GLuint shader, GLsizei count, const GLchar** string, const GLint* length );
+  typedef void (SYS_APIENTRY *EGL_glStencilFuncSeparate_t)( GLenum frontfunc, GLenum backfunc, GLint ref, GLuint mask );
+  typedef void (SYS_APIENTRY *EGL_glStencilMaskSeparate_t)( GLenum face, GLuint mask );
+  typedef void (SYS_APIENTRY *EGL_glStencilOpSeparate_t)( GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass );
+  typedef void (SYS_APIENTRY *EGL_glUniform1f_t)( GLint location, GLfloat v0 );
+  typedef void (SYS_APIENTRY *EGL_glUniform1fv_t)( GLint location, GLsizei count, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform1i_t)( GLint location, GLint v0 );
+  typedef void (SYS_APIENTRY *EGL_glUniform1iv_t)( GLint location, GLsizei count, const GLint* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform2f_t)( GLint location, GLfloat v0, GLfloat v1 );
+  typedef void (SYS_APIENTRY *EGL_glUniform2fv_t)( GLint location, GLsizei count, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform2i_t)( GLint location, GLint v0, GLint v1 );
+  typedef void (SYS_APIENTRY *EGL_glUniform2iv_t)( GLint location, GLsizei count, const GLint* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform3f_t)( GLint location, GLfloat v0, GLfloat v1, GLfloat v2 );
+  typedef void (SYS_APIENTRY *EGL_glUniform3fv_t)( GLint location, GLsizei count, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform3i_t)( GLint location, GLint v0, GLint v1, GLint v2 );
+  typedef void (SYS_APIENTRY *EGL_glUniform3iv_t)( GLint location, GLsizei count, const GLint* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform4f_t)( GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3 );
+  typedef void (SYS_APIENTRY *EGL_glUniform4fv_t)( GLint location, GLsizei count, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniform4i_t)( GLint location, GLint v0, GLint v1, GLint v2, GLint v3 );
+  typedef void (SYS_APIENTRY *EGL_glUniform4iv_t)( GLint location, GLsizei count, const GLint* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix2fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix3fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix4fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUseProgram_t)( GLuint program );
+  typedef void (SYS_APIENTRY *EGL_glValidateProgram_t)( GLuint program );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib1d_t)( GLuint index, GLdouble x );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib1dv_t)( GLuint index, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib1f_t)( GLuint index, GLfloat x );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib1fv_t)( GLuint index, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib1s_t)( GLuint index, GLshort x );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib1sv_t)( GLuint index, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib2d_t)( GLuint index, GLdouble x, GLdouble y );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib2dv_t)( GLuint index, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib2f_t)( GLuint index, GLfloat x, GLfloat y );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib2fv_t)( GLuint index, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib2s_t)( GLuint index, GLshort x, GLshort y );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib2sv_t)( GLuint index, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib3d_t)( GLuint index, GLdouble x, GLdouble y, GLdouble z );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib3dv_t)( GLuint index, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib3f_t)( GLuint index, GLfloat x, GLfloat y, GLfloat z );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib3fv_t)( GLuint index, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib3s_t)( GLuint index, GLshort x, GLshort y, GLshort z );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib3sv_t)( GLuint index, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Nbv_t)( GLuint index, const GLbyte* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Niv_t)( GLuint index, const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Nsv_t)( GLuint index, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Nub_t)( GLuint index, GLubyte x, GLubyte y, GLubyte z, GLubyte w );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Nubv_t)( GLuint index, const GLubyte* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Nuiv_t)( GLuint index, const GLuint* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4Nusv_t)( GLuint index, const GLushort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4bv_t)( GLuint index, const GLbyte* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4d_t)( GLuint index, GLdouble x, GLdouble y, GLdouble z, GLdouble w );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4dv_t)( GLuint index, const GLdouble* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4f_t)( GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4fv_t)( GLuint index, const GLfloat* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4iv_t)( GLuint index, const GLint* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4s_t)( GLuint index, GLshort x, GLshort y, GLshort z, GLshort w );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4sv_t)( GLuint index, const GLshort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4ubv_t)( GLuint index, const GLubyte* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4uiv_t)( GLuint index, const GLuint* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttrib4usv_t)( GLuint index, const GLushort* v );
+  typedef void (SYS_APIENTRY *EGL_glVertexAttribPointer_t)( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid* pointer );
 
-  SYS_API extern app_glAttachShader_t glAttachShader;
-  SYS_API extern app_glBindAttribLocation_t glBindAttribLocation;
-  SYS_API extern app_glBlendEquationSeparate_t glBlendEquationSeparate;
-  SYS_API extern app_glCompileShader_t glCompileShader;
-  SYS_API extern app_glCreateProgram_t glCreateProgram;
-  SYS_API extern app_glCreateShader_t glCreateShader;
-  SYS_API extern app_glDeleteProgram_t glDeleteProgram;
-  SYS_API extern app_glDeleteShader_t glDeleteShader;
-  SYS_API extern app_glDetachShader_t glDetachShader;
-  SYS_API extern app_glDisableVertexAttribArray_t glDisableVertexAttribArray;
-  SYS_API extern app_glDrawBuffers_t glDrawBuffers;
-  SYS_API extern app_glEnableVertexAttribArray_t glEnableVertexAttribArray;
-  SYS_API extern app_glGetActiveAttrib_t glGetActiveAttrib;
-  SYS_API extern app_glGetActiveUniform_t glGetActiveUniform;
-  SYS_API extern app_glGetAttachedShaders_t glGetAttachedShaders;
-  SYS_API extern app_glGetAttribLocation_t glGetAttribLocation;
-  SYS_API extern app_glGetProgramInfoLog_t glGetProgramInfoLog;
-  SYS_API extern app_glGetProgramiv_t glGetProgramiv;
-  SYS_API extern app_glGetShaderInfoLog_t glGetShaderInfoLog;
-  SYS_API extern app_glGetShaderiv_t glGetShaderiv;
-  SYS_API extern app_glGetShaderSource_t glGetShaderSource;
-  SYS_API extern app_glGetUniformLocation_t glGetUniformLocation;
-  SYS_API extern app_glGetUniformfv_t glGetUniformfv;
-  SYS_API extern app_glGetUniformiv_t glGetUniformiv;
-  SYS_API extern app_glGetVertexAttribdv_t glGetVertexAttribdv;
-  SYS_API extern app_glGetVertexAttribfv_t glGetVertexAttribfv;
-  SYS_API extern app_glGetVertexAttribiv_t glGetVertexAttribiv;
-  SYS_API extern app_glGetVertexAttribPointerv_t glGetVertexAttribPointerv;
-  SYS_API extern app_glIsProgram_t glIsProgram;
-  SYS_API extern app_glIsShader_t glIsShader;
-  SYS_API extern app_glLinkProgram_t glLinkProgram;
-  SYS_API extern app_glShaderSource_t glShaderSource;
-  SYS_API extern app_glStencilFuncSeparate_t glStencilFuncSeparate;
-  SYS_API extern app_glStencilMaskSeparate_t glStencilMaskSeparate;
-  SYS_API extern app_glStencilOpSeparate_t glStencilOpSeparate;
-  SYS_API extern app_glUniform1f_t glUniform1f;
-  SYS_API extern app_glUniform1fv_t glUniform1fv;
-  SYS_API extern app_glUniform1i_t glUniform1i;
-  SYS_API extern app_glUniform1iv_t glUniform1iv;
-  SYS_API extern app_glUniform2f_t glUniform2f;
-  SYS_API extern app_glUniform2fv_t glUniform2fv;
-  SYS_API extern app_glUniform2i_t glUniform2i;
-  SYS_API extern app_glUniform2iv_t glUniform2iv;
-  SYS_API extern app_glUniform3f_t glUniform3f;
-  SYS_API extern app_glUniform3fv_t glUniform3fv;
-  SYS_API extern app_glUniform3i_t glUniform3i;
-  SYS_API extern app_glUniform3iv_t glUniform3iv;
-  SYS_API extern app_glUniform4f_t glUniform4f;
-  SYS_API extern app_glUniform4fv_t glUniform4fv;
-  SYS_API extern app_glUniform4i_t glUniform4i;
-  SYS_API extern app_glUniform4iv_t glUniform4iv;
-  SYS_API extern app_glUniformMatrix2fv_t glUniformMatrix2fv;
-  SYS_API extern app_glUniformMatrix3fv_t glUniformMatrix3fv;
-  SYS_API extern app_glUniformMatrix4fv_t glUniformMatrix4fv;
-  SYS_API extern app_glUseProgram_t glUseProgram;
-  SYS_API extern app_glValidateProgram_t glValidateProgram;
-  SYS_API extern app_glVertexAttrib1d_t glVertexAttrib1d;
-  SYS_API extern app_glVertexAttrib1dv_t glVertexAttrib1dv;
-  SYS_API extern app_glVertexAttrib1f_t glVertexAttrib1f;
-  SYS_API extern app_glVertexAttrib1fv_t glVertexAttrib1fv;
-  SYS_API extern app_glVertexAttrib1s_t glVertexAttrib1s;
-  SYS_API extern app_glVertexAttrib1sv_t glVertexAttrib1sv;
-  SYS_API extern app_glVertexAttrib2d_t glVertexAttrib2d;
-  SYS_API extern app_glVertexAttrib2dv_t glVertexAttrib2dv;
-  SYS_API extern app_glVertexAttrib2f_t glVertexAttrib2f;
-  SYS_API extern app_glVertexAttrib2fv_t glVertexAttrib2fv;
-  SYS_API extern app_glVertexAttrib2s_t glVertexAttrib2s;
-  SYS_API extern app_glVertexAttrib2sv_t glVertexAttrib2sv;
-  SYS_API extern app_glVertexAttrib3d_t glVertexAttrib3d;
-  SYS_API extern app_glVertexAttrib3dv_t glVertexAttrib3dv;
-  SYS_API extern app_glVertexAttrib3f_t glVertexAttrib3f;
-  SYS_API extern app_glVertexAttrib3fv_t glVertexAttrib3fv;
-  SYS_API extern app_glVertexAttrib3s_t glVertexAttrib3s;
-  SYS_API extern app_glVertexAttrib3sv_t glVertexAttrib3sv;
-  SYS_API extern app_glVertexAttrib4Nbv_t glVertexAttrib4Nbv;
-  SYS_API extern app_glVertexAttrib4Niv_t glVertexAttrib4Niv;
-  SYS_API extern app_glVertexAttrib4Nsv_t glVertexAttrib4Nsv;
-  SYS_API extern app_glVertexAttrib4Nub_t glVertexAttrib4Nub;
-  SYS_API extern app_glVertexAttrib4Nubv_t glVertexAttrib4Nubv;
-  SYS_API extern app_glVertexAttrib4Nuiv_t glVertexAttrib4Nuiv;
-  SYS_API extern app_glVertexAttrib4Nusv_t glVertexAttrib4Nusv;
-  SYS_API extern app_glVertexAttrib4bv_t glVertexAttrib4bv;
-  SYS_API extern app_glVertexAttrib4d_t glVertexAttrib4d;
-  SYS_API extern app_glVertexAttrib4dv_t glVertexAttrib4dv;
-  SYS_API extern app_glVertexAttrib4f_t glVertexAttrib4f;
-  SYS_API extern app_glVertexAttrib4fv_t glVertexAttrib4fv;
-  SYS_API extern app_glVertexAttrib4iv_t glVertexAttrib4iv;
-  SYS_API extern app_glVertexAttrib4s_t glVertexAttrib4s;
-  SYS_API extern app_glVertexAttrib4sv_t glVertexAttrib4sv;
-  SYS_API extern app_glVertexAttrib4ubv_t glVertexAttrib4ubv;
-  SYS_API extern app_glVertexAttrib4uiv_t glVertexAttrib4uiv;
-  SYS_API extern app_glVertexAttrib4usv_t glVertexAttrib4usv;
-  SYS_API extern app_glVertexAttribPointer_t glVertexAttribPointer;
+  SYS_API extern EGL_glAttachShader_t glAttachShader;
+  SYS_API extern EGL_glBindAttribLocation_t glBindAttribLocation;
+  SYS_API extern EGL_glBlendEquationSeparate_t glBlendEquationSeparate;
+  SYS_API extern EGL_glCompileShader_t glCompileShader;
+  SYS_API extern EGL_glCreateProgram_t glCreateProgram;
+  SYS_API extern EGL_glCreateShader_t glCreateShader;
+  SYS_API extern EGL_glDeleteProgram_t glDeleteProgram;
+  SYS_API extern EGL_glDeleteShader_t glDeleteShader;
+  SYS_API extern EGL_glDetachShader_t glDetachShader;
+  SYS_API extern EGL_glDisableVertexAttribArray_t glDisableVertexAttribArray;
+  SYS_API extern EGL_glDrawBuffers_t glDrawBuffers;
+  SYS_API extern EGL_glEnableVertexAttribArray_t glEnableVertexAttribArray;
+  SYS_API extern EGL_glGetActiveAttrib_t glGetActiveAttrib;
+  SYS_API extern EGL_glGetActiveUniform_t glGetActiveUniform;
+  SYS_API extern EGL_glGetAttachedShaders_t glGetAttachedShaders;
+  SYS_API extern EGL_glGetAttribLocation_t glGetAttribLocation;
+  SYS_API extern EGL_glGetProgramInfoLog_t glGetProgramInfoLog;
+  SYS_API extern EGL_glGetProgramiv_t glGetProgramiv;
+  SYS_API extern EGL_glGetShaderInfoLog_t glGetShaderInfoLog;
+  SYS_API extern EGL_glGetShaderiv_t glGetShaderiv;
+  SYS_API extern EGL_glGetShaderSource_t glGetShaderSource;
+  SYS_API extern EGL_glGetUniformLocation_t glGetUniformLocation;
+  SYS_API extern EGL_glGetUniformfv_t glGetUniformfv;
+  SYS_API extern EGL_glGetUniformiv_t glGetUniformiv;
+  SYS_API extern EGL_glGetVertexAttribdv_t glGetVertexAttribdv;
+  SYS_API extern EGL_glGetVertexAttribfv_t glGetVertexAttribfv;
+  SYS_API extern EGL_glGetVertexAttribiv_t glGetVertexAttribiv;
+  SYS_API extern EGL_glGetVertexAttribPointerv_t glGetVertexAttribPointerv;
+  SYS_API extern EGL_glIsProgram_t glIsProgram;
+  SYS_API extern EGL_glIsShader_t glIsShader;
+  SYS_API extern EGL_glLinkProgram_t glLinkProgram;
+  SYS_API extern EGL_glShaderSource_t glShaderSource;
+  SYS_API extern EGL_glStencilFuncSeparate_t glStencilFuncSeparate;
+  SYS_API extern EGL_glStencilMaskSeparate_t glStencilMaskSeparate;
+  SYS_API extern EGL_glStencilOpSeparate_t glStencilOpSeparate;
+  SYS_API extern EGL_glUniform1f_t glUniform1f;
+  SYS_API extern EGL_glUniform1fv_t glUniform1fv;
+  SYS_API extern EGL_glUniform1i_t glUniform1i;
+  SYS_API extern EGL_glUniform1iv_t glUniform1iv;
+  SYS_API extern EGL_glUniform2f_t glUniform2f;
+  SYS_API extern EGL_glUniform2fv_t glUniform2fv;
+  SYS_API extern EGL_glUniform2i_t glUniform2i;
+  SYS_API extern EGL_glUniform2iv_t glUniform2iv;
+  SYS_API extern EGL_glUniform3f_t glUniform3f;
+  SYS_API extern EGL_glUniform3fv_t glUniform3fv;
+  SYS_API extern EGL_glUniform3i_t glUniform3i;
+  SYS_API extern EGL_glUniform3iv_t glUniform3iv;
+  SYS_API extern EGL_glUniform4f_t glUniform4f;
+  SYS_API extern EGL_glUniform4fv_t glUniform4fv;
+  SYS_API extern EGL_glUniform4i_t glUniform4i;
+  SYS_API extern EGL_glUniform4iv_t glUniform4iv;
+  SYS_API extern EGL_glUniformMatrix2fv_t glUniformMatrix2fv;
+  SYS_API extern EGL_glUniformMatrix3fv_t glUniformMatrix3fv;
+  SYS_API extern EGL_glUniformMatrix4fv_t glUniformMatrix4fv;
+  SYS_API extern EGL_glUseProgram_t glUseProgram;
+  SYS_API extern EGL_glValidateProgram_t glValidateProgram;
+  SYS_API extern EGL_glVertexAttrib1d_t glVertexAttrib1d;
+  SYS_API extern EGL_glVertexAttrib1dv_t glVertexAttrib1dv;
+  SYS_API extern EGL_glVertexAttrib1f_t glVertexAttrib1f;
+  SYS_API extern EGL_glVertexAttrib1fv_t glVertexAttrib1fv;
+  SYS_API extern EGL_glVertexAttrib1s_t glVertexAttrib1s;
+  SYS_API extern EGL_glVertexAttrib1sv_t glVertexAttrib1sv;
+  SYS_API extern EGL_glVertexAttrib2d_t glVertexAttrib2d;
+  SYS_API extern EGL_glVertexAttrib2dv_t glVertexAttrib2dv;
+  SYS_API extern EGL_glVertexAttrib2f_t glVertexAttrib2f;
+  SYS_API extern EGL_glVertexAttrib2fv_t glVertexAttrib2fv;
+  SYS_API extern EGL_glVertexAttrib2s_t glVertexAttrib2s;
+  SYS_API extern EGL_glVertexAttrib2sv_t glVertexAttrib2sv;
+  SYS_API extern EGL_glVertexAttrib3d_t glVertexAttrib3d;
+  SYS_API extern EGL_glVertexAttrib3dv_t glVertexAttrib3dv;
+  SYS_API extern EGL_glVertexAttrib3f_t glVertexAttrib3f;
+  SYS_API extern EGL_glVertexAttrib3fv_t glVertexAttrib3fv;
+  SYS_API extern EGL_glVertexAttrib3s_t glVertexAttrib3s;
+  SYS_API extern EGL_glVertexAttrib3sv_t glVertexAttrib3sv;
+  SYS_API extern EGL_glVertexAttrib4Nbv_t glVertexAttrib4Nbv;
+  SYS_API extern EGL_glVertexAttrib4Niv_t glVertexAttrib4Niv;
+  SYS_API extern EGL_glVertexAttrib4Nsv_t glVertexAttrib4Nsv;
+  SYS_API extern EGL_glVertexAttrib4Nub_t glVertexAttrib4Nub;
+  SYS_API extern EGL_glVertexAttrib4Nubv_t glVertexAttrib4Nubv;
+  SYS_API extern EGL_glVertexAttrib4Nuiv_t glVertexAttrib4Nuiv;
+  SYS_API extern EGL_glVertexAttrib4Nusv_t glVertexAttrib4Nusv;
+  SYS_API extern EGL_glVertexAttrib4bv_t glVertexAttrib4bv;
+  SYS_API extern EGL_glVertexAttrib4d_t glVertexAttrib4d;
+  SYS_API extern EGL_glVertexAttrib4dv_t glVertexAttrib4dv;
+  SYS_API extern EGL_glVertexAttrib4f_t glVertexAttrib4f;
+  SYS_API extern EGL_glVertexAttrib4fv_t glVertexAttrib4fv;
+  SYS_API extern EGL_glVertexAttrib4iv_t glVertexAttrib4iv;
+  SYS_API extern EGL_glVertexAttrib4s_t glVertexAttrib4s;
+  SYS_API extern EGL_glVertexAttrib4sv_t glVertexAttrib4sv;
+  SYS_API extern EGL_glVertexAttrib4ubv_t glVertexAttrib4ubv;
+  SYS_API extern EGL_glVertexAttrib4uiv_t glVertexAttrib4uiv;
+  SYS_API extern EGL_glVertexAttrib4usv_t glVertexAttrib4usv;
+  SYS_API extern EGL_glVertexAttribPointer_t glVertexAttribPointer;
 #endif
 
 #ifndef GL_VERSION_2_1
   #define GL_VERSION_2_1 1
-  #define APP_GL_VERSION_2_1_DEFINED
+  #define EGL_GL_VERSION_2_1_DEFINED
 
   #define GL_CURRENT_RASTER_SECONDARY_COLOR                                    0x845F
   #define GL_PIXEL_PACK_BUFFER                                                 0x88EB
@@ -1705,37 +1696,25 @@ extern "C" {
   #define GL_COMPRESSED_SLUMINANCE                                             0x8C4A
   #define GL_COMPRESSED_SLUMINANCE_ALPHA                                       0x8C4B
 
-  typedef void (SYS_APIENTRY *app_glUniformMatrix2x3fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix2x4fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix3x2fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix3x4fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix4x2fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
-  typedef void (SYS_APIENTRY *app_glUniformMatrix4x3fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix2x3fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix2x4fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix3x2fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix3x4fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix4x2fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
+  typedef void (SYS_APIENTRY *EGL_glUniformMatrix4x3fv_t)( GLint location, GLsizei count, GLboolean transpose, const GLfloat* value );
 
-  SYS_API extern app_glUniformMatrix2x3fv_t glUniformMatrix2x3fv;
-  SYS_API extern app_glUniformMatrix2x4fv_t glUniformMatrix2x4fv;
-  SYS_API extern app_glUniformMatrix3x2fv_t glUniformMatrix3x2fv;
-  SYS_API extern app_glUniformMatrix3x4fv_t glUniformMatrix3x4fv;
-  SYS_API extern app_glUniformMatrix4x2fv_t glUniformMatrix4x2fv;
-  SYS_API extern app_glUniformMatrix4x3fv_t glUniformMatrix4x3fv;
+  SYS_API extern EGL_glUniformMatrix2x3fv_t glUniformMatrix2x3fv;
+  SYS_API extern EGL_glUniformMatrix2x4fv_t glUniformMatrix2x4fv;
+  SYS_API extern EGL_glUniformMatrix3x2fv_t glUniformMatrix3x2fv;
+  SYS_API extern EGL_glUniformMatrix3x4fv_t glUniformMatrix3x4fv;
+  SYS_API extern EGL_glUniformMatrix4x2fv_t glUniformMatrix4x2fv;
+  SYS_API extern EGL_glUniformMatrix4x3fv_t glUniformMatrix4x3fv;
 #endif
 
-
-SYS_API bool_t app_checkglversion( app_glversion_t glversion );
-SYS_API app_glversion_t app_getglversion();
-
+SYS_API void EGL_loadextensions(void);
 
 #ifdef __cplusplus
 }
 #endif
-
-
-/*============================================================================================================================================================*/
-/*                                                                                                                                                            */
-/*============================================================================================================================================================*/
-/*       1         2         3         4         5         6         7         8         9         0         1         2         3         4         5        */
-/*345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678*/
-/*============================================================================================================================================================*/
-
 
 #endif

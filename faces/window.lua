@@ -11,9 +11,9 @@ return function(_ENV)
   face.radius = false
 
   face.flow = {
-    minimize = cel.flows.linear(2000),
-    maximize = cel.flows.linear(200),
-    restore = cel.flows.linear(200),
+    minimize = cel.flows.smooth(300),
+    maximize = cel.flows.smooth(300),
+    restore = cel.flows.smooth(300),
   }
 
   face['%focus'] = face:new {

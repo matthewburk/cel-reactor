@@ -4,7 +4,7 @@ local cel = require 'cel'
 
 local driver = cel.installdriver(
   {
-    buttons = { left = 1, middle = 2, right = 3, },
+    buttons = { left = 'left', middle = 'middle', right = 'right', },
     states = { unknown = 'unknown', normal = 'normal', pressed = 'pressed', },
     wheeldirection = { up = 1, down = -1, },
   },
@@ -13,15 +13,15 @@ local driver = cel.installdriver(
     keystates = { unknown = 'unknown', normal = 'normal', pressed = 'pressed', }
   })
   
-function reactor.mousepressed(x, y, button, alt, ctrl, shift)
+function reactor.mousedown(x, y, button, alt, ctrl, shift)
   driver.mousedown(x, y, button, alt, ctrl, shift)
 end
 
-function reactor.mousereleased(x, y, button, alt, ctrl, shift)
+function reactor.mouseup(x, y, button, alt, ctrl, shift)
   driver.mouseup(x, y, button, alt, ctrl, shift)
 end
 
-function reactor.mousewheel(delta, step)
+function reactor.mousewheel(x, y, delta, step, alt, ctrl, shift)
   local direction 
 
   if delta > 0 then
@@ -30,11 +30,9 @@ function reactor.mousewheel(delta, step)
     direction =  cel.mouse.wheeldirection.down
   end
 
-  local x, y = cel.mouse:xy()
-
   delta = math.abs(delta)
   for i=1,delta do
-    driver.mousewheel(x, y, direction, step)
+    driver.mousewheel(x, y, direction, step, alt, ctrl, shift)
   end
 end
 
@@ -42,16 +40,16 @@ function reactor.mousemove(x, y)
   driver.mousemove(x, y)
 end
 
-function reactor.keypressed(key, alt, ctrl, shift, autorepeat)
-  if autorepeat then
-    driver.keypress(key, alt, ctrl, shift)
-  else
-    driver.keydown(key, alt, ctrl, shift)
-  end
+function reactor.keydown(key, alt, ctrl, shift)
+  driver.keydown(key, alt, ctrl, shift)
 end
 
-function reactor.keyreleased(key)
-  driver.keyup(key)
+function reactor.keydown(key, alt, ctrl, shift)
+  driver.keypress(key, alt, ctrl, shift)
+end
+
+function reactor.keyup(key, alt, ctrl, shift)
+  driver.keyup(key, alt, ctrl, shift)
 end
 
 function reactor.character(c)
@@ -63,18 +61,18 @@ function reactor.command(c)
 end
 
 function reactor.load()
-  driver.root:resize(reactor.graphics.getwidth(), reactor.graphics.getheight())
+  driver.root:resize(reactor.w, reactor.h)
   if M.load then
-    M.load(reactor.graphics.getwidth(), reactor.graphics.getheight())
+    M.load(reactor.w, reactor.h)
   end
 end
 
-function reactor.resized(nw, nh)
-  driver.root:resize(reactor.graphics.getwidth(), reactor.graphics.getheight())
+function reactor.resized() 
+  driver.root:resize(reactor.w, reactor.h)
 end
 
 function reactor.draw()
-  reactor.graphics.pushstate2d(reactor.graphics.getwidth(), reactor.graphics.getheight())
+  reactor.graphics.pushstate2d(reactor.w, reactor.h)
   reactor.graphics.setcolor(1, 1, 1)
 
   if M.draw then
@@ -84,15 +82,8 @@ function reactor.draw()
   reactor.graphics.popstate()
 end
 
-do
-  local lastfps
-  function reactor.update(fps)
-    if fps ~= lastfps then
-      lastfps = fps
-      print('fps', fps)
-    end
-    driver.timer(reactor.timermillis());
-  end
+function reactor.update()
+  driver.timer(reactor.timermillis());
 end
 
 function driver.clipboard(command, data)

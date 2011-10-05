@@ -1,9 +1,7 @@
 #include <stdlib.h>
-#include <toolkits/dbg/debug.h>
-#include <toolkits/app/gl.h>
-#include <toolkits/gfx/graphics.h>
-#include <toolkits/gfx/texture.h>
-#include "reactor.h"
+#include <debug.h>
+#include "gl.h"
+#include "reactor_graphics.h"
 #include "lua_cairo.h"
 
 void checkself_cairo_font_face(lua_State* L, reactor_cairo_font_face_t** rpp, cairo_font_face_t** pp) {
