@@ -8,10 +8,11 @@ return function(_ENV)
   face.fillcolor = false
   face.linecolor = false
   face.linewidth = false
+  face.font = cel.loadfont('wingdings', 32)
 
   face.layout = {
     padding = {
-      l = function(w, h, font) return font.bbox.ymax * .1 end,
+      l = function(w, h, font) return font.ascent * .1 end,
     },
   }
 
@@ -25,10 +26,14 @@ return function(_ENV)
     if f.textcolor and t.text then
       cairo.cel_set_source_rgba(cr, f.textcolor)
       for i, line in ipairs(t.lines) do
+        if string.sub(t.text, line.j, line.j) ~= '\n' then
         --uncomment this optimization later
         --if t.y + line.y < t.clip.b  and t.y + line.y + line.h > t.clip.t then
           cairo.cel_show_text(cr, t.font, line.penx, line.peny, t.text, line.i, line.j)
         --end
+        elseif line.i < line.j then
+          cairo.cel_show_text(cr, t.font, line.penx, line.peny, t.text, line.i, line.j-1)
+        end
       end
     end
 

@@ -26,14 +26,14 @@ return function(_ENV)
       track = {
         size = size,
         link = {'edges', nil, size},
-        slider = {
+        thumb = {
           minsize = 20,
           size = size,
         };
       },
       decbutton = {
         size = size,
-        link = {'width.top'},
+        link = 'width.top',
       },
       incbutton = {
         size = size,
@@ -46,7 +46,7 @@ return function(_ENV)
       track = {
         size = size,
         link = {'edges', size, nil},
-        slider = {
+        thumb = {
           minsize = 10,
           size = size,
         },
@@ -73,14 +73,14 @@ return function(_ENV)
   track.select = false
   track.draw = scroll.draw
 
-  --slider
-  local slider = cel.getface('scroll.bar.slider')
-  slider.fillcolor = cel.color.encodef(.2, .2, .2)
-  slider.linecolor = cel.color.encodef(0, 1, 1)
-  slider.accentcolor = cel.color.encodef(0, 1, 1)
-  slider.select = false
+  --thumb
+  local thumb = cel.getface('scroll.bar.thumb')
+  thumb.fillcolor = cel.color.encodef(.2, .2, .2)
+  thumb.linecolor = cel.color.encodef(0, 1, 1)
+  thumb.accentcolor = cel.color.encodef(0, 1, 1)
+  thumb.select = false
 
-  function slider.draw(f, t, size)
+  function thumb.draw(f, t, size)
     local size = size or t.host.host.size
 
     if f.fillcolor then
@@ -114,7 +114,7 @@ return function(_ENV)
   incbutton.fillcolor = cel.color.encodef(.2, .2, .2)
   incbutton.linecolor = cel.color.encodef(0, 1, 1)
   incbutton.accentcolor = cel.color.encodef(0, 1, 1)
-  incbutton.draw = function(f, t) return slider.draw(f, t, t.host.size) end
+  incbutton.draw = function(f, t) return thumb.draw(f, t, t.host.size) end
 
   do
     local face = incbutton
@@ -145,7 +145,7 @@ return function(_ENV)
   decbutton.fillcolor = cel.color.encodef(.2, .2, .2)
   decbutton.linecolor = cel.color.encodef(0, 1, 1)
   decbutton.accentcolor = cel.color.encodef(0, 1, 1)
-  decbutton.draw = function(f, t) return slider.draw(f, t, t.host.size) end
+  decbutton.draw = function(f, t) return thumb.draw(f, t, t.host.size) end
 
   do
     local face = decbutton

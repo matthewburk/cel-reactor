@@ -367,13 +367,27 @@ void reactor_paint(void) {
 void reactor_update(void) {
   DBG_ENTER();
   DBG_ASSERT(L);
-    
+  
+  
+
   lua_getglobal(L, "reactor");
   lua_pushliteral(L, "update");
   lua_gettable(L, -2);
 
   if (lua_isfunction(L, -1)) { 	  
     docall(L, 0, 0);
+    lua_pop(L, 1);
+  }
+  else {
+    lua_pop(L, 2);
+  }
+  
+  lua_getglobal(L, "reactor");
+  lua_getfield(L, -1, "tick");  
+
+  if (lua_isfunction(L, -1)) { 	    
+    lua_pushnumber(L, reactor_driver_millis()); 
+    docall(L, 1, 0);
     lua_pop(L, 1);
   }
   else {

@@ -1,4 +1,5 @@
 #include <windows.h>
+#include <windowsx.h>
 #include <stdio.h>
 #include <debug.h>
 #include "reactor.h"
@@ -257,8 +258,8 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_MOVE:
       if ( !IsIconic( hwnd ) ) {
-        window.x = LOWORD( lparam );
-        window.y = HIWORD( lparam );
+        window.x = (int)(short)LOWORD( lparam );
+        window.y = (int)(short)HIWORD( lparam );
         if (window.created) reactor_winevent("move");        
       }
       return 0;    
@@ -299,21 +300,21 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       return 1;
     
     case WM_MBUTTONDBLCLK:
-      reactor_mousedblclick(LOWORD( lparam ), HIWORD( lparam ), "middle", 
+      reactor_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
       return 0;
 
     case WM_LBUTTONDBLCLK:
-      reactor_mousedblclick(LOWORD( lparam ), HIWORD( lparam ), "left", 
+      reactor_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
       return 0;
 
     case WM_RBUTTONDBLCLK:
-      reactor_mousedblclick(LOWORD( lparam ), HIWORD( lparam ), "right", 
+      reactor_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -321,7 +322,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_MBUTTONDOWN:
       SetCapture( hwnd );
-      reactor_mousedown(LOWORD( lparam ), HIWORD( lparam ), "middle", 
+      reactor_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -329,7 +330,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_LBUTTONDOWN:
       SetCapture( hwnd );
-      reactor_mousedown(LOWORD( lparam ), HIWORD( lparam ), "left", 
+      reactor_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -337,7 +338,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_RBUTTONDOWN:
       SetCapture( hwnd );
-      reactor_mousedown(LOWORD( lparam ), HIWORD( lparam ), "right", 
+      reactor_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -345,7 +346,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_MBUTTONUP:
       ReleaseCapture();
-      reactor_mouseup(LOWORD( lparam ), HIWORD( lparam ), "middle", 
+      reactor_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -353,7 +354,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_LBUTTONUP:
       ReleaseCapture();
-      reactor_mouseup(LOWORD( lparam ), HIWORD( lparam ), "left", 
+      reactor_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -361,7 +362,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_RBUTTONUP:    
       ReleaseCapture();
-      reactor_mouseup(LOWORD( lparam ), HIWORD( lparam ), "right", 
+      reactor_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -393,7 +394,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
         reactor_mouseenter();
       }
 
-      reactor_mousemove(LOWORD( lparam ), HIWORD( lparam ), 
+      reactor_mousemove(GET_X_LPARAM(lparam ), GET_Y_LPARAM(lparam ), 
         GetKeyState( VK_MENU ) & 0x8000,
         GetKeyState( VK_CONTROL ) & 0x8000,
         GetKeyState( VK_SHIFT ) & 0x8000);      
@@ -401,10 +402,14 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_MOUSEWHEEL:
       {
+        POINT pt;
         UINT step;
         SystemParametersInfo( SPI_GETWHEELSCROLLLINES, 0, &step, 0 );
 
-        reactor_mousewheel(LOWORD( lparam ), HIWORD( lparam ), 
+        pt.x = GET_X_LPARAM( lparam );
+        pt.y = GET_Y_LPARAM( lparam );
+        ScreenToClient(hwnd, &pt);
+        reactor_mousewheel(pt.x, pt.y, 
           GET_WHEEL_DELTA_WPARAM( wparam ) / WHEEL_DELTA,
           step,
           GetKeyState( VK_MENU ) & 0x8000,
@@ -535,7 +540,7 @@ static void _create_glwindow( const char* title, int cw, int ch ) {
 
     pfd.nSize = sizeof( PIXELFORMATDESCRIPTOR );
     pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL ;//| PFD_DOUBLEBUFFER;
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cRedBits = 8;
     pfd.cGreenBits = 8;

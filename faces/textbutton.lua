@@ -7,10 +7,17 @@ return function(_ENV)
 
   local face = cel.getface('textbutton')
 
+  face.textcolor = cel.color.encodef(.8, .8, .8)
+  face.fillcolor = cel.color.encodef(.2, .2, .2)
+  face.linecolor = cel.color.encodef(.4, .4, .4)
+  face.linewidth = 1
+
   face.layout = {
+    wrap = 'line',
+    justification = 'center',
     padding = {
       fitx = 'bbox',
-      l = function(w, h, font) return font.bbox.ymax * .5 end, --TODO need font em
+      l = function(w, h, font) return font.ascent * .5 end, --TODO need font em
       t = function(w, h, font) return h*.35 end,
     },
   }
@@ -24,7 +31,16 @@ return function(_ENV)
 
     if f.textcolor and t.text then
       cairo.cel_set_source_rgba(cr, f.textcolor)
-      cairo.cel_show_text(cr, t.font, t.penx, t.peny, t.text)
+      for i, line in ipairs(t.lines) do
+        if string.sub(t.text, line.j, line.j) ~= '\n' then
+        --uncomment this optimization later
+        --if t.y + line.y < t.clip.b  and t.y + line.y + line.h > t.clip.t then
+          cairo.cel_show_text(cr, t.font, line.penx, line.peny, t.text, line.i, line.j)
+        --end
+        elseif line.i < line.j then
+          cairo.cel_show_text(cr, t.font, line.penx, line.peny, t.text, line.i, line.j-1)
+        end
+      end
     end
 
     if f.linewidth and f.linecolor then
@@ -58,6 +74,18 @@ return function(_ENV)
         linewidth = 2,
       }
     end
+  end
+
+  function face.select(face, t)
+    if t.mousefocusin then
+      face = face['%mousefocusin'] or face
+      if t.pressed then
+        face = face['%pressed'] or face
+      end
+    elseif t.pressed then
+      face = face['%pressed'] or face
+    end
+    return face
   end
 end
 

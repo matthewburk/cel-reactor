@@ -35,7 +35,7 @@ function cairo.cel_show_text(cr, font, x, y, text, i, j)
     return 
   end
 
-  cr:set_font_face(font.nativefont)
+  cr:set_font_face(font.cairofont)
   cr:set_font_size(font.size)
   cr:save()
   cr:move_to(x, y)
@@ -52,21 +52,14 @@ function cairo.cel_show_textlt(cr, font, x, y, text, i, j)
     return 
   end
 
-  cr:set_font_face(font.nativefont)
+  cr:set_font_face(font.cairofont)
   cr:set_font_size(font.size)
 
-  if font.bbox.xmin ~= 0 then
-    local xmin = font:measurebbox(text)
-    cr:save()
-    cr:move_to(x - xmin, y + font.bbox.ymax)
-    cr:show_text(text, i, j)
-    cr:restore()
-  else
-    cr:save()
-    cr:move_to(x, y + font.bbox.ymax)
-    cr:show_text(text, i, j)
-    cr:restore()
-  end
+  local xmin = font:measurebbox(text)
+  cr:save()
+  cr:move_to(x - xmin, y + font.ascent)
+  cr:show_text(text, i, j)
+  cr:restore()
 end
 
 function _ENV.updaterect(t, r)
@@ -99,11 +92,11 @@ end
 do --cel face
   local face = cel.getface('cel')
 
-  face.font = cel.loadfont('arial')
+  face.font = cel.loadfont('dejavu sans mono', 12)
   face.textcolor = cel.color.encodef(1, 1, 1)
   face.fillcolor = false --cel.color.encodef(0, 0, 0)
   face.linecolor = cel.color.encodef(1, 1, 1)
-  face.linewidth = 1 
+  face.linewidth = false 
   face.radius = false
 
   function face.draw(f, t)
@@ -197,12 +190,12 @@ function root.draw(f, t)
   --]]
   --
 
-   print('cairo took', reactor.timermillis() - tbeg)
+   --print('cairo took', reactor.timermillis() - tbeg)
 
 
   local tbeg = reactor.timermillis()
   reactor.graphics.updatetexture(f.texture, f.surface, ur.l, ur.t, ur.r-ur.l, ur.b-ur.t)
-  print('updatetexture took', reactor.timermillis() - tbeg)
+  --print('updatetexture took', reactor.timermillis() - tbeg)
 
 
 
@@ -219,21 +212,25 @@ end
 require('faces.button')(_ENV)
 require('faces.textbutton')(_ENV)
 require('faces.text')(_ENV)
+require('faces.editbox')(_ENV)
 require('faces.grip')(_ENV)
 require('faces.label')(_ENV)
 require('faces.scroll')(_ENV)
 require('faces.listbox')(_ENV)
 require('faces.window')(_ENV)
-require('faces.altimeter')(_ENV)
---[[
-require('faces.airspeed')(_ENV)
---]]
+require('faces.marker')(_ENV)
 
 return {
-  draw = function(t, changed)
+  draw = function()
+    local t, changed = cel.describe()
+    reactor.graphics.pushstate2d(reactor.w, reactor.h)
+    reactor.graphics.setcolor(1, 1, 1)
+
     _ENV.description = t
     if changed then
       root.draw(root, t.description)
     end
+
+    reactor.graphics.popstate()
   end
 }

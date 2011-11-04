@@ -27,7 +27,9 @@ local cel = require 'cel'
 local driver = require 'driver'
 local faces = require 'faces'
 
-function driver.load(...)
+function reactor.load(...)
+  driver.load(reactor.w, reactor.h)
+
   local root = driver.root
 
   local sandbox = cel.mutexpanel.new(100, 100)
@@ -69,7 +71,8 @@ function driver.load(...)
   local modules = cel.col {
     link = 'width';
 
-    addmodule'airspeedtest',
+    addmodule'editbox',
+    addmodule'windows',
     addmodule'altimetertest',
     addmodule'test.document.basic',
     addmodule'test.col.flux',
@@ -141,16 +144,7 @@ function driver.load(...)
 
   do
     local _update = reactor.update
-    local i = 0
-    function reactor.update(...)
-      _update(...)
-      i = i + 1
-
-      if i % 10000 == 0 then
-        print( tostring(collectgarbage('count') / 1024))
-        i = 0
-      end
-    end
+    
   end
 
   --[[
@@ -172,10 +166,18 @@ function driver.load(...)
   end
 end
 
-function driver.draw(t, changed)
-  return faces.draw(t, changed)
+function reactor.resized()
+  driver.resize(reactor.w, reactor.h)
 end
 
+function reactor.update()
+end
 
+function reactor.draw()
+  reactor.graphics.pushstate2d(reactor.w, reactor.h)
+  reactor.graphics.setcolor(1, 1, 1)
+  faces.draw(cel.describe())
+  reactor.graphics.popstate()
+end
 
 
