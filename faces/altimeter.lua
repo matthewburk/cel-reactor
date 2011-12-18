@@ -48,14 +48,14 @@ return function(_ENV)
   end
   function altimeter.draw(f, t)
     if f.fillcolor then
-      cairo.cel_set_source_rgba(cr, f.fillcolor)
-      cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.fillcolor)
+      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
     end
 
     if f.linewidth and f.linecolor then
       cairo.set_line_width(cr, f.linewidth)
-      cairo.cel_set_source_rgba(cr, f.linecolor)
-      cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.linecolor)
+      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
       cairo.stroke(cr)
     end
 
@@ -105,7 +105,7 @@ return function(_ENV)
           cr:arc(xc, yc, rminortick, a, a)
         end
 
-        cairo.cel_set_source_rgba(cr,f.minortickcolor)
+        cairo.extcel_set_source_color(cr,f.minortickcolor)
         cr:set_line_width(f.minortickwidth)
         cr:stroke()
       end
@@ -118,7 +118,7 @@ return function(_ENV)
           cr:arc(xc, yc, rmajortick, a, a)
         end
 
-        cairo.cel_set_source_rgba(cr,f.majortickcolor)
+        cairo.extcel_set_source_color(cr,f.majortickcolor)
         cr:set_line_width(f.majortickwidth)
         cr:stroke()
       end
@@ -127,7 +127,7 @@ return function(_ENV)
         --cr:select_font_face('gill sans mt condensed', 'normal', 'normal')
         cr:select_font_face('wingdings', 'normal', 'normal')
         cr:set_font_size(64 * r/200)
-        cairo.cel_set_source_rgba(cr, f.majorticktextcolor)
+        cairo.extcel_set_source_color(cr, f.majorticktextcolor)
         for i = 0, f.majortickcount-1 do
           local a = lerp(a1, a2, i/f.majortickcount)
           cr:save()
@@ -162,7 +162,7 @@ return function(_ENV)
           cr:arc(xc, yc, rmajortick, needle, needle)
           cr:close_path()
 
-          cairo.cel_set_source_rgba(cr,f.needle10kcolor)
+          cairo.extcel_set_source_color(cr,f.needle10kcolor)
           cr:set_line_width(1 )
           cr:stroke_preserve()
           cr:fill()
@@ -191,7 +191,7 @@ return function(_ENV)
           cr:arc(xc, yc, rpivot, needle + .75 * math.pi*2/f.minortickcount, needle + .75 * math.pi*2/f.minortickcount)
           cr:close_path()
           
-          cairo.cel_set_source_rgba(cr,f.needle1kcolor)
+          cairo.extcel_set_source_color(cr,f.needle1kcolor)
           cr:set_line_width(2)
           cr:stroke_preserve()
           cr:fill()
@@ -211,7 +211,7 @@ return function(_ENV)
             cr:line_to(hw, 0)
             cr:close_path()
 
-            cairo.cel_set_source_rgba(cr,f.needle100color)
+            cairo.extcel_set_source_color(cr,f.needle100color)
             cr:set_line_width(2)
             cr:stroke_preserve()
              cr:fill()
@@ -221,7 +221,7 @@ return function(_ENV)
 
         do --pivot
           cr:arc(xc, yc, rpivot*1.5, 0, 2*math.pi)
-          cairo.cel_set_source_rgba(cr,f.pivotcolor)
+          cairo.extcel_set_source_color(cr,f.pivotcolor)
           cr:fill()
         end
       end

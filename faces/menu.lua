@@ -58,7 +58,7 @@ return function(_ENV)
 
       if t.mousefocusin or t.submenu == 'active' then
         if f.highlightcolor then
-          cairo.cel_set_source_rgba(cr, f.highlightcolor)
+          cairo.extcel_set_source_color(cr, f.highlightcolor)
           cairo.rectangle(cr, t.x, t.y, t.w, t.h)
           cairo.fill(cr)
         end

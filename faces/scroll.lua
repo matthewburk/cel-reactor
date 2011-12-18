@@ -62,7 +62,7 @@ return function(_ENV)
     },
   }
 
-  scroll.draw = function(f, t) return drawlinks(t) end
+  --scroll.draw = function(f, t) return drawlinks(t) end
 
   --scrollbar
   local scrollbar = cel.getface('scroll.bar')
@@ -84,20 +84,20 @@ return function(_ENV)
     local size = size or t.host.host.size
 
     if f.fillcolor then
-      cairo.cel_set_source_rgba(cr, f.fillcolor)
-      cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.fillcolor)
+      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
       cairo.fill(cr)
     end
 
     if f.linewidth and f.linecolor then
       cairo.set_line_width(cr, f.linewidth)
-      cairo.cel_set_source_rgba(cr, f.linecolor)
-      cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.linecolor)
+      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
       cairo.stroke(cr)
     end
 
     if f.accentcolor then
-      cairo.cel_set_source_rgba(cr, f.accentcolor)
+      cairo.extcel_set_source_color(cr, f.accentcolor)
       cairo.save(cr)
       cairo.translate(cr, t.w/2, t.h/2)
       cairo.scale(cr, size, size)

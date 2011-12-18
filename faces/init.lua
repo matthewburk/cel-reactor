@@ -9,11 +9,7 @@ _ENV.cairo = cairo
 _ENV.cr = nil
 _ENV.description = nil
 
-function cairo.cel_set_source_rgba(cr, color)
-  cr:set_source_rgba(decodef(color))
-end
-
-function cairo.cel_roundrect(cr, x, y, w, h, r)
+function cairo.ext_roundrect(cr, x, y, w, h, r)
   if not r then
     cr:rectangle(x, y, w, h);
   else
@@ -27,7 +23,11 @@ function cairo.cel_roundrect(cr, x, y, w, h, r)
   end
 end
 
-function cairo.cel_show_text(cr, font, x, y, text, i, j)
+function cairo.extcel_set_source_color(cr, color)
+  cr:set_source_rgba(decodef(color))
+end
+
+function cairo.extcel_drawstring(cr, font, x, y, text, i, j)
   i = i or 1
   j = j or #text
 
@@ -44,7 +44,7 @@ function cairo.cel_show_text(cr, font, x, y, text, i, j)
 end
 
 --x, y specify left top of string
-function cairo.cel_show_textlt(cr, font, x, y, text, i, j) 
+function cairo.extcel_drawstringlt(cr, font, x, y, text, i, j) 
   i = i or 1
   j = j or #text
 
@@ -94,7 +94,7 @@ do --cel face
 
   face.font = cel.loadfont('dejavu sans mono', 12)
   face.textcolor = cel.color.encodef(1, 1, 1)
-  face.fillcolor = false --cel.color.encodef(0, 0, 0)
+  face.fillcolor = false 
   face.linecolor = cel.color.encodef(1, 1, 1)
   face.linewidth = false 
   face.radius = false
@@ -103,20 +103,36 @@ do --cel face
     local cr = face.cr or cr
 
     if f.fillcolor then
-      cairo.cel_set_source_rgba(cr, f.fillcolor)
-      cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.fillcolor)
+      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
       cairo.fill(cr)
     end
 
     if f.linewidth and f.linecolor then
-      cairo.set_line_width(cr, f.linewidth)
-      cairo.cel_set_source_rgba(cr, f.linecolor)
-      local _, offset = math.modf(f.linewidth/2)
-      cairo.cel_roundrect(cr, 0 +offset, 0 + offset, t.w, t.h, f.radius)
+      cairo.set_line_width(cr, f.linewidth*2)
+      cairo.extcel_set_source_color(cr, f.linecolor)
+      local _, offset = math.modf((f.linewidth+1)/2)
+      offset = 0
+      cairo.ext_roundrect(cr, 0 +offset, 0 + offset, t.w, t.h, f.radius)
       cairo.stroke(cr)
     end
 
     return drawlinks(t)
+  end
+
+  function face.print(f, t, pre)
+    local s = string.format('%s[%d:%s] { x:%d y:%d w:%d h:%d [refresh:%s]',
+      t.metacel, t.id, tostring(t.face[_name]), t.x, t.y, t.w, t.h, tostring(t.refresh))
+    io.write(pre, s)
+    if t.font then
+      io.write('\n', pre, '  @@', string.format('font[%s:%d]', t.font.name, t.font.size))
+    end
+    if f.fillcolor then
+      io.write('\n', pre, '  @@', string.format('fillcolor[%d, %d, %d, %d]', string.byte(f.fillcolor, 1, 4)))
+    end
+    if f.linecolor and f.linewidth then
+      io.write('\n', pre, '  @@', string.format('linecolor[%d, %d, %d, %d]', string.byte(f.linecolor, 1, 4)))
+    end
   end
 end
 

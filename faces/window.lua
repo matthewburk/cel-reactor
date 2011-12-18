@@ -10,6 +10,30 @@ return function(_ENV)
   face.linewidth = 4
   face.radius = false
 
+  do
+    local border = 5
+    local handle = 24
+    face.layout = {
+      minw = border + (handle*3) + border,
+      minh = border + handle + border,
+      maxw = nil,
+      maxh = nil,
+
+      border = { size = border },
+      corner = { size = border * 2 },
+      handle = {
+        w = handle,
+        h = handle,    
+        link = {'width.top', border, border},
+      },
+      client = {    
+        w = 0,
+        h = 0,
+        link = {'edges.topunique', border, border + handle + 1},
+      }
+    }
+  end
+
   face.flow = {
     minimize = cel.flows.smooth(300),
     maximize = cel.flows.smooth(300),
@@ -52,25 +76,25 @@ return function(_ENV)
 
     function face.draw(f, t)
       if f.fillcolor then
-        cairo.cel_set_source_rgba(cr, f.fillcolor)
-        cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+        cairo.extcel_set_source_color(cr, f.fillcolor)
+        cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
         cairo.fill(cr)
       end
 
       if f.textcolor and t.text then
         
-        cairo.cel_show_text(cr, t.font, t.penx, t.peny, t.text)
+        cairo.extcel_drawstring(cr, t.font, t.penx, t.peny, t.text)
       end
 
       if t.host.title and f.textcolor then
-        cairo.cel_set_source_rgba(cr, f.textcolor)
-        cairo.cel_show_textlt(cr, f.font, 4, 4, t.host.title)
+        cairo.extcel_set_source_color(cr, f.textcolor)
+        cairo.extcel_drawstringlt(cr, f.font, 4, 4, t.host.title)
       end
 
       if f.linewidth and f.linecolor then
         cairo.set_line_width(cr, f.linewidth)
-        cairo.cel_set_source_rgba(cr, f.linecolor)
-        cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+        cairo.extcel_set_source_color(cr, f.linecolor)
+        cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
         cairo.stroke(cr)
       end
 

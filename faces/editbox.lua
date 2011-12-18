@@ -28,30 +28,30 @@ return function(_ENV)
 
     function face.draw(f, t)
       if f.fillcolor then
-        cairo.cel_set_source_rgba(cr, f.fillcolor)
-        cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+        cairo.extcel_set_source_color(cr, f.fillcolor)
+        cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
         cairo.fill(cr)
       end
 
       if f.textcolor and t.text then
         --cairo.set_font_options(cr, 'gray')
-        cairo.cel_set_source_rgba(cr, f.textcolor)
-        cairo.cel_show_text(cr, t.font, t.penx, t.peny, t.text)
+        cairo.extcel_set_source_color(cr, f.textcolor)
+        cairo.extcel_drawstring(cr, t.font, t.penx, t.peny, t.text)
         if t.selectionx then
           cairo.save(cr)
           cairo.rectangle(cr, t.selectionx, t.selectiony, t.selectionw, t.selectionh)
           cairo.clip(cr)
           cairo.paint(cr)
-          cairo.cel_set_source_rgba(cr, f.selectedtextcolor)
-          cairo.cel_show_text(cr, t.font, t.penx, t.peny, t.text)
+          cairo.extcel_set_source_color(cr, f.selectedtextcolor)
+          cairo.extcel_drawstring(cr, t.font, t.penx, t.peny, t.text)
           cairo.restore(cr)
         end
       end
 
       if f.linewidth and f.linecolor then
         cairo.set_line_width(cr, f.linewidth)
-        cairo.cel_set_source_rgba(cr, f.linecolor)
-        cairo.cel_roundrect(cr, 0, 0, t.w, t.h, f.radius)
+        cairo.extcel_set_source_color(cr, f.linecolor)
+        cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
         cairo.stroke(cr)
       end
 

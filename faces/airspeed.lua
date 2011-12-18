@@ -50,14 +50,14 @@ return function(_ENV)
 
   function airspeed.draw(f, t)
     if f.fillcolor then
-      cairo.cel_set_source_rgba(cr, f.fillcolor)
-      cairo.cel_roundrect(cr, t.x, t.y, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.fillcolor)
+      cairo.ext_roundrect(cr, t.x, t.y, t.w, t.h, f.radius)
     end
 
     if f.linewidth and f.linecolor then
       cairo.set_line_width(cr, f.linewidth)
-      cairo.cel_set_source_rgba(cr, f.linecolor)
-      cairo.cel_roundrect(cr, t.x, t.y, t.w, t.h, f.radius)
+      cairo.extcel_set_source_color(cr, f.linecolor)
+      cairo.ext_roundrect(cr, t.x, t.y, t.w, t.h, f.radius)
       cairo.stroke(cr)
     end
 
@@ -114,7 +114,7 @@ return function(_ENV)
           cr:arc(xc, yc, rmod1, a, a)
         end
 
-        cairo.cel_set_source_rgba(cr,f.mod1color)
+        cairo.extcel_set_source_color(cr,f.mod1color)
         cr:set_line_width(f.mod1width)
         cr:stroke()
       end
@@ -130,7 +130,7 @@ return function(_ENV)
           cr:arc(xc, yc, rmod2, a, a)
         end
 
-        cairo.cel_set_source_rgba(cr,f.mod2color)
+        cairo.extcel_set_source_color(cr,f.mod2color)
         cr:set_line_width(f.mod2width)
         cr:stroke()
       end
@@ -144,7 +144,7 @@ return function(_ENV)
 
         cr:select_font_face('gill sans mt condensed', nil, 'normal')
         cr:set_font_size(48 * r/200)
-        cairo.cel_set_source_rgba(cr, f.mod3textcolor)
+        cairo.extcel_set_source_color(cr, f.mod3textcolor)
 
         local mod3countf = (f.max-f.min)/f.mod3
 
@@ -167,7 +167,7 @@ return function(_ENV)
           cr:arc(xc, yc, rticks, a, a)
           cr:arc(xc, yc, rmod3, a, a)
 
-          cairo.cel_set_source_rgba(cr,f.mod3color)
+          cairo.extcel_set_source_color(cr,f.mod3color)
           cr:set_line_width(f.mod3width)
           cr:stroke()
         end
@@ -177,7 +177,7 @@ return function(_ENV)
       do --mod2s text
         cr:select_font_face('gill sans mt condensed', nil, 'bold')
         cr:set_font_size(64 * r/200)
-        cairo.cel_set_source_rgba(cr, f.mod2textcolor)
+        cairo.extcel_set_source_color(cr, f.mod2textcolor)
         local _, ybearing, sw, sh = cr:text_extents('0123456789')
         sw = sw/10
         for i = 0, f.mod2count-1 do
@@ -214,7 +214,7 @@ return function(_ENV)
           cr:arc(xc, yc, rmod2, needle, needle)
           cr:close_path()
 
-          cairo.cel_set_source_rgba(cr,f.needle10kcolor)
+          cairo.extcel_set_source_color(cr,f.needle10kcolor)
           cr:set_line_width(1 )
           cr:stroke_preserve()
           cr:fill()
@@ -243,7 +243,7 @@ return function(_ENV)
           cr:arc(xc, yc, rpivot, needle + .75 * math.pi*2/f.mod1count, needle + .75 * math.pi*2/f.mod1count)
           cr:close_path()
           
-          cairo.cel_set_source_rgba(cr,f.needle1kcolor)
+          cairo.extcel_set_source_color(cr,f.needle1kcolor)
           cr:set_line_width(2)
           cr:stroke_preserve()
           cr:fill()
@@ -264,7 +264,7 @@ return function(_ENV)
             cr:line_to(hw, 0)
             cr:close_path()
 
-            cairo.cel_set_source_rgba(cr,f.needle100color)
+            cairo.extcel_set_source_color(cr,f.needle100color)
             cr:set_line_width(2)
             cr:stroke_preserve()
              cr:fill()
@@ -274,7 +274,7 @@ return function(_ENV)
 
         do --pivot
           cr:arc(xc, yc, rpivot*1.5, 0, 2*math.pi)
-          cairo.cel_set_source_rgba(cr,f.pivotcolor)
+          cairo.extcel_set_source_color(cr,f.pivotcolor)
           cr:fill()
         end
       end
