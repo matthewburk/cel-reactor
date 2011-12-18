@@ -1,0 +1,14 @@
+*.swp
+*.ncb
+
+# Compiled source #
+###################
+*.o
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
