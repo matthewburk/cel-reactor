@@ -121,13 +121,32 @@ local driver = cel.installdriver(
       down = 'down', 
     }
   })
-  
+
+  local rootrect = {
+    x = 0,
+    y = 0,
+    w = 0,
+    h = 0,
+  }
+
+function reactor.roottowindow(x, y)
+  return x, y
+end
+
+function reactor.windowtoroot(x, y, ...)
+  x = x - rootrect.x
+  y = y - rootrect.y
+  x = driver.root.w/rootrect.w * x
+  y = driver.root.h/rootrect.h * y
+  return math.floor(x + .5), math.floor(y + .5), ...
+end
+
 function reactor.mousedown(x, y, button, alt, ctrl, shift)
-  driver.mousedown(x, y, button, alt, ctrl, shift)
+  driver.mousedown(reactor.windowtoroot(x, y, button, alt, ctrl, shift))
 end
 
 function reactor.mouseup(x, y, button, alt, ctrl, shift)
-  driver.mouseup(x, y, button, alt, ctrl, shift)
+  driver.mouseup(reactor.windowtoroot(x, y, button, alt, ctrl, shift))
 end
 
 function reactor.mousewheel(x, y, delta, step, alt, ctrl, shift)
@@ -141,12 +160,12 @@ function reactor.mousewheel(x, y, delta, step, alt, ctrl, shift)
 
   delta = math.abs(delta)
   for i=1,delta do
-    driver.mousewheel(x, y, direction, step, alt, ctrl, shift)
+    driver.mousewheel(reactor.windowtoroot(x, y, direction, step, alt, ctrl, shift))
   end
 end
 
 function reactor.mousemove(x, y)
-  driver.mousemove(x, y)
+  driver.mousemove(reactor.windowtoroot(x, y))
 end
 
 function reactor.keydown(key, alt, ctrl, shift)
@@ -230,13 +249,26 @@ do
   end
 end
 
+local stretch = cel.getlinker('fixedaspectstretch') 
+
 return {
   load = function(w, h)
+    local x, y, aw, ah = stretch(reactor.w, reactor.h, 0, 0, w, h, w/h)
+    rootrect.x = x
+    rootrect.y = y
+    rootrect.w = aw
+    rootrect.h = ah
     driver.root:resize(w, h)  
   end,
 
   resize = function(w, h)
+    local x, y, aw, ah = stretch(reactor.w, reactor.h, 0, 0, w, h, w/h)
+    rootrect.x = x
+    rootrect.y = y
+    rootrect.w = aw
+    rootrect.h = ah
     driver.root:resize(w, h)
+    driver.root:refresh()
   end,
 
   root = driver.root:newroot():link(driver.root, 'edges'):takefocus()

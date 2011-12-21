@@ -13,6 +13,7 @@ return function(_ENV)
   do
     local border = 5
     local handle = 24
+
     face.layout = {
       minw = border + (handle*3) + border,
       minh = border + handle + border,

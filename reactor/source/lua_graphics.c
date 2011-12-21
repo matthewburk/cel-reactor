@@ -144,9 +144,22 @@ static int clamp(int v, int min, int max) {
 //  return graphics_rect(L, GFX_DRAWMODE2D_LINE);
 //}
 //
-//static int graphics_fillrect(lua_State* L) {
-//  return graphics_rect(L, GFX_DRAWMODE2D_FILL);
-//}
+static int graphics_fillrect(lua_State* L) {
+  double x = luaL_checknumber(L, 1);
+  double y = luaL_checknumber(L, 2);
+  double w = luaL_checknumber(L, 3);
+  double h = luaL_checknumber(L, 4);
+
+  glDisable( GL_TEXTURE_2D );
+  glBegin( GL_QUADS ); {   
+    glVertex2d( x, y );    
+    glVertex2d( x, y + h );    
+    glVertex2d( x + w, y + h );    
+    glVertex2d( x + w, y );	
+  } glEnd();
+  glEnable( GL_TEXTURE_2D );
+  return 0;
+}
 
 static int graphics_pushstate2d(lua_State* L) {
   GLdouble width = luaL_checknumber(L, 1);
@@ -377,7 +390,7 @@ int luaopen_reactor_graphics(lua_State* L) {
       {"setcolor", graphics_setcolor},    
       {"clipxywh", graphics_clip_xywh},
       {"clipltrb", graphics_clip_ltrb},    
-      //{"fillrect", graphics_fillrect},
+      {"fillrect", graphics_fillrect},
       //{"strokerect", graphics_strokerect},
       {"pushstate2d", graphics_pushstate2d},
       //{"pushstate3d", graphics_pushstate3d},

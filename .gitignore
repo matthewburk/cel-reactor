@@ -1,5 +1,8 @@
 *.swp
 *.ncb
+*.pdb
+*.suo
+reactor/obj
 
 # Compiled source #
 ###################

@@ -4,8 +4,9 @@ local cel = require 'cel'
 local driver = require 'driver'
 local faces = require 'faces'
 
+local _w, _h = 1920, 1080
 function reactor.load(...)
-  driver.load(reactor.w, reactor.h)
+  driver.load(_w, _h)
 
   function driver.root:onkeydown(key, ...)
     if key == ' ' then
@@ -23,7 +24,7 @@ function reactor.load(...)
 end
 
 function reactor.resized()
-  driver.resize(reactor.w, reactor.h)
+  driver.resize(_w, _h)
 end
 
 function reactor.update()

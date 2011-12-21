@@ -175,6 +175,7 @@ local function rlerp(a, b, c)
   return (c - a)/(b - a);
 end
 
+local stretch = cel.getlinker('fixedaspectstretch') 
 function root.draw(f, t)
   local tbeg = reactor.timermillis()
   init(f, t.w, t.h)
@@ -213,8 +214,20 @@ function root.draw(f, t)
   reactor.graphics.updatetexture(f.texture, f.surface, ur.l, ur.t, ur.r-ur.l, ur.b-ur.t)
   --print('updatetexture took', reactor.timermillis() - tbeg)
 
+  do
+    local x, y, aw, ah = stretch(reactor.w, reactor.h, 0, 0, t.w, t.h, t.w/t.h)
 
+    if x > 0 then
+      reactor.graphics.fillrect(0, 0, x, ah)
+      reactor.graphics.fillrect(x+aw, 0, x+1, ah)
+    elseif y > 0 then
+      reactor.graphics.fillrect(0, 0, aw, y)
+      reactor.graphics.fillrect(0, y+ah, aw, y+1)
+    end
+    reactor.graphics.drawtexture(f.texture, x, y, aw, ah, 0, 0, t.w, t.h)
+  end
 
+  --[[
   reactor.graphics.pushmatrix()
   reactor.graphics.loadidentity()
   reactor.graphics.translate(t.w/2, t.h/2)
@@ -222,6 +235,7 @@ function root.draw(f, t)
   reactor.graphics.scale(t.w, t.h)
   reactor.graphics.drawtexture(f.texture, -.5, -.5, 1, 1, 0, 0, t.w, t.h)
   reactor.graphics.popmatrix()
+  --]]
 
 end
 
@@ -243,9 +257,9 @@ return {
     reactor.graphics.setcolor(1, 1, 1)
 
     _ENV.description = t
-    if changed then
+    --if changed then
       root.draw(root, t.description)
-    end
+    --end
 
     reactor.graphics.popstate()
   end
