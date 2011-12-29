@@ -239,16 +239,16 @@ function root.draw(f, t)
 
 end
 
-require('faces.button')(_ENV)
-require('faces.textbutton')(_ENV)
-require('faces.text')(_ENV)
-require('faces.editbox')(_ENV)
-require('faces.grip')(_ENV)
-require('faces.label')(_ENV)
-require('faces.scroll')(_ENV)
-require('faces.listbox')(_ENV)
-require('faces.window')(_ENV)
-require('faces.marker')(_ENV)
+require((...)..'.button')(_ENV)
+require((...)..'.textbutton')(_ENV)
+require((...)..'.text')(_ENV)
+require((...)..'.editbox')(_ENV)
+require((...)..'.grip')(_ENV)
+require((...)..'.label')(_ENV)
+require((...)..'.scroll')(_ENV)
+require((...)..'.listbox')(_ENV)
+require((...)..'.window')(_ENV)
+require((...)..'.marker')(_ENV)
 
 return {
   draw = function()

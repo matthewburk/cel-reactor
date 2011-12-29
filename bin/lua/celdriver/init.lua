@@ -251,16 +251,9 @@ end
 
 local stretch = cel.getlinker('fixedaspectstretch') 
 
-return {
-  load = function(w, h)
-    local x, y, aw, ah = stretch(reactor.w, reactor.h, 0, 0, w, h, w/h)
-    rootrect.x = x
-    rootrect.y = y
-    rootrect.w = aw
-    rootrect.h = ah
-    driver.root:resize(w, h)  
-  end,
+local faces = require((...)..'.faces')
 
+return {
   resize = function(w, h)
     local x, y, aw, ah = stretch(reactor.w, reactor.h, 0, 0, w, h, w/h)
     rootrect.x = x
@@ -271,5 +264,7 @@ return {
     driver.root:refresh()
   end,
 
-  root = driver.root:newroot():link(driver.root, 'edges'):takefocus()
+  draw = faces.draw,
+
+  root = driver.root:newroot():link(driver.root, 'edges'):takefocus(),
 }
