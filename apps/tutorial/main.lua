@@ -1,4 +1,4 @@
-require 'stdinit' {'../../cel'}
+require 'stdinit'
 
 local celdriver = require 'celdriver'
 local cel = require 'cel'
