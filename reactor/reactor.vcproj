@@ -147,7 +147,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="Winmm.lib cairo.lib lua51.lib tk-dbg.lib opengl32.lib"
-				OutputFile="$(ProjectDir)\..\bin\$(ProjectName).exe"
+				OutputFile="$(ProjectDir)\..\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib"
 				GenerateDebugInformation="true"

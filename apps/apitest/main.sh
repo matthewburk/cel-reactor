@@ -1,1 +1,1 @@
-../../bin/reactor.exe main.lua d:n:O,-
+../../reactor.exe main.lua d:n:O,-

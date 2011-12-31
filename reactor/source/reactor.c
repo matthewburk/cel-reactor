@@ -491,24 +491,12 @@ void reactor_init( int argc, char* argv[] ) {
     printf("%s", lua_tostring(L, -1));
     lua_pop(L, 1);  
   }
-  docall(L, 0, 0);
-
-  lua_getglobal(L, "reactor");
-  lua_pushliteral(L, "load");
-  lua_gettable(L, -2);
- 
-  if (lua_isfunction(L, -1)) { 
-    int x, y, w, h;
-    reactor_driver_get_windowrect(&x, &y, &w, &h);
-    reactor.w = w;
-    reactor.h = h;
-    lua_pushinteger(L, w);
-    lua_pushinteger(L, h);    
-    docall(L, 2, 0);
-    lua_pop(L, 1);
-  }
   else {
-    lua_pop(L, 2);
+    int i = 0;
+    for (i=2; i<argc; i++) {
+      lua_pushstring(L, argv[i]);
+    }
+    docall(L, i-2, 0);
   }
 }
 

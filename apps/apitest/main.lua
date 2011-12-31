@@ -1,13 +1,22 @@
-require 'stdinit' {'../..', '../../cel'}
+require 'stdinit' {'../../cel'}
 
+local celdriver = require 'celdriver'
 local cel = require 'cel'
-local driver = require 'driver'
-local faces = require 'faces'
 
-function reactor.load(...)
-  driver.load(reactor.w, reactor.h)
+function reactor.keydown(key, ...)
+  celdriver.keydown(key, ...)
+  if key == 'space' then
+    cel.printdescription()
+  elseif key == 'f1' then
+    reactor.fullscreen(true)
+  elseif key == 'f2' then
+    reactor.fullscreen(false)
+  elseif key == 'escape' then
+    reactor.quit()
+  end
+end
 
-  local root = driver.root
+  local root = celdriver.root
 
   local sandbox = cel.mutexpanel.new(100, 100)
 
@@ -110,48 +119,3 @@ function reactor.load(...)
       { sandbox, link = 'edges'; flex=1; },
     },
   }
-
-  --[[
-  local function memusage()
-    print( tostring(collectgarbage('count') / 1024))
-    cel.doafter(100, memusage)
-  end
-  cel.doafter(1000, memusage)
-  --]]
-
-  do
-    local _update = reactor.update
-    
-  end
-
-  --[[
-  for name in lfs.dir(lfs.currentdir()) do
-    print(name)
-  end
-  --]]
-
-  function root:onkeydown(key, ...)
-    if key == ' ' then
-      cel.printdescription()
-    elseif key == 'f1' then
-      reactor.fullscreen(true)
-    elseif key == 'f2' then
-      reactor.fullscreen(false)
-    elseif key == 'escape' then
-      reactor.quit()
-    end
-  end
-end
-
-function reactor.resized()
-  driver.resize(reactor.w, reactor.h)
-end
-
-function reactor.update()
-end
-
-function reactor.draw()
-  faces.draw() 
-end
-
-
