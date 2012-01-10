@@ -9,6 +9,8 @@ local cel = require 'cel'
 return function(root)
   pause()
   
+  print('hello world')
+  pause()
   --The first thing to understand is that a cel always has a face, A cel is 
   --assigned a face when it is created.
   --
@@ -16,10 +18,12 @@ return function(root)
   --Here we get the face for the cel metacel.  Just as all cels inherit from
   --the 'cel' metacel, all faces inherit from the 'cel' face.
   local face = cel.getface('cel')
-
+  print(face)
+  print('hello world')
   --Here we get the face for the label metacel.  All labels will use this face
   --or a face that inherits from it.
-  local labelface = cel.getface('label')
+  --local labelface = cel.getface('label')
+  --print(labelface)
 
   --face and labelface are special faces becuase they are bound to the metacel.
   --When a new metacel is created a face is created 
@@ -46,10 +50,12 @@ return function(root)
   
   --Lets take a look at the face.
   for k, v in pairs(face) do
-    print('face['..tostring(k)..']', v)
+    io.write('face['..tostring(k)..']', tostring(v), '\n') io.flush()
+    --print('face['..tostring(k)..']', tostring(v))
   end
   pause()
 
+  --[==[
   --Notice the face.draw function.  The tutorial renderer looks for a draw
   --function on a face and calls it, we will supply our own draw function later.
   --
@@ -230,4 +236,5 @@ return function(root)
   --exist.  Creating a new metacel is fairly easy as well, and will be covered
   --in another tutorial.
   pause()
+  --]==]
 end

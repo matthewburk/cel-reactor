@@ -206,6 +206,7 @@ local function loadtut(tut, name)
 end
 
 function tut:run()
+  loadtut(self, 'faces')
   loadtut(self, 'textbutton')
   loadtut(self, 'text')
   loadtut(self, 'button')
@@ -216,7 +217,6 @@ function tut:run()
   loadtut(self, 'linking')
   loadtut(self, 'autolayout')
   loadtut(self, 'metacels and factorys')
-  loadtut(self, 'faces')
   loadtut(self, 'did i mention linkers')
   self:reset()
 end

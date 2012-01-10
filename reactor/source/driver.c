@@ -268,7 +268,12 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       if ( SIZE_MAXIMIZED == wparam || SIZE_RESTORED == wparam ) {
         window.w = LOWORD( lparam );
         window.h = HIWORD( lparam );
-        if (window.created) reactor_winevent("resize");        
+        if (window.created) {
+          reactor_winevent("resize");    
+          reactor_update();
+          reactor_paint();        
+          SwapBuffers(window.hdc);  
+        }
       }
       return 0;
 
@@ -540,7 +545,7 @@ static void _create_glwindow( const char* title, int cw, int ch ) {
 
     pfd.nSize = sizeof( PIXELFORMATDESCRIPTOR );
     pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL ;//| PFD_DOUBLEBUFFER;
+    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cRedBits = 8;
     pfd.cGreenBits = 8;
