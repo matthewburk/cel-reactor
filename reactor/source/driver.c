@@ -508,7 +508,7 @@ static void _create_glwindow( const char* title, int cw, int ch ) {
     wndclass.lpfnWndProc = _window_proc;
     wndclass.hInstance = GetModuleHandle( 0 );
     wndclass.hIcon = LoadIcon( 0, IDI_APPLICATION );
-    wndclass.hbrBackground = (HBRUSH)GetStockObject( BLACK_BRUSH );
+    wndclass.hbrBackground = (HBRUSH)NULL;
     wndclass.lpszClassName = APP_WINDOW_CLASSNAME;
 
     if ( !RegisterClass( &wndclass ) ) {
@@ -545,7 +545,7 @@ static void _create_glwindow( const char* title, int cw, int ch ) {
 
     pfd.nSize = sizeof( PIXELFORMATDESCRIPTOR );
     pfd.nVersion = 1;
-    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
+    pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL;// | PFD_DOUBLEBUFFER;
     pfd.iPixelType = PFD_TYPE_RGBA;
     pfd.cRedBits = 8;
     pfd.cGreenBits = 8;
@@ -588,8 +588,7 @@ int main( int argc, char* argv[] ) {
   reactor_init(argc, argv);
   while ( _poll_nowait() ) {
     reactor_update();
-    reactor_paint();        
-    SwapBuffers(window.hdc);  
+    RedrawWindow(window.hwnd, NULL, NULL, RDW_INVALIDATE);
   }   
   reactor_exit();  
   _destroy_window();

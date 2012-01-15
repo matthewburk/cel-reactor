@@ -21,7 +21,7 @@ return function(root)
   --link returns the cel, as do many functions, allowing us to chain calls together
   --the purpose here is to give the window a close to maximum initial size, and the 
   --we take of the linker with relink
-  win:link(root, 'edges', 10, 10):relink()
+  win:link(root, 'fill.margin', 10):relink()
   pause()
 
   --put zed in win, notice that zed is already linked to root, a cel automatically unlinked before

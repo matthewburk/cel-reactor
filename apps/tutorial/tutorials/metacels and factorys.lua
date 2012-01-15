@@ -110,7 +110,7 @@ return function(root)
     { link = 'right.center'; 'right.center'},
     { link = 'center.top'; 'center.top'},
     { link = 'center.bottom'; 'center.bottom'},
-  }:link(root, 'edges')
+  }:link(root, 'fill')
   pause()
 
   --The idea of just putting a label in a button to have a textbutton is nice,

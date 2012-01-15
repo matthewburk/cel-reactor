@@ -30,7 +30,7 @@ return function(_ENV)
       client = {    
         w = 0,
         h = 0,
-        link = {'edges.topunique', border, border + handle + 1},
+        link = {cel.rcomposelinker('fill.topmargin', 'fill.margin'), {handle + 1,  border}},
       }
     }
   end

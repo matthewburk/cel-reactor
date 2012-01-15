@@ -251,7 +251,7 @@ do
   end
 end
 
-local stretch = cel.getlinker('fixedaspectstretch') 
+local stretch = cel.getlinker('fill.aspect') 
 
 local faces = require((...)..'.faces')
 
@@ -267,7 +267,7 @@ end
 
 celreactor.draw = faces.draw
 
-celreactor.root = driver.root:newroot():link(driver.root, 'edges'):takefocus()
+celreactor.root = driver.root:newroot():link(driver.root, 'fill'):takefocus()
 
 function celreactor.resized()
   celreactor.resize(reactor.w, reactor.h)

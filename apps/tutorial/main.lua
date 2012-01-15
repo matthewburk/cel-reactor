@@ -117,7 +117,7 @@ local function loadtut(tut, name)
     tut.window.listbox:unlink()
   end
   tut.window.listbox = cel.listbox.new(0, 0, '@code')
-  tut.window.listbox:link(tut.window, 'edges')
+  tut.window.listbox:link(tut.window, 'fill')
 
   local listbox = tut.window.listbox
 
@@ -206,7 +206,9 @@ local function loadtut(tut, name)
 end
 
 function tut:run()
-  loadtut(self, 'faces')
+  loadtut(self, 'coldiagram')
+  loadtut(self, 'linking')
+  loadtut(self, 'did i mention linkers')
   loadtut(self, 'textbutton')
   loadtut(self, 'text')
   loadtut(self, 'button')
@@ -214,10 +216,9 @@ function tut:run()
   loadtut(self, 'textbutton')
   loadtut(self, 'tldr')
   loadtut(self, 'intro')
-  loadtut(self, 'linking')
+  loadtut(self, 'faces')
   loadtut(self, 'autolayout')
   loadtut(self, 'metacels and factorys')
-  loadtut(self, 'did i mention linkers')
   self:reset()
 end
 
@@ -243,23 +244,23 @@ do
   }
 
   cel {
-    link = 'edges';
+    link = 'fill';
     cel.col {
-      link = 'edges';
+      link = 'fill';
       { flex=2; 
         cel.row {
-          link = 'edges';
+          link = 'fill';
           { flex=2; 
-            cel.window { link = 'edges'; title = 'buffer'; tut.printbuffer} 
+            cel.window { link = 'fill'; title = 'buffer'; tut.printbuffer} 
           },
           { flex=3; 
-            cel.window { link = 'edges'; title = 'root'; tut.board} 
+            cel.window { link = 'fill'; title = 'root'; tut.board} 
           },
         },
       },
       { flex=3; tut.window },
     }
-  }:link(celdriver.root, 'edges')
+  }:link(celdriver.root, 'fill')
 
   tut:start()
 end

@@ -25,7 +25,7 @@ return function(_ENV)
       size = size, 
       track = {
         size = size,
-        link = {'edges', nil, size},
+        link = {'fill.margin', 0, size},
         thumb = {
           minsize = 20,
           size = size,
@@ -45,7 +45,7 @@ return function(_ENV)
       size = size,
       track = {
         size = size,
-        link = {'edges', size, nil},
+        link = {'fill.margin', size, 0},
         thumb = {
           minsize = 10,
           size = size,

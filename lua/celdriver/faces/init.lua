@@ -92,7 +92,7 @@ end
 do --cel face
   local face = cel.getface('cel')
 
-  face.font = cel.loadfont('dejavu sans mono', 12)
+  face.font = cel.loadfont('code', 12)
   face.textcolor = cel.color.encodef(1, 1, 1)
   face.fillcolor = false 
   face.linecolor = cel.color.encodef(1, 1, 1)
@@ -120,6 +120,7 @@ do --cel face
     return drawlinks(t)
   end
 
+  --[[
   function face.print(f, t, pre)
     local s = string.format('%s[%d:%s] { x:%d y:%d w:%d h:%d [refresh:%s]',
       t.metacel, t.id, tostring(t.face[_name]), t.x, t.y, t.w, t.h, tostring(t.refresh))
@@ -134,6 +135,7 @@ do --cel face
       io.write('\n', pre, '  @@', string.format('linecolor[%d, %d, %d, %d]', string.byte(f.linecolor, 1, 4)))
     end
   end
+  --]]
 end
 
 cel.getface('col').draw = function(f, t) return drawlinks(t) end
@@ -175,7 +177,7 @@ local function rlerp(a, b, c)
   return (c - a)/(b - a);
 end
 
-local stretch = cel.getlinker('fixedaspectstretch') 
+local stretch = cel.getlinker('fill.aspect') 
 function root.draw(f, t)
   local tbeg = reactor.timermillis()
   init(f, t.w, t.h)
