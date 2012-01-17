@@ -8,7 +8,7 @@ return function(root)
 pause()
 
 --create a red cel 100px width 100px height
-local zed = cel.new(100, 100, cel.rgbaface(1, 0, 0))
+local zed = cel.new(100, 100, cel.colorface(cel.color.rgb(1, 0, 0)))
 
 --access properties of a cel, these are read-only
 print('zed.w', zed.w, 'zed.h', zed.h)

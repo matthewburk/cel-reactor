@@ -4,8 +4,8 @@ return function(_ENV)
   setfenv(1, _ENV)
 
   local face = cel.getface('grip')
-  face.fillcolor = cel.color.encodef(.2, .2, .2)
-  face.linecolor = cel.color.encodef(.4, .4, .4)
+  face.fillcolor = cel.color.rgb(.2, .2, .2)
+  face.linecolor = cel.color.rgb(.4, .4, .4)
   face.linewidth = 1
 
   function face.select(face, t)
@@ -22,21 +22,21 @@ return function(_ENV)
 
   do
     face['%grabbed'] = face:new {
-      fillcolor = cel.color.encodef(.4, .4, .4),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.rgb(.4, .4, .4),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
 
     face['%mousefocusin'] = face:new {
-      fillcolor = cel.color.encodef(.4, .4, .4),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.rgb(.4, .4, .4),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
     
     do
       local face = face['%mousefocusin']
 
       face['%grabbed'] = face:new {
-        fillcolor = cel.color.encodef(0, .8, .8),
-        linecolor = cel.color.encodef(0, 1, 1),
+        fillcolor = cel.color.rgb(0, .8, .8),
+        linecolor = cel.color.rgb(0, 1, 1),
         linewidth = 1,
       }
     end

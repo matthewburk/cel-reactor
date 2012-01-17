@@ -6,7 +6,7 @@ return function(_ENV)
   local face = cel.getface('window')
   face.textcolor = false
   face.fillcolor = false
-  face.linecolor = cel.color.encodef(.2, .2, .2)
+  face.linecolor = cel.color.rgb(.2, .2, .2)
   face.linewidth = 4
   face.radius = false
 
@@ -42,11 +42,11 @@ return function(_ENV)
   }
 
   face['%focus'] = face:new {
-    linecolor = cel.color.encodef(0, 1, 1),
+    linecolor = cel.color.rgb(0, 1, 1),
   }
 
   face['%mousefocusin'] = face:new {
-    linecolor = cel.color.encodef(.4, .4, .4),
+    linecolor = cel.color.rgb(.4, .4, .4),
   }
 
   function face.select(face, t)
@@ -60,12 +60,12 @@ return function(_ENV)
 
   do --window.handle
     local face = cel.getface('window.handle')
-    face.fillcolor = cel.color.encodef(.4, .4, .4)
+    face.fillcolor = cel.color.rgb(.4, .4, .4)
     face.font = cel.loadfont('arial:bold')
 
     face['%focus'] = face:new {
-      textcolor = cel.color.encodef(.2, .2, .2),
-      fillcolor = cel.color.encodef(0, 1, 1),
+      textcolor = cel.color.rgb(.2, .2, .2),
+      fillcolor = cel.color.rgb(0, 1, 1),
     }
 
     function face.select(face, t)
@@ -105,7 +105,7 @@ return function(_ENV)
 
   do --window.client
     local face = cel.getface('window.client')
-    face.fillcolor = cel.color.encodef(.2, .2, .2)
+    face.fillcolor = cel.color.rgb(.2, .2, .2)
     face.linecolor = false
     face.linewidth = false
   end

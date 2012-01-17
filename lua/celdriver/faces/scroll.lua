@@ -66,7 +66,7 @@ return function(_ENV)
 
   --scrollbar
   local scrollbar = cel.getface('scroll.bar')
-  scrollbar.fillcolor = cel.color.encodef(.4, .4, .4)
+  scrollbar.fillcolor = cel.color.rgb(.4, .4, .4)
 
   --track
   local track = cel.getface('scroll.bar.track')
@@ -75,9 +75,9 @@ return function(_ENV)
 
   --thumb
   local thumb = cel.getface('scroll.bar.thumb')
-  thumb.fillcolor = cel.color.encodef(.2, .2, .2)
-  thumb.linecolor = cel.color.encodef(0, 1, 1)
-  thumb.accentcolor = cel.color.encodef(0, 1, 1)
+  thumb.fillcolor = cel.color.rgb(.2, .2, .2)
+  thumb.linecolor = cel.color.rgb(0, 1, 1)
+  thumb.accentcolor = cel.color.rgb(0, 1, 1)
   thumb.select = false
 
   function thumb.draw(f, t, size)
@@ -111,30 +111,30 @@ return function(_ENV)
 
   --incbutton
   local incbutton = cel.getface 'scroll.bar.inc'
-  incbutton.fillcolor = cel.color.encodef(.2, .2, .2)
-  incbutton.linecolor = cel.color.encodef(0, 1, 1)
-  incbutton.accentcolor = cel.color.encodef(0, 1, 1)
+  incbutton.fillcolor = cel.color.rgb(.2, .2, .2)
+  incbutton.linecolor = cel.color.rgb(0, 1, 1)
+  incbutton.accentcolor = cel.color.rgb(0, 1, 1)
   incbutton.draw = function(f, t) return thumb.draw(f, t, t.host.size) end
 
   do
     local face = incbutton
     face['%pressed'] = face:new {
-      fillcolor = cel.color.encodef(.4, .4, .4),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.rgb(.4, .4, .4),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
 
     face['%mousefocusin'] = face:new {
-      fillcolor = cel.color.encodef(.4, .4, .4),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.rgb(.4, .4, .4),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
     
     do
       local face = face['%mousefocusin']
 
       face['%pressed'] = face:new {
-        textcolor = cel.color.encodef(.2, .2, .2),
-        fillcolor = cel.color.encodef(0, .8, .8),
-        linecolor = cel.color.encodef(0, 1, 1),
+        textcolor = cel.color.rgb(.2, .2, .2),
+        fillcolor = cel.color.rgb(0, .8, .8),
+        linecolor = cel.color.rgb(0, 1, 1),
         linewidth = 2,
       }
     end
@@ -142,30 +142,30 @@ return function(_ENV)
 
   --decbutton
   local decbutton = cel.getface 'scroll.bar.dec'
-  decbutton.fillcolor = cel.color.encodef(.2, .2, .2)
-  decbutton.linecolor = cel.color.encodef(0, 1, 1)
-  decbutton.accentcolor = cel.color.encodef(0, 1, 1)
+  decbutton.fillcolor = cel.color.rgb(.2, .2, .2)
+  decbutton.linecolor = cel.color.rgb(0, 1, 1)
+  decbutton.accentcolor = cel.color.rgb(0, 1, 1)
   decbutton.draw = function(f, t) return thumb.draw(f, t, t.host.size) end
 
   do
     local face = decbutton
     face['%pressed'] = face:new {
-      fillcolor = cel.color.encodef(.4, .4, .4),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.rgb(.4, .4, .4),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
 
     face['%mousefocusin'] = face:new {
-      fillcolor = cel.color.encodef(.4, .4, .4),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.rgb(.4, .4, .4),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
     
     do
       local face = face['%mousefocusin']
 
       face['%pressed'] = face:new {
-        textcolor = cel.color.encodef(.2, .2, .2),
-        fillcolor = cel.color.encodef(0, .8, .8),
-        linecolor = cel.color.encodef(0, 1, 1),
+        textcolor = cel.color.rgb(.2, .2, .2),
+        fillcolor = cel.color.rgb(0, .8, .8),
+        linecolor = cel.color.rgb(0, 1, 1),
         linewidth = 2,
       }
     end

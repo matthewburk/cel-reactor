@@ -12,9 +12,9 @@ return function(_ENV)
   airspeed.radius = false
   airspeed.fillcolor = false
   airspeed.linewidth = 1
-  airspeed.linecolor = cel.color.encodef(1, 0, 0)
+  airspeed.linecolor = cel.color.rgb(1, 0, 0)
 
-  airspeed.backgroundcolor = cel.color.encodef(.1, .1, .1)
+  airspeed.backgroundcolor = cel.color.rgb(.1, .1, .1)
   airspeed.bgpattern = cairo.pattern.create_radial(0, 0, .5, 0, 0, 0)
   airspeed.bgpattern:add_color_stop(0, 0, 0, 0, 1)
   airspeed.bgpattern:add_color_stop(.2, .07, .07, .07, 1)
@@ -30,23 +30,23 @@ return function(_ENV)
 
   airspeed.mod1length = .1 --* radius
   airspeed.mod1width = 1.5 
-  airspeed.mod1color = cel.color.encodef(1, 1, 1)
+  airspeed.mod1color = cel.color.rgb(1, 1, 1)
 
   airspeed.mod2length = .15 --* radius
   airspeed.mod2width = 3 
-  airspeed.mod2color = cel.color.encodef(1, 1, 1)
+  airspeed.mod2color = cel.color.rgb(1, 1, 1)
 
   airspeed.mod3length = .20 --* radius
   airspeed.mod3width = 3 
-  airspeed.mod3color = cel.color.encodef(0, 1, 1)
-  airspeed.mod3textcolor = cel.color.shade(.1, cel.color.encodef(1, 1, 1))
+  airspeed.mod3color = cel.color.rgb(0, 1, 1)
+  airspeed.mod3textcolor = cel.color.shade(.1, cel.color.rgb(1, 1, 1))
 
   airspeed.ticksradius = .5
   airspeed.pivotradius = .4
   airspeed.needleradius = .9 --* radius
 
-  airspeed.pivotcolor = cel.color.encodef(0, 0, 0)
-  airspeed.needlecolor = cel.color.shade(.1, cel.color.encodef(1, 1, 1))
+  airspeed.pivotcolor = cel.color.rgb(0, 0, 0)
+  airspeed.needlecolor = cel.color.shade(.1, cel.color.rgb(1, 1, 1))
 
   function airspeed.draw(f, t)
     if f.fillcolor then

@@ -1,4 +1,5 @@
 require 'stdinit'
+require 'strict'
 
 local celdriver = require 'celdriver'
 local cel = require 'cel'
@@ -17,12 +18,12 @@ function reactor.keydown(key, ...)
 end
 
 cel.getface('cel'):new {
-  fillcolor = cel.color.encodef(0, 1, 1),
+  fillcolor = cel.color.rgb(0, 1, 1),
   linecolor = false,
 }:register('@divider')
 
 cel.getface('listbox'):new {
-  fillcolor = cel.color.encode(250, 250, 250),
+  fillcolor = cel.color.rgb8(250, 250, 250),
   flow = {
     scroll = cel.flows.constant(500),
     showybar = cel.flows.linear(300),
@@ -33,21 +34,21 @@ cel.getface('listbox'):new {
 }:register('@code')
 
 cel.getface('text'):new {
-  textcolor = cel.color.encode(116, 96, 116),
+  textcolor = cel.color.rgb8(116, 96, 116),
   font = cel.loadfont('monospace', 12*72/96),
-  fillcolor = false, --cel.color.encodef(.9, .9, .95),
+  fillcolor = false, --cel.color.rgb(.9, .9, .95),
 }:register('@comment')
 
 cel.getface('label'):new {
-  textcolor = cel.color.encode(6, 38, 60),
+  textcolor = cel.color.rgb8(6, 38, 60),
   font = cel.loadfont('code', 12),
   fillcolor = false,
 }:register('@code')
 
 cel.getface('slot'):new {
   linewidth = 1,
-  linecolor = cel.color.encode(221, 221, 221),
-  fillcolor = cel.color.encode(245, 244, 238),
+  linecolor = cel.color.rgb8(221, 221, 221),
+  fillcolor = cel.color.rgb8(245, 244, 238),
 }:register('@commentbox')
 
 local tut = {}
@@ -206,9 +207,8 @@ local function loadtut(tut, name)
 end
 
 function tut:run()
-  loadtut(self, 'coldiagram')
-  loadtut(self, 'linking')
   loadtut(self, 'did i mention linkers')
+  loadtut(self, 'linking')
   loadtut(self, 'textbutton')
   loadtut(self, 'text')
   loadtut(self, 'button')

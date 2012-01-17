@@ -13,7 +13,7 @@ return function(root)
   --move them when the mouse is moved the grip will move the gripped cel.
   local grip = cel.grip.new(100, 100)
   local zed = cel {
-    w = 300; h = 300; face = cel.rgbaface(1, 1, 0, .5);
+    w = 300; h = 300; face = cel.colorface(cel.color.rgb(1, 1, 0, .5));
     { link = 'fill'; grip},
     { link = 'center'; 'THIS CEL IS THE GRIP TARGET'},
   }:link(root)

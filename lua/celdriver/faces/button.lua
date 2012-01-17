@@ -5,9 +5,9 @@ return function(_ENV)
 
   local face = cel.getface('button')
 
-  face.textcolor = cel.color.encodef(.8, .8, .8)
-  face.fillcolor = cel.color.encodef(.2, .2, .2)
-  face.linecolor = cel.color.encodef(.4, .4, .4)
+  face.textcolor = cel.color.rgb(.8, .8, .8)
+  face.fillcolor = cel.color.rgb(.2, .2, .2)
+  face.linecolor = cel.color.rgb(.4, .4, .4)
   face.linewidth = 1
 
   function face.select(face, t)
@@ -24,22 +24,22 @@ return function(_ENV)
 
   do
     face['%pressed'] = face:new {
-      fillcolor = cel.color.tint(.5, face.fillcolor),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.tint(face.fillcolor, .5),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
 
     face['%mousefocusin'] = face:new {
-      fillcolor = cel.color.tint(.5, face.fillcolor),
-      linecolor = cel.color.encodef(0, 1, 1),
+      fillcolor = cel.color.tint(face.fillcolor, .5),
+      linecolor = cel.color.rgb(0, 1, 1),
     }
     
     do
       local face = face['%mousefocusin']
 
       face['%pressed'] = face:new {
-        textcolor = cel.color.encodef(.2, .2, .2),
-        fillcolor = cel.color.encodef(0, .8, .8),
-        linecolor = cel.color.encodef(0, 1, 1),
+        textcolor = cel.color.rgb(.2, .2, .2),
+        fillcolor = cel.color.rgb(0, .8, .8),
+        linecolor = cel.color.rgb(0, 1, 1),
         linewidth = 2,
       }
     end

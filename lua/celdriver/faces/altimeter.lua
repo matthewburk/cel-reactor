@@ -12,9 +12,9 @@ return function(_ENV)
   altimeter.radius = false
   altimeter.fillcolor = false
   altimeter.linewidth = 1
-  altimeter.linecolor = cel.color.encodef(1, 0, 0)
+  altimeter.linecolor = cel.color.rgb(1, 0, 0)
 
-  altimeter.backgroundcolor = cel.color.encodef(.1, .1, .1)
+  altimeter.backgroundcolor = cel.color.rgb(.1, .1, .1)
   altimeter.bgpattern = cairo.pattern.create_radial(0, 0, .5, 0, 0, 0)
   altimeter.bgpattern:add_color_stop(0, 0, 0, 0, 1)
   altimeter.bgpattern:add_color_stop(.15, .07, .07, .07, 1)
@@ -22,23 +22,23 @@ return function(_ENV)
   altimeter.minorticklength = .1 --* radius
   altimeter.minortickwidth = 1.5 
   altimeter.minortickcount = 50
-  altimeter.minortickcolor = cel.color.encodef(1, 1, 1)
+  altimeter.minortickcolor = cel.color.rgb(1, 1, 1)
 
   altimeter.majorticklength = .15 --* radius
   altimeter.majortickwidth = 3 
   altimeter.majortickcount = 10 
-  altimeter.majortickcolor = cel.color.encodef(1, 1, 1)
-  altimeter.majorticktextcolor = cel.color.shade(.1, cel.color.encodef(1, 1, 1))
+  altimeter.majortickcolor = cel.color.rgb(1, 1, 1)
+  altimeter.majorticktextcolor = cel.color.shade(.1, cel.color.rgb(1, 1, 1))
 
   altimeter.pivotradius = .05 --* radius
   altimeter.needle100radius = .9 --* radius
   altimeter.needle1kradius = .6 --* radius
   altimeter.needle10kradius = 1 --* radius
 
-  altimeter.pivotcolor = cel.color.encodef(0, 0, 0)
-  altimeter.needle100color = cel.color.encodef(1, 1, 1)
-  altimeter.needle1kcolor = cel.color.shade(.1, cel.color.encodef(1, 1, 1))
-  altimeter.needle10kcolor = cel.color.shade(.2, cel.color.encodef(1, 1, 1))
+  altimeter.pivotcolor = cel.color.rgb(0, 0, 0)
+  altimeter.needle100color = cel.color.rgb(1, 1, 1)
+  altimeter.needle1kcolor = cel.color.shade(.1, cel.color.rgb(1, 1, 1))
+  altimeter.needle10kcolor = cel.color.shade(.2, cel.color.rgb(1, 1, 1))
 
   local function show_text_center(cr, s, xb, yb, w, h)
     local cx = w/2 + xb 

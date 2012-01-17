@@ -2,7 +2,7 @@ local _ENV = setmetatable({}, {__index=_G})
 setfenv(1, _ENV)
 
 local cel = require 'cel'
-local decodef = cel.color.decodef
+local torgb = cel.color.torgb
 local cairo = cairo
 
 _ENV.cairo = cairo
@@ -24,7 +24,7 @@ function cairo.ext_roundrect(cr, x, y, w, h, r)
 end
 
 function cairo.extcel_set_source_color(cr, color)
-  cr:set_source_rgba(decodef(color))
+  cr:set_source_rgba(torgb(color))
 end
 
 function cairo.extcel_drawstring(cr, font, x, y, text, i, j)
@@ -73,7 +73,7 @@ end
 function _ENV.drawlinks(t)
   for i = #t,1,-1 do
     local t = t[i]
-    if t.refresh or updaterect(t, t.clip) then
+    if true or t.refresh or updaterect(t, t.clip) then --TODO need to fix dirty rect stystem, it does not work in all cases
       local face = t.face.select and t.face:select(t) or t.face
       if face.draw then 
         local _cr = cr
@@ -93,9 +93,9 @@ do --cel face
   local face = cel.getface('cel')
 
   face.font = cel.loadfont('code', 12)
-  face.textcolor = cel.color.encodef(1, 1, 1)
+  face.textcolor = cel.color.rgb(1, 1, 1)
   face.fillcolor = false 
-  face.linecolor = cel.color.encodef(1, 1, 1)
+  face.linecolor = cel.color.rgb(1, 1, 1)
   face.linewidth = false 
   face.radius = false
 

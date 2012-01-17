@@ -7,7 +7,7 @@ return function(root)
   --Create a new cel that is with the with an initial width of 100 and an
   --initial height of 150. The last parameter is the face that will be used to
   --render the cel, faces will be coverd in the next tutorial. 
-  local zed = cel.new(100, 150, cel.rgbaface(.5, .5, .5))
+  local zed = cel.new(100, 150, cel.colorface(cel.color.rgb(.5, .5, .5)))
   pause()
   --At this point zed will not be drawn and the user cannot interact with it. 
   --To show zed to the user we must link it to the root cel.  
@@ -25,7 +25,7 @@ return function(root)
   --cel.  In other words there is no special cel that is not a potential host.
 
   --Lets create another cel and link it to zed.
-  local zoe = cel.new(30, 30, cel.rgbaface(1, 0, 0))
+  local zoe = cel.new(30, 30, cel.colorface(cel.color.rgb(1, 0, 0)))
   zoe:link(zed)
   pause()
   --You should be able to see a red rectangle in zed, that's zoe.

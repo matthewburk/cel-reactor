@@ -4,19 +4,19 @@ return function(_ENV)
   setfenv(1, _ENV)
 
   local face = cel.getface('cel'):new {
-    fillcolor = cel.color.encodef(1, 0, 0, .3)
+    fillcolor = cel.color.rgb(1, 0, 0, .3)
   }:register('@caret')
 
   local face = cel.getface('editbox')
-  face.fillcolor = cel.color.encodef(1, 1, 1)
+  face.fillcolor = cel.color.rgb(1, 1, 1)
 
   do
     local face = cel.getface('editbox.text')
-    face.textcolor = cel.color.encodef(0, 0, 0)
-    face.selectedtextcolor = cel.color.encodef(1, 1, 1)
+    face.textcolor = cel.color.rgb(0, 0, 0)
+    face.selectedtextcolor = cel.color.rgb(1, 1, 1)
     face.font = cel.loadfont('arial', 28)
     face.fillcolor = false
-    face.linecolor = cel.color.encodef(0, 1, 0)
+    face.linecolor = cel.color.rgb(0, 1, 0)
     face.linewidth = false 
 
     face.layout = {

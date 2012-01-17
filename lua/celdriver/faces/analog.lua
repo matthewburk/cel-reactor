@@ -6,15 +6,15 @@ return function(_ENV)
   local analog = cel.getface('analog') 
 
   analog.font = cel.loadfont('monospace:bold', 8)
-  analog.okcolor = cel.color.encodef(0, .7, .2)
-  analog.cautioncolor = cel.color.encodef(1, 1, 0)
-  analog.warncolor = cel.color.encodef(1, 0, 0)
-  analog.needlecolor = cel.color.encodef(1, .2, .2, .7) 
+  analog.okcolor = cel.color.rgb(0, .7, .2)
+  analog.cautioncolor = cel.color.rgb(1, 1, 0)
+  analog.warncolor = cel.color.rgb(1, 0, 0)
+  analog.needlecolor = cel.color.rgb(1, .2, .2, .7) 
 
   analog.rlinewidth = .2
   analog.tickmodulate = .1
-  analog.tickcolor = cel.color.encodef(0, 0, 0)
-  analog.ticklabelcolor = cel.color.encodef(1, 1, 1)
+  analog.tickcolor = cel.color.rgb(0, 0, 0)
+  analog.ticklabelcolor = cel.color.rgb(1, 1, 1)
   analog.tickwidth = 1
 
   analog.tick = {
@@ -192,7 +192,7 @@ return function(_ENV)
         end,
         labelw = true,
         labelh = true,
-        color = cel.color.encodef(0, 0, 0),
+        color = cel.color.rgb(0, 0, 0),
       }, {__index=analog.tick})
     }:register('@memgauge')
 
@@ -209,9 +209,9 @@ local altimeter = ctk.getface('altimeter')
 altimeter.radius = false
 altimeter.fillcolor = false
 altimeter.linewidth = 1
-altimeter.linecolor = ctk.color.encodef(1, 0, 0)
+altimeter.linecolor = ctk.color.rgb(1, 0, 0)
 
-altimeter.backgroundcolor = ctk.color.encodef(.1, .1, .1)
+altimeter.backgroundcolor = ctk.color.rgb(.1, .1, .1)
 altimeter.bgpattern = cairo.pattern.create_radial(0, 0, .5, 0, 0, 0)
 altimeter.bgpattern:add_color_stop(0, 0, 0, 0, .5)
 altimeter.bgpattern:add_color_stop(.2, .07, .07, .07, 1)
@@ -219,23 +219,23 @@ altimeter.bgpattern:add_color_stop(.2, .07, .07, .07, 1)
 altimeter.minorticklength = .1 --* radius
 al timeter.minortickwidth = 1.5 
 altimeter.minortickcount = 50
-altimeter.minortickcolor = ctk.color.encodef(1, 1, 1)
+altimeter.minortickcolor = ctk.color.rgb(1, 1, 1)
 
 altimeter.majorticklength = .15 --* radius
 altimeter.majortickwidth = 3 
 altimeter.majortickcount = 10 
-altimeter.majortickcolor = ctk.color.encodef(1, 1, 1)
-altimeter.majorticktextcolor = ctk.color.shade(.1, ctk.color.encodef(1, 1, 1))
+altimeter.majortickcolor = ctk.color.rgb(1, 1, 1)
+altimeter.majorticktextcolor = ctk.color.shade(.1, ctk.color.rgb(1, 1, 1))
 
 altimeter.pivotradius = .05 --* radius
 altimeter.needle100radius = .9 --* radius
 altimeter.needle1kradius = .6 --* radius
 altimeter.needle10kradius = 1 --* radius
 
-altimeter.pivotcolor = ctk.color.encodef(0, 0, 0)
-altimeter.needle100color = ctk.color.encodef(1, 1, 1)
-altimeter.needle1kcolor = ctk.color.shade(.1, ctk.color.encodef(1, 1, 1))
-altimeter.needle10kcolor = ctk.color.shade(.2, ctk.color.encodef(1, 1, 1))
+altimeter.pivotcolor = ctk.color.rgb(0, 0, 0)
+altimeter.needle100color = ctk.color.rgb(1, 1, 1)
+altimeter.needle1kcolor = ctk.color.shade(.1, ctk.color.rgb(1, 1, 1))
+altimeter.needle10kcolor = ctk.color.shade(.2, ctk.color.rgb(1, 1, 1))
 
 function altimeter.draw(f, t)
   local cr = f.cr

@@ -33,7 +33,7 @@ end
 
       if not subject then
         subject =  root:newroot()
-        subject:link(sandbox, 'edges')
+        subject:link(sandbox, 'fill')
         sandbox:select(subject)
 
         local sub = require(name)
@@ -113,9 +113,9 @@ end
   }
 
   root {
-    link = 'edges';
+    link = 'fill';
     cel.row {
-      { modules, link = 'edges'; },
-      { sandbox, link = 'edges'; flex=1; },
+      { modules, link = 'fill'; },
+      { sandbox, link = 'fill'; flex=1; },
     },
   }

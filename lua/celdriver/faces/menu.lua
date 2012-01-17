@@ -5,8 +5,8 @@ return function(_ENV)
 
   local menu = cel.face {
     metacel = 'menu',
-    fillcolor = cel.color.encodef(.4, .4, .4),
-    linecolor = cel.color.encodef(.2, .2, .2),
+    fillcolor = cel.color.rgb(.4, .4, .4),
+    linecolor = cel.color.rgb(.2, .2, .2),
     linewidth = false,
     radius = radius,
 
@@ -36,14 +36,14 @@ return function(_ENV)
     cel.face {
       metacel = 'cel';
       name = cel.menu.divider;
-      fillcolor = cel.color.encodef(.8, .8, .8);
+      fillcolor = cel.color.rgb(.8, .8, .8);
     }
   end
 
   do --menu.slot
     local item = cel.face {
       metacel = 'menu.slot',
-      highlightcolor = cel.color.encodef(1, 1, .5, .5),
+      highlightcolor = cel.color.rgb(1, 1, .5, .5),
     }
 
     function item.draw(f, t)

@@ -4,7 +4,7 @@ return function(_ENV)
   setfenv(1, _ENV)
 
   local face = cel.getface('label')
-  face.textcolor = cel.color.encodef(.1, .1, .1)
+  face.textcolor = cel.color.rgb(.1, .1, .1)
   face.fillcolor = false
   face.linecolor = false
   face.linewidth = false

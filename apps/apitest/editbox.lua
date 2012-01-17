@@ -5,7 +5,7 @@ return function(root)
   cel.window {
     w = root.w/2;
     h = root.h/2;
-    link = 'edges';
+    link = 'fill';
     cel.listbox {
       link = 'width';
       cel.editbox.new('HELLO', 200),
