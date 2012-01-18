@@ -138,14 +138,15 @@ local diagram =
         }
       };
       { flex = 1; link = 'left.center'; face = faces.white; minh=0;
-        cel.col {
-          'slot minh = 0';
+        cel.col { link = 'width';
+          'slot minh = 0.';
           'slot flex = 1';
-          cel.text.new[[- flexible height is allocated evenly]];
+          cel.text.new([[- flexible height is allocated evenly]]):justify('right');
         }
       };
     },
-    { flex = 1; 
+    { flex = 1;--there is an error here, increasing the width of the link doesn't flex properly, it jumps to correct
+    --when its width matches the slot width
       newcol()
     },
     { flex = 1; 
