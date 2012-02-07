@@ -101,7 +101,7 @@ local function newcol(linker)
 end
 
 local diagram = 
-  cel.row { link = 'fill'; gap=1; face = cel.colorface(cel.color.rgb(0, 0, .5));
+  cel.row { link = 'fill'; gap=1; --face = cel.colorface(cel.color.rgb(0, 0, .5));
     cel.col { gap=1;
       '';
       { flex = 1; link = 'left.center'; face = faces.white; minh=0;

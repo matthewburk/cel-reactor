@@ -57,6 +57,7 @@ end
   local modules = cel.col {
     link = 'width';
 
+    addmodule'baseline',
     addmodule'editbox',
     addmodule'windows',
     addmodule'altimetertest',

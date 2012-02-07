@@ -16,4 +16,4 @@ function reactor.keydown(key, ...)
   end
 end
 
-require('diagrams.col'):link(celdriver.root, 'fill')
+require('sets.lua'):link(celdriver.root, 'fill')

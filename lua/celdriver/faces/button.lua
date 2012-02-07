@@ -1,48 +1,44 @@
 local cel = require 'cel'
 
-return function(_ENV)
-  setfenv(1, _ENV)
+local face = cel.getface('button')
 
-  local face = cel.getface('button')
+face.textcolor = 'current'
+face.color = 'current'
+face.bordercolor = cel.color.rgb(.4, .4, .4)
+face.borderwidth = 1
 
-  face.textcolor = cel.color.rgb(.8, .8, .8)
-  face.fillcolor = cel.color.rgb(.2, .2, .2)
-  face.linecolor = cel.color.rgb(.4, .4, .4)
-  face.linewidth = 1
-
-  function face.select(face, t)
-    if t.mousefocusin then
-      face = face['%mousefocusin'] or face
-      if t.pressed then
-        face = face['%pressed'] or face
-      end
-    elseif t.pressed then
-      face = face['%pressed'] or face
+function face.select(f, t)
+  if t.mousefocusin then
+    f = f['%mousefocusin'] or f
+    if t.pressed then
+      f = f['%pressed'] or f
     end
-    return face
+  elseif t.pressed then
+    f = f['%pressed'] or f
   end
+  return f
+end
 
+do
+  face['%pressed'] = face:new {
+    color = cel.color.tint(face.color, .5),
+    bordercolor = cel.color.rgb(0, 1, 1),
+  }
+
+  face['%mousefocusin'] = face:new {
+    color = cel.color.tint(face.color, .5),
+    bordercolor = cel.color.rgb(0, 1, 1),
+  }
+  
   do
+    local face = face['%mousefocusin']
+
     face['%pressed'] = face:new {
-      fillcolor = cel.color.tint(face.fillcolor, .5),
-      linecolor = cel.color.rgb(0, 1, 1),
+      textcolor = cel.color.rgb(.2, .2, .2),
+      color = cel.color.rgb(0, .8, .8),
+      bordercolor = cel.color.rgb(0, 1, 1),
+      borderwidth = 2,
     }
-
-    face['%mousefocusin'] = face:new {
-      fillcolor = cel.color.tint(face.fillcolor, .5),
-      linecolor = cel.color.rgb(0, 1, 1),
-    }
-    
-    do
-      local face = face['%mousefocusin']
-
-      face['%pressed'] = face:new {
-        textcolor = cel.color.rgb(.2, .2, .2),
-        fillcolor = cel.color.rgb(0, .8, .8),
-        linecolor = cel.color.rgb(0, 1, 1),
-        linewidth = 2,
-      }
-    end
   end
 end
 

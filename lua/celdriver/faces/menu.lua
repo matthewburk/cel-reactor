@@ -5,9 +5,9 @@ return function(_ENV)
 
   local menu = cel.face {
     metacel = 'menu',
-    fillcolor = cel.color.rgb(.4, .4, .4),
-    linecolor = cel.color.rgb(.2, .2, .2),
-    linewidth = false,
+    color = cel.color.rgb(.4, .4, .4),
+    bordercolor = cel.color.rgb(.2, .2, .2),
+    borderwidth = false,
     radius = radius,
 
     layout = {
@@ -36,7 +36,7 @@ return function(_ENV)
     cel.face {
       metacel = 'cel';
       name = cel.menu.divider;
-      fillcolor = cel.color.rgb(.8, .8, .8);
+      color = cel.color.rgb(.8, .8, .8);
     }
   end
 

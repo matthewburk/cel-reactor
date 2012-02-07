@@ -304,9 +304,12 @@ static int graphics_update_texture(lua_State* L) {
   texture_t* texture = check_texture(L, 1);
   reactor_cairo_surface_t* surface = check_reactor_cairo_surface(L, 2);
 
+  
   if (texture->id != lastid) {
     glBindTexture (GL_TEXTURE_2D, texture->id);
   }
+
+  cairo_surface_flush(surface->surface);
 
   lastid = texture->id;
 

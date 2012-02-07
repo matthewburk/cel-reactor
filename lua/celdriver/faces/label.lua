@@ -1,42 +1,38 @@
 local cel = require 'cel'
 
-return function(_ENV)
-  setfenv(1, _ENV)
+local face = cel.getface('label')
+face.textcolor = 'current'
+face.color = false
+face.bordercolor = false
+face.borderwidth = false
 
-  local face = cel.getface('label')
-  face.textcolor = cel.color.rgb(.1, .1, .1)
-  face.fillcolor = false
-  face.linecolor = false
-  face.linewidth = false
+face.layout = {
+  padding = {
+    l = 1,
+    t = 1,
+  },
+}
 
-  face.layout = {
-    padding = {
-      l = 1,
-      t = 1,
-    },
-  }
-
-  function face.draw(f, t)
-    if f.fillcolor then
-      cairo.extcel_set_source_color(cr, f.fillcolor)
-      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
-      cairo.fill(cr)
-    end
-
-    if f.textcolor and t.text then
-      cairo.extcel_set_source_color(cr, f.textcolor)
-      cairo.extcel_drawstring(cr, t.font, t.penx, t.peny, t.text)
-    end
-
-    if f.linewidth and f.linecolor then
-      cairo.set_line_width(cr, f.linewidth)
-      cairo.extcel_set_source_color(cr, f.linecolor)
-      cairo.ext_roundrect(cr, 0, 0, t.w, t.h, f.radius)
-      cairo.stroke(cr)
-    end
-
-    return drawlinks(t)
+function face.cairodraw(_ENV, cr, f, t)
+  if f.color then
+    cairo.rectangle(cr, 0, 0, t.w, t.h)
+    cairo.set_source_color(cr, _ENV.color)
+    cairo.fill(cr)
   end
+
+  if f.textcolor and t.text then
+    cairo.set_source_color(cr, _ENV.textcolor)
+    cairo.drawstring(cr, t.font, t.penx, t.peny, t.text)
+  end
+
+  if f.borderwidth and f.bordercolor then
+    cairo.set_line_width(cr, f.borderwidth)
+    cairo.set_source_color(cr, _ENV.bordercolor)
+    cairo.rectangle(cr, 0, 0, t.w, t.h)
+    cairo.stroke(cr)
+  end
+
+  return _ENV.drawlinks(cr, t)
 end
 
 
