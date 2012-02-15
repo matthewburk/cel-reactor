@@ -4,6 +4,8 @@
 #include "reactor_graphics.h"
 #include "lua_cairo.h"
 
+extern GLuint texobj;
+
 static char* drawmodes[] = {
   "fill",
   "fill",
@@ -17,6 +19,7 @@ static int graphics_clip_xywh(lua_State *L) {
   int w = (GLint)luaL_checknumber(L, 3);
   int h = (GLint)luaL_checknumber(L, 4);
   glScissor(x, reactor.h - (y + h), w, h);
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
 
@@ -26,10 +29,17 @@ static int graphics_clip_ltrb(lua_State *L) {
   int r = (GLint)luaL_checknumber(L, 3);
   int b = (GLint)luaL_checknumber(L, 4);  
   glScissor(l, reactor.h - b, r - l, b - t);
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
 
-static int graphics_setcolor(lua_State* L) {
+static int graphics_setcolor(lua_State* L) {  
+  const char* s = lua_tostring(L, 1);
+  glColor4ub(s[0], s[1], s[2], s[3]);
+  return 0;
+}
+
+static int graphics_setcolorf(lua_State* L) {
   int argc = lua_gettop(L);
   GLdouble r = lua_tonumber(L, 1);
   GLdouble g = lua_tonumber(L, 2);
@@ -37,6 +47,7 @@ static int graphics_setcolor(lua_State* L) {
   GLdouble a = luaL_optnumber(L, 4, 1);
 
   glColor4d(r, g, b, a);
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
 
   return 0;
 }
@@ -158,6 +169,7 @@ static int graphics_fillrect(lua_State* L) {
     glVertex2d( x + w, y );	
   } glEnd();
   glEnable( GL_TEXTURE_2D );
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
 
@@ -170,8 +182,10 @@ static int graphics_pushstate2d(lua_State* L) {
   glDisable( GL_LIGHTING );
 
   glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-  glDisable(GL_BLEND);
+  //glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+  glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
+
 
   glEnable( GL_LINE_SMOOTH );
   glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
@@ -186,6 +200,9 @@ static int graphics_pushstate2d(lua_State* L) {
 
   glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
   glViewport( 0, 0, (GLsizei)width, (GLsizei)height );
 
   glMatrixMode( GL_PROJECTION );
@@ -196,6 +213,9 @@ static int graphics_pushstate2d(lua_State* L) {
   glMatrixMode( GL_MODELVIEW );
   glPushMatrix();
   glLoadIdentity();
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
+
+  glClearColor(.5, .5, 1, 1);
   return 0;
 }
 
@@ -207,6 +227,10 @@ static int graphics_popstate(lua_State* L) {
   glPopMatrix();
 
   glPopAttrib();
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
 
@@ -221,12 +245,219 @@ static int graphics_getheight(lua_State* L) {
 }
 
 static int graphics_clear(lua_State* L) {
-  glClear( GL_COLOR_BUFFER_BIT );
+  glClear( GL_COLOR_BUFFER_BIT );if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
 
-static GLuint lastid = -1;
 
+ 
+//texture or texturerect
+//x -] destination rect
+//y
+//w
+//h -]
+//l position in texture, from topleft defines left of center portion
+//t position in texture, from topleft defines top of center portion
+//r 
+//b
+static int graphics_draw_texture_9grid(lua_State* L) {
+  static GLubyte quadindexes[4*9] = {
+    0, 4, 5, 1,
+    1, 5, 6, 2,
+    2, 6, 7, 3,
+
+    4, 8, 9, 5,
+    5, 9,10, 6,
+    6,10,11, 7,
+
+    8,12,13, 9,
+    9,13,14,10,
+    10,14,15,11
+  };
+  texture_t* texture = check_texture(L, 1);
+  double x = luaL_checknumber(L, 2);
+  double y = luaL_checknumber(L, 3);
+  double w = luaL_checknumber(L, 4);
+  double h = luaL_checknumber(L, 5);
+  int l = luaL_checkint(L, 6);
+  int t = luaL_optint(L, 7, l);
+  int r = luaL_optint(L, 8, l);
+  int b = luaL_optint(L, 9, t);
+  int tw = texture->np2w;
+  int th = texture->np2h;
+  
+  if (texobj != texture->id) {
+    texobj = texture->id;
+    glBindTexture (GL_TEXTURE_2D, texture->id);    
+  }
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
+
+  {
+    vertexdata_2vt_t vertex[16];
+    float sa[4] = {0, (float)l/texture->w, (float)(tw-r)/texture->w, (float)tw/texture->w};
+    float ta[4] = {0, (float)t/texture->h, (float)(th-b)/texture->h, (float)th/texture->h};
+    float xa[4] = {x+0, x+l, x+(w-r), x+w};
+    float ya[4] = {y+0, y+t, y+(h-b), y+h};    
+
+    int i, j;
+    for (i=0, j=0; i < 4; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[0];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[0];
+    }
+    for (i=4, j=0; i < 8; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[1];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[1];
+    }
+    for (i=8, j=0; i < 12; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[2];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[2];
+    }
+    for (i=12, j=0; i < 16; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[3];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[3];
+    }
+
+    //for ( i = 0; i < 4; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);      
+    //}
+    //printf("\n");
+    //for ( i = 4; i < 8; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);         
+    //}
+    //printf("\n");
+    //for ( i = 8; i < 12; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);          
+    //}
+    //printf("\n");
+    //for ( i = 12; i < 16; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);          
+    //}
+    //printf("\n=========================\n");
+    //fflush(stdout);
+      
+
+    glEnableClientState(GL_VERTEX_ARRAY);if (glGetError()) return luaL_error(L, "%d", glGetError());
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);if (glGetError()) return luaL_error(L, "%d", glGetError());
+
+    glVertexPointer(2, GL_FLOAT, sizeof(vertexdata_2vt_t), &vertex[0].vertex);if (glGetError()) return luaL_error(L, "%d", glGetError());
+    glTexCoordPointer(2, GL_FLOAT, sizeof(vertexdata_2vt_t), &vertex[0].tex);if (glGetError()) return luaL_error(L, "%d", glGetError());
+    glDrawElements(GL_QUADS, 4*9, GL_UNSIGNED_BYTE, quadindexes);if (glGetError()) return luaL_error(L, "%d", glGetError());
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
+  }
+
+  
+
+  return 0;
+}
+
+static int graphics_draw_texture_9grid_borders(lua_State* L) {
+  static GLubyte quadindexes[4*8] = {
+    0, 4, 5, 1,
+    1, 5, 6, 2,
+    2, 6, 7, 3,
+
+    4, 8, 9, 5,
+    //5, 9,10, 6,
+    6,10,11, 7,
+
+    8,12,13, 9,
+    9,13,14,10,
+    10,14,15,11
+  };
+  texture_t* texture = check_texture(L, 1);
+  double x = luaL_checknumber(L, 2);
+  double y = luaL_checknumber(L, 3);
+  double w = luaL_checknumber(L, 4);
+  double h = luaL_checknumber(L, 5);
+  int l = luaL_checkint(L, 6);
+  int t = luaL_optint(L, 7, l);
+  int r = luaL_optint(L, 8, l);
+  int b = luaL_optint(L, 9, t);
+  int tw = texture->np2w;
+  int th = texture->np2h;
+  
+
+  if (texobj != texture->id) {
+    texobj = texture->id;
+    glBindTexture (GL_TEXTURE_2D, texture->id);    
+  }
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
+
+  {
+    vertexdata_2vt_t vertex[16];
+    float sa[4] = {0, (float)l/texture->w, (float)(tw-r)/texture->w, (float)tw/texture->w};
+    float ta[4] = {0, (float)t/texture->h, (float)(th-b)/texture->h, (float)th/texture->h};
+    float xa[4] = {x+0, x+l, x+(w-r), x+w};
+    float ya[4] = {y+0, y+t, y+(h-b), y+h};    
+
+    int i, j;
+    for (i=0, j=0; i < 4; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[0];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[0];
+    }
+    for (i=4, j=0; i < 8; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[1];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[1];
+    }
+    for (i=8, j=0; i < 12; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[2];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[2];
+    }
+    for (i=12, j=0; i < 16; i++, j++) {
+      vertex[i].tex.s = sa[j];
+      vertex[i].tex.t = ta[3];
+      vertex[i].vertex.x = xa[j];
+      vertex[i].vertex.y = ya[3];
+    }
+
+    //for ( i = 0; i < 4; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);      
+    //}
+    //printf("\n");
+    //for ( i = 4; i < 8; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);         
+    //}
+    //printf("\n");
+    //for ( i = 8; i < 12; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);          
+    //}
+    //printf("\n");
+    //for ( i = 12; i < 16; i++) {
+    //  printf("(%f, %f [%f, %f]) ", vertex[i].vertex.x, vertex[i].vertex.y, vertex[i].tex.s, vertex[i].tex.t);          
+    //}
+    //printf("\n=========================\n");
+    //fflush(stdout);
+      
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+    glVertexPointer(2, GL_FLOAT, sizeof(vertexdata_2vt_t), &vertex[0].vertex);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(vertexdata_2vt_t), &vertex[0].tex);
+
+    
+    glDrawElements(GL_QUADS, 4*8, GL_UNSIGNED_BYTE, quadindexes);
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
+  }
+
+  
+
+  return 0;
+}
 //texture or texturerect
 //x -] destination rect
 //y
@@ -242,42 +473,102 @@ static int graphics_draw_texture(lua_State* L) {
   double h = luaL_checknumber(L, 5);
   int tx = luaL_optint(L, 6, 0);
   int ty = luaL_optint(L, 7, 0);
-  int tw = luaL_optint(L, 8, texture->w);
-  int th = luaL_optint(L, 9, texture->h);
-  
-  //glMatrixMode (GL_MODELVIEW);
-  //glLoadIdentity ();
-  //glPushMatrix ();
+  int tw = luaL_optint(L, 8, texture->np2w);
+  int th = luaL_optint(L, 9, texture->np2h);
 
-  if (texture->id != lastid) {
-    glBindTexture (GL_TEXTURE_2D, texture->id);
+  if (texobj != texture->id) {
+    texobj = texture->id;
+    glBindTexture (GL_TEXTURE_2D, texture->id);    
   }
 
-  lastid = texture->id;
-
-  glBegin( GL_QUADS ); {
+  {
+    int i;
+    vertexdata_2vt_t vertex[4];
     float x1, y1, x2, y2;
     x1 = (float)tx/texture->w;
     y1 = (float)ty/texture->h;
     x2 = ((float)(tx + tw))/texture->w;
     y2 = (float)(ty + th)/texture->h;
+    
 
-    glTexCoord2f(x1, y1);
-    glVertex2d( x, y );
+    vertex[0].tex.s = x1;
+    vertex[0].tex.t = y1;
 
-    glTexCoord2f (x1, y2);
-    glVertex2d( x, y + h );
+    vertex[0].vertex.x = x;
+    vertex[0].vertex.y = y;    
 
-    glTexCoord2f (x2, y2);
-    glVertex2d( x + w, y + h );
+    vertex[1].tex.s = x1;
+    vertex[1].tex.t = y2;
 
-    glTexCoord2f (x2, y1);
-    glVertex2d( x + w, y );	
-  } glEnd();
+    vertex[1].vertex.x = x;
+    vertex[1].vertex.y = y+h;    
 
-  //glPopMatrix();
+    vertex[2].tex.s = x2;
+    vertex[2].tex.t = y2;
+
+    vertex[2].vertex.x = x+w;
+    vertex[2].vertex.y = y+h ;    
+
+    vertex[3].tex.s = x2;
+    vertex[3].tex.t = y1;
+
+    vertex[3].vertex.x = x+w;
+    vertex[3].vertex.y = y;    
+
+    glVertexPointer(2, GL_FLOAT, sizeof(vertexdata_2vt_t), &vertex[0].vertex);
+    glTexCoordPointer(2, GL_FLOAT, sizeof(vertexdata_2vt_t), &vertex[0].tex);
+    glDrawArrays(GL_QUADS, 0, 4);
+  }
+
+  
+
   return 0;
 }
+
+//static int graphics_draw_texture(lua_State* L) {
+//  texture_t* texture = check_texture(L, 1);
+//  double x = luaL_checknumber(L, 2);
+//  double y = luaL_checknumber(L, 3);
+//  double w = luaL_checknumber(L, 4);
+//  double h = luaL_checknumber(L, 5);
+//  int tx = luaL_optint(L, 6, 0);
+//  int ty = luaL_optint(L, 7, 0);
+//  int tw = luaL_optint(L, 8, texture->np2w);
+//  int th = luaL_optint(L, 9, texture->np2h);
+//  
+//  //glMatrixMode (GL_MODELVIEW);
+//  //glLoadIdentity ();
+//  //glPushMatrix ();
+//
+//  if (texture->id != lastid) {
+//    glBindTexture (GL_TEXTURE_2D, texture->id);
+//  }
+//
+//  lastid = texture->id;
+//
+//  glBegin( GL_QUADS ); {
+//    float x1, y1, x2, y2;
+//    x1 = (float)tx/texture->w;
+//    y1 = (float)ty/texture->h;
+//    x2 = ((float)(tx + tw))/texture->w;
+//    y2 = (float)(ty + th)/texture->h;
+//
+//    glTexCoord2f(x1, y1);
+//    glVertex2d( x, y );
+//
+//    glTexCoord2f (x1, y2);
+//    glVertex2d( x, y + h );
+//
+//    glTexCoord2f (x2, y2);
+//    glVertex2d( x + w, y + h );
+//
+//    glTexCoord2f (x2, y1);
+//    glVertex2d( x + w, y );	
+//  } glEnd();
+//
+//  //glPopMatrix();
+//  return 0;
+//}
 
 typedef struct image {
   int w;
@@ -305,16 +596,18 @@ static int graphics_update_texture(lua_State* L) {
   reactor_cairo_surface_t* surface = check_reactor_cairo_surface(L, 2);
 
   
-  if (texture->id != lastid) {
-    glBindTexture (GL_TEXTURE_2D, texture->id);
+  if (texobj != texture->id) {
+    texobj = texture->id;
+    glBindTexture (GL_TEXTURE_2D, texture->id);    
   }
+  if (glGetError()) return luaL_error(L, "%d", glGetError());
 
   cairo_surface_flush(surface->surface);
 
-  lastid = texture->id;
-
   if lua_isnoneornil(L, 3) {
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, surface->w, surface->h, GL_BGRA, GL_UNSIGNED_BYTE, surface->data);
+    { int error = glGetError();
+    if (error) return luaL_error(L, "bad texsub %d", error);}
   }
   else{
     int imagex, imagey, w, h, texturex, texturey;
@@ -332,13 +625,14 @@ static int graphics_update_texture(lua_State* L) {
     }
 
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, surface->w);
-    data = surface->data + (imagex + (imagey * surface->w))*4;
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, surface->w);if (glGetError()) return luaL_error(L, "%d", glGetError());
+    data = surface->data + (imagex + (imagey * surface->w))*4;if (glGetError()) return luaL_error(L, "%d", glGetError());
 
-    glTexSubImage2D(GL_TEXTURE_2D, 0, texturex, texturey, w, h, GL_BGRA, GL_UNSIGNED_BYTE, data);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, texturex, texturey, w, h, GL_BGRA, GL_UNSIGNED_BYTE, data);if (glGetError()) return luaL_error(L, "%d", glGetError());
 
     //glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glPixelStorei( GL_UNPACK_ROW_LENGTH, 0 );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
   }
 
   return 0;
@@ -391,6 +685,7 @@ int luaopen_reactor_graphics(lua_State* L) {
       {"getwidth", graphics_getwidth},
       {"getheight", graphics_getheight},
       {"setcolor", graphics_setcolor},    
+      {"setcolorf", graphics_setcolorf},   
       {"clipxywh", graphics_clip_xywh},
       {"clipltrb", graphics_clip_ltrb},    
       {"fillrect", graphics_fillrect},
@@ -400,6 +695,10 @@ int luaopen_reactor_graphics(lua_State* L) {
       {"popstate", graphics_popstate},
       {"clear", graphics_clear},        
       {"drawtexture", graphics_draw_texture},
+      {"draw9grid", graphics_draw_texture_9grid},
+      {"draw9gridborders", graphics_draw_texture_9grid_borders},
+      
+      
       {"updatetexture", graphics_update_texture},
       {"rotate", glRotate_L},
       {"translate", glTranslate_L},

@@ -18,7 +18,7 @@ return function(root)
     w = 400, h = 400, 
     title = 'listbox';
 
-    link = 'edges';
+    link = 'fill';
     function(self)
       self:adddefaultcontrols()
     end,

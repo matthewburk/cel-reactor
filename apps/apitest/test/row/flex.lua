@@ -24,9 +24,9 @@ return function(root)
           }:link(col, 'width')
         end
 
-  local window = cel.window.new():link(root, 'edges', 5, 5):relink()
+  local window = cel.window.new():link(root, 'fill.margin', 5, 5):relink()
 
-  col:link(window, 'edges', 5, 5)
+  col:link(window, 'fill.margin', 5, 5)
 
   col:endflux()
 

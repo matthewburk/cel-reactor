@@ -15,6 +15,8 @@ typedef struct texture {
   GLuint id;
   int w;
   int h;
+  int np2w; 
+  int np2h;
 } texture_t;
 
 typedef struct texture_rect {
@@ -24,6 +26,22 @@ typedef struct texture_rect {
   int w;
   int h;
 } texture_rect_t;
+
+typedef struct vertex2d {
+  GLfloat x;
+  GLfloat y;
+} vertex2d_t;
+
+typedef struct texcoord2d {
+  GLfloat s;
+  GLfloat t;
+} texcoord2d_t;
+
+
+typedef struct vertexdata_2vt {
+  texcoord2d_t tex;
+  vertex2d_t vertex;
+} vertexdata_2vt_t;
 
 
 void checkself_texture(lua_State* L, texture_t** rpp);

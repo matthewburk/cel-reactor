@@ -6,6 +6,22 @@ face.textcolor = 'current'
 face.color = 'current'
 face.bordercolor = cel.color.rgb(.4, .4, .4)
 face.borderwidth = 1
+face.image = {
+  texture = reactor.graphics.texture.create(32, 32),
+  l = 5,
+}
+
+do --draw to texture
+  local surface = cairo.surface.create(32, 32)
+  local cr = cairo.create(surface)
+  cairo.set_line_width(cr, 4)
+  cairo.roundrect(cr, 2, 2, 32-4, 32-4, 4)
+  cairo.set_source_rgb(cr, 1, 1, 1)
+  cairo.stroke(cr)
+  reactor.graphics.updatetexture(face.image.texture, surface)
+  cr:destroy()
+  surface:destroy()
+end
 
 function face.select(f, t)
   if t.mousefocusin then

@@ -4,6 +4,14 @@ require 'strict'
 local celdriver = require 'celdriver'
 local cel = require 'cel'
 
+--[[
+celdriver.resize(1920/2, 1200/2)
+
+function reactor.resized()
+  celdriver.resize(1920/2, 1200/2)
+end
+--]]
+
 function reactor.keydown(key, ...)
   celdriver.keydown(key, ...)
   if key == 'space' then
@@ -23,7 +31,7 @@ cel.getface('cel'):new {
 }:register('@divider')
 
 cel.getface('listbox'):new {
-  fillcolor = cel.color.rgb8(250, 250, 250),
+  color = cel.color.rgb8(250, 250, 250),
   flow = {
     scroll = cel.flows.constant(500),
     showybar = cel.flows.linear(300),

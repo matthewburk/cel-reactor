@@ -43,9 +43,9 @@ function face.cairodraw(_ENV, cr, f, t)
   return _ENV.drawlinks(cr, t)
 end
 
-function face.print(f, t, pre)
+function face.print(f, t, pre, facename)
   local s = string.format('%s[%d:%s] { x:%d y:%d w:%d h:%d [refresh:%s]',
-    t.metacel, t.id, tostring(t.face[_name]), t.x, t.y, t.w, t.h, tostring(t.refresh))
+    t.metacel, t.id, tostring(facename), t.x, t.y, t.w, t.h, tostring(t.refresh))
   io.write(pre, s)
   if t.text then
     for i, line in ipairs(t.lines) do

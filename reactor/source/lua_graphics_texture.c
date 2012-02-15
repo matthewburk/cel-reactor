@@ -5,6 +5,8 @@
 #include <math.h>
 #include "lua_cairo.h"
 
+GLuint texobj = 0;
+
 void checkself_texture(lua_State* L, texture_t** rpp) {
   *rpp = luaL_checkudata(L, 1, "reactor_graphics_texture_t");  
   if (0 == (*rpp)->id) {
@@ -35,17 +37,28 @@ static int graphics_texture_create_L(lua_State* L) {
     h = luaL_checkint(L, 2);
 
     glGenTextures( 1, &texture->id );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
     glBindTexture( GL_TEXTURE_2D, texture->id );
+    texobj = texture->id;
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
 
     for ( texture->w = 1; texture->w < w; texture->w <<= 1 );
     for ( texture->h = 1; texture->h < h; texture->h <<= 1 );  
 
+    texture->np2w = w;
+    texture->np2h = h;
+
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
     glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
 
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, texture->w, texture->h, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0 );
+    if (glGetError()) return luaL_error(L, "%d", glGetError());
   }
   DBG_RETURN(1);
 }

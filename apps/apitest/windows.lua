@@ -21,6 +21,6 @@ return function(root)
   cel.scroll {
     w = 300, h = 300, title = 'windows',    
     subject = bigcel,
-  }:link(root, 'edges')
+  }:link(root, 'fill')
 end
 

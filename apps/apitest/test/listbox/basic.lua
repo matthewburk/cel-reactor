@@ -38,7 +38,7 @@ return function(root)
         window:adddefaultcontrols()
       end,
 
-      link = 'edges',
+      link = 'fill',
       app.listbox {
         function(lb)
           for i = 1, 20 do
@@ -59,9 +59,9 @@ return function(root)
         window:adddefaultcontrols()
       end,
 
-      link = 'edges';
+      link = 'fill';
       app.row {
-            link = 'edges';
+            link = 'fill';
         {
           app.col {
             function(col)

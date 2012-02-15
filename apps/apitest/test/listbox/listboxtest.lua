@@ -8,7 +8,7 @@ return function(root)
         window:adddefaultcontrols()
         WINDOW = window
       end,
-      link = {'edges'},
+      link = 'fill',
 
       cel.listbox {
         --cel.window.new(300, 300),
