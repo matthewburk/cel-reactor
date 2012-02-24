@@ -44,4 +44,7 @@ return function(luapath)
   for i, v in ipairs(luapath) do
     package.path = v .. '/?.lua;' .. v .. '/?/init.lua;' .. package.path
   end
+
+  dprint(package.path)
+  dprint(package.cpath)
 end

@@ -61,7 +61,7 @@ end
 local _ENV = {
   color = cel.color.rgb(0, 0, 0),
   bordercolor = cel.color.rgb(1, 1, 1),
-  textcolor = cel.color.rgb(1, 0, 0),
+  textcolor = cel.color.tint(cel.color.rgb(0, 1, 1), .7),
   description = false,
 }
 
@@ -212,6 +212,7 @@ require((...)..'.window')
 require((...)..'.scroll')
 require((...)..'.grip')
 require((...)..'.plot')
+require((...)..'.slider')
 
 do
   local stretch = cel.getlinker('fill.aspect') 

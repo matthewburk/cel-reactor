@@ -114,38 +114,32 @@ end
   local modules = cel.col {
     link = 'width';
 
+    addmodule'celcoroutine',
+    addmodule'slider',
+    addmodule'cairo.buttons',
+    addmodule'menu',
     addmodule'baseline',
     addmodule'editbox',
     addmodule'windows',
+    addmodule'printbuffer',
+
+
+    addmodule'col.flexandminh',
     addmodule'col.flux',
     addmodule'col.sort',
     addmodule'col.big',
-    addmodule'test.row.row',
-    addmodule'test.row.minw',
-    addmodule'test.row.flex',
-    addmodule'test.row.big',
-    addmodule'test.formations.withoutlimits',
-    addmodule'test.scroll.basic',
-    addmodule'test.listbox.basic',
-    addmodule'test.listbox.listboxtest',
-    addmodule'test.listbox.big',
-    addmodule'test.listbox.sort',
-    addmodule'test.formations.basic',
-    addmodule'test.tabpanel.basic',
-    addmodule'test.coltest',
-    addmodule'test.gridtest',
-    addmodule'test.menutest',
-    addmodule'test.listboxtest',
-    addmodule'test.windowtest',
-    addmodule'test.printbuffertest',
-    addmodule'tutorial.tut_cel',
-    addmodule'demo.cairo.buttons',
-    cel.textbutton {
-      text = 'PRINT';
-      onclick = function()
-        cel.printdescription()
-      end
-    },
+
+    addmodule'row.big',
+    addmodule'row.minw',
+    addmodule'row.flex',
+    addmodule'col.withoutlimits',
+    addmodule'row.withoutlimits',
+    addmodule'scroll.basic',
+    addmodule'listbox.basic',
+    addmodule'listbox.big',
+    addmodule'listbox.sort',
+    addmodule'listbox.listboxtest',
+
     cel.textbutton {
       text = 'FULL GC';
       onclick = function()
@@ -157,18 +151,9 @@ end
         print( tostring(collectgarbage('count') / 1024))
       end
     },
-    cel.textbutton {
-      text = 'MEM USAGE';
-      onclick = function()
-        print( tostring(collectgarbage('count') / 1024))
-      end,
-      onhold = function()
-        print( tostring(collectgarbage('count') / 1024))
-      end
-    },
   }
 
-  root {
+  root:addlinks {
     link = 'fill';
     cel.row {
       { modules, link = 'fill'; },

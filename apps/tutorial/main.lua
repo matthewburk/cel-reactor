@@ -4,11 +4,11 @@ require 'strict'
 local celdriver = require 'celdriver'
 local cel = require 'cel'
 
---[[
-celdriver.resize(1920/2, 1200/2)
+---[[
+celdriver.resize(1920/1.5, 1080/1.5)
 
 function reactor.resized()
-  celdriver.resize(1920/2, 1200/2)
+  celdriver.resize(1920/1.5, 1080/1.5)
 end
 --]]
 
@@ -25,39 +25,41 @@ function reactor.keydown(key, ...)
   end
 end
 
-cel.getface('cel'):new {
-  fillcolor = cel.color.rgb(0, 1, 1),
-  linecolor = false,
-}:register('@divider')
+do --faces
+  cel.getface('cel'):new {
+    fillcolor = cel.color.rgb(0, 1, 1),
+    linecolor = false,
+  }:register('@divider')
 
-cel.getface('listbox'):new {
-  color = cel.color.rgb8(250, 250, 250),
-  flow = {
-    scroll = cel.flows.constant(500),
-    showybar = cel.flows.linear(300),
-    hideybar = cel.flows.linear(100),
-    showxbar = cel.flows.linear(100),
-    hidexbar = cel.flows.linear(100),
-  },
-}:register('@code')
+  cel.getface('listbox'):new {
+    color = cel.color.rgb8(250, 250, 250),
+    flow = {
+      scroll = cel.flows.constant(500),
+      showybar = cel.flows.linear(300),
+      hideybar = cel.flows.linear(100),
+      showxbar = cel.flows.linear(100),
+      hidexbar = cel.flows.linear(100),
+    },
+  }:register('@code')
 
-cel.getface('text'):new {
-  textcolor = cel.color.rgb8(116, 96, 116),
-  font = cel.loadfont('monospace', 12*72/96),
-  fillcolor = false, --cel.color.rgb(.9, .9, .95),
-}:register('@comment')
+  cel.getface('text'):new {
+    textcolor = cel.color.rgb8(116, 96, 116),
+    font = cel.loadfont('monospace', 12*72/96),
+    fillcolor = false, --cel.color.rgb(.9, .9, .95),
+  }:register('@comment')
 
-cel.getface('label'):new {
-  textcolor = cel.color.rgb8(6, 38, 60),
-  font = cel.loadfont('code', 12),
-  fillcolor = false,
-}:register('@code')
+  cel.getface('label'):new {
+    textcolor = cel.color.rgb8(6, 38, 60),
+    font = cel.loadfont('code', 12),
+    fillcolor = false,
+  }:register('@code')
 
-cel.getface('slot'):new {
-  linewidth = 1,
-  linecolor = cel.color.rgb8(221, 221, 221),
-  fillcolor = cel.color.rgb8(245, 244, 238),
-}:register('@commentbox')
+  cel.getface('slot'):new {
+    linewidth = 1,
+    linecolor = cel.color.rgb8(221, 221, 221),
+    fillcolor = cel.color.rgb8(245, 244, 238),
+  }:register('@commentbox')
+end
 
 local tut = {}
 
@@ -215,18 +217,19 @@ local function loadtut(tut, name)
 end
 
 function tut:run()
-  loadtut(self, 'did i mention linkers')
+  loadtut(self, 'tldr')
+  loadtut(self, 'intro')
+  loadtut(self, 'faces')
+  loadtut(self, 'autolayout')
   loadtut(self, 'linking')
+  loadtut(self, 'did i mention linkers')
+  loadtut(self, 'metacels and factorys')
+  --metacels
   loadtut(self, 'textbutton')
   loadtut(self, 'text')
   loadtut(self, 'button')
   loadtut(self, 'label')
   loadtut(self, 'textbutton')
-  loadtut(self, 'tldr')
-  loadtut(self, 'intro')
-  loadtut(self, 'faces')
-  loadtut(self, 'autolayout')
-  loadtut(self, 'metacels and factorys')
   self:reset()
 end
 
@@ -251,22 +254,25 @@ do
     end,
   }
 
-  cel {
-    link = 'fill';
-    cel.col {
-      link = 'fill';
-      { flex=2; 
-        cel.row {
-          link = 'fill';
+  cel { link = 'fill';
+    cel.row { link = 'fill';
+      { flex=1; minw=0;
+        tut.window 
+      },
+
+      { flex=1; minw=0;
+        cel.col { link = 'fill';
           { flex=2; 
-            cel.window { link = 'fill'; title = 'buffer'; tut.printbuffer} 
+            tut.board;
           },
-          { flex=3; 
-            cel.window { link = 'fill'; title = 'root'; tut.board} 
+
+          cel.new(1,1, cel.colorface(cel.color.rgb(1, 1, 1)));
+
+          { flex=1; 
+            tut.printbuffer;
           },
         },
       },
-      { flex=3; tut.window },
     }
   }:link(celdriver.root, 'fill')
 

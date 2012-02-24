@@ -99,7 +99,7 @@ function face.cairodraw(_ENV, cr, f, t, w, h)
     end
   cr:restore()
   cr:save()
-  cr:set_source_rgb(0, .7, .2)
+  cr:set_source_rgb(0, 1, 1)
     cr:stroke()
   cr:restore()
 end
