@@ -267,7 +267,7 @@ end
 
 celreactor.draw = faces.draw
 
-celreactor.root = driver.root:newroot():link(driver.root, 'fill'):takefocus()
+celreactor.root = driver.root:takefocus()
 
 function celreactor.resized()
   celreactor.resize(reactor.w, reactor.h)

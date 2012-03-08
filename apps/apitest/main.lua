@@ -38,9 +38,9 @@ local plots = cel.window {
     latency:start()
 
     local memcount = cel.plot.new(0, 0, function(time) return collectgarbage('count') end)
-    memcount:setrange(0, 1024*128, 8192)
+    memcount:setrange(0, 1024*8, 1024)
     memcount:setdomain(-60000 , 0, 5000) 
-    memcount:setpollinterval(200)
+    memcount:setpollinterval(50)
     memcount:start()
 
 
@@ -89,7 +89,7 @@ end
       end
 
       if not subject then
-        subject =  root:newroot()
+        subject =  cel.new()
         subject:link(sandbox, 'fill')
         sandbox:select(subject)
 

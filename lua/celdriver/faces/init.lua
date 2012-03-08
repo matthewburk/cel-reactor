@@ -213,6 +213,7 @@ require((...)..'.scroll')
 require((...)..'.grip')
 require((...)..'.plot')
 require((...)..'.slider')
+require((...)..'.menu')
 
 do
   local stretch = cel.getlinker('fill.aspect') 

@@ -3,6 +3,7 @@ return function(root)
 
   local faces = {
     white = cel.colorface(cel.color.rgb(1, 1, 1)),
+    gray = cel.colorface(cel.color.rgb(.3, .3, .3)),
     black = cel.colorface(cel.color.rgb(0, 0, 0)),
     red = cel.colorface(cel.color.rgb(1, 0, 0)),
     green = cel.colorface(cel.color.rgb(0, 1, 0)),
@@ -41,10 +42,10 @@ return function(root)
 
   local function newcol(linker)
     return cel.col { gap=1; 
-      { link = 'center'; face = faces.white;
+      { link = 'center'; face = faces.gray;
         string.format('linker = %s', tostring(linker));
       },
-      { flex = 1; link = 'center.height'; minh=0; face = faces.white;
+      { flex = 1; link = 'center.height'; minh=0; face = faces.gray;
         cel.col { gap = 5; face = faces.green;
           { nolimits('1'), face = faces.red; link = linker; flex=0 },
           { fixedsize('2'), face = faces.red;  link = linker; flex=0 },
@@ -53,7 +54,7 @@ return function(root)
           { nolimits('5', 0, 0), face = faces.red; link = linker; flex=0 },
         },
       },
-      { flex = 1; link = 'center.height'; minh=0; face = faces.white;
+      { flex = 1; link = 'center.height'; minh=0; face = faces.gray;
         cel.col { gap = 5; face = faces.green;
           { nolimits('1'), face = faces.red; link = linker; flex=1; },
           { fixedsize('2'), face = faces.red;  link = linker; flex=1; },
@@ -62,7 +63,7 @@ return function(root)
           { nolimits('5', 0, 0), face = faces.red; link = linker; flex=1; },
         },
       },
-      { flex = 1; link = 'center.height'; minh=0; face = faces.white;
+      { flex = 1; link = 'center.height'; minh=0; face = faces.gray;
         cel.col { gap = 5; face = faces.green;
           { nolimits('1'), face = faces.red; link = linker; minh=40; },
           { fixedsize('2'), face = faces.red;  link = linker; minh=40; },
@@ -71,7 +72,7 @@ return function(root)
           { nolimits('5', 0, 0), face = faces.red; link = linker; minh=40; },
         },
       },
-      { flex = 1; link = 'center.height'; minh=0; face = faces.white;
+      { flex = 1; link = 'center.height'; minh=0; face = faces.gray;
         cel.col { gap = 5; face = faces.green;
           { nolimits('1'), face = faces.red; link = linker; minh=40; flex=1; },
           { fixedsize('2'), face = faces.red;  link = linker; minh=40; flex=1; },
@@ -80,7 +81,7 @@ return function(root)
           { nolimits('5', 0, 0), face = faces.red; link = linker; minh=40; flex=1; },
         },
       },
-      { flex = 1; link = 'center.height'; minh=0; face = faces.white;
+      { flex = 1; link = 'center.height'; minh=0; face = faces.gray;
         cel.col { gap = 5; face = faces.green;
           { nolimits('1'), face = faces.red; link = linker; minh=0; flex=0; },
           { fixedsize('2'), face = faces.red;  link = linker; minh=0; flex=0; },
@@ -89,7 +90,7 @@ return function(root)
           { nolimits('5', 0, 0), face = faces.red; link = linker; minh=0; flex=0; },
         },
       },
-      { flex = 1; link = 'center.height'; minh=0; face = faces.white;
+      { flex = 1; link = 'center.height'; minh=0; face = faces.gray;
         cel.col { gap = 5; face = faces.green;
           { nolimits('1'), face = faces.red; link = linker; minh=0; flex=1; },
           { fixedsize('2'), face = faces.red;  link = linker; minh=0; flex=1; },
@@ -105,26 +106,26 @@ return function(root)
     cel.row { link = 'fill'; gap=1; --face = cel.colorface(cel.color.rgb(0, 0, .5));
       cel.col { gap=1;
         '';
-        { flex = 1; link = 'left.center'; face = faces.white; minh=0;
+        { flex = 1; link = 'left.center'; face = faces.gray; minh=0;
           cel.col {
             'slot minh = nil'; 
             'slot flex = 0';
           }
         };
-        { flex = 1; link = 'left.center'; face = faces.white; minh=0;
+        { flex = 1; link = 'left.center'; face = faces.gray; minh=0;
           cel.col { link = 'width';
             'slot minh = nil';
             'slot flex = 1';
             cel.text.new[[- flexible height is allocated unevenly]];
           }
         };
-        { flex = 1; link = 'left.center'; face = faces.white; minh=0;
+        { flex = 1; link = 'left.center'; face = faces.gray; minh=0;
           cel.col {
             'slot minh = 40';
             'slot flex = 0';
           }
         };
-        { flex = 1; link = 'left.center'; face = faces.white; minh=0;
+        { flex = 1; link = 'left.center'; face = faces.gray; minh=0;
           cel.col { link = 'width';
             'slot minh = 40';
             'slot flex = 1';
@@ -132,13 +133,13 @@ return function(root)
             
           }
         };
-        { flex = 1; link = 'left.center'; face = faces.white; minh=0;
+        { flex = 1; link = 'left.center'; face = faces.gray; minh=0;
           cel.col {
             'slot minh = 0';
             'slot flex = 0';
           }
         };
-        { flex = 1; link = 'left.center'; face = faces.white; minh=0;
+        { flex = 1; link = 'left.center'; face = faces.gray; minh=0;
           cel.col { link = 'width';
             'slot minh = 0.';
             'slot flex = 1';
