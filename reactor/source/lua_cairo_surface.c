@@ -48,6 +48,37 @@ static int cairo_image_surface_create_L(lua_State* L) {
   DBG_RETURN(1);
 }
 
+static int cairo_image_surface_create_from_png_L(lua_State* L) {  
+  DBG_ENTER();
+  {
+    reactor_cairo_surface_t* rsurface = 0;  
+    const char* filename = luaL_checkstring(L, 1);
+    
+    rsurface = lua_newuserdata(L, sizeof(reactor_cairo_surface_t));
+    luaL_getmetatable(L, "reactor_cairo_surface_t");
+    lua_setmetatable(L, -2);
+
+    rsurface->surface = cairo_image_surface_create_from_png(filename);
+
+    {
+      int status = cairo_surface_status(rsurface->surface);
+      switch(status) {
+        case CAIRO_STATUS_FILE_NOT_FOUND:
+          return luaL_error(L, "file not found %s", filename);
+        case CAIRO_STATUS_READ_ERROR:
+          return luaL_error(L, "read error on file %s", filename);
+        case CAIRO_STATUS_NO_MEMORY:
+          return luaL_error(L, "no memory for file %s", filename);
+      }
+    }
+
+    rsurface->w = cairo_image_surface_get_width(rsurface->surface);
+    rsurface->h = cairo_image_surface_get_height(rsurface->surface);
+    rsurface->data = cairo_image_surface_get_data(rsurface->surface);    
+  }
+  DBG_RETURN(1);
+}
+
 static int cairo_surface__gc_L(lua_State* L) {
   DBG_ENTER();
   {
@@ -78,6 +109,13 @@ static int cairo_surface_get_size_L(lua_State* L) {
   return 2;  
 }
 
+static int cairo_surface_write_to_png_L(lua_State* L) {
+  cairo_surface_t* surface = check_cairo_surface(L, 1);
+  int ok = cairo_surface_write_to_png(surface, luaL_checkstring(L, 2));
+  lua_pushboolean(L, ok == CAIRO_STATUS_SUCCESS);
+  return 1;  
+}
+
 
 void luaopen_cairo_surface(lua_State* L) {
   DBG_ENTER();
@@ -85,14 +123,17 @@ void luaopen_cairo_surface(lua_State* L) {
     static const luaL_reg surface_functions[] = {
       {"__gc", cairo_surface__gc_L},
       {"destroy", cairo_surface_destroy_L},    
-      {"get_size", cairo_surface_get_size_L},    
+      {"get_size", cairo_surface_get_size_L},   
+      {"write_to_png", cairo_surface_write_to_png_L},   
       {NULL, NULL}
     }; 
 
     static const luaL_reg module_functions[] = {
       {"create", cairo_image_surface_create_L}, 
+      {"create_from_png", cairo_image_surface_create_from_png_L}, 
       {"destroy", cairo_surface_destroy_L},      
       {"get_size", cairo_surface_get_size_L},    
+      {"write_to_png", cairo_surface_write_to_png_L},    
       {NULL, NULL}
     };
 
