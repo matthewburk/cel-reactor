@@ -40,11 +40,39 @@ do --string interpolation via % operator
   end
 end
 
-return function(luapath)
-  for i, v in ipairs(luapath) do
-    package.path = v .. '/?.lua;' .. v .. '/?/init.lua;' .. package.path
+return function(tluapath)
+  if type(tluapath) == 'table' then
+    do
+      local path = ''
+      for i=#tluapath, 1, -1 do
+        local v = tluapath[i]
+        path = v .. '/?.lua;' .. v .. '/?/init.lua;' .. path
+      end
+      package.path = path .. package.path
+    end
+    do
+      local path = ''
+      for i=#tluapath, 1, -1 do
+        local v = tluapath[i]
+        path = v .. '/?_L.dll;' .. v .. '/?.dll;' .. path
+      end
+      package.cpath = path .. package.cpath
+    end
+  elseif type(tluapath) == 'string' then
+    do
+      local path = ''
+      local v = tluapath
+      path = v .. '/?.lua;' .. v .. '/?/init.lua;' .. path
+      package.path = path .. package.path
+    end
+    do
+      local path = ''
+      local v = tluapath
+      path = v .. '/?_L.dll;' .. v .. '/?.dll;' .. path
+      package.cpath = path .. package.cpath
+    end
   end
 
-  dprint(package.path)
-  dprint(package.cpath)
+  dprint('package.path', (string.gsub('\n  '..package.path, ';', '\n  ')))
+  dprint('package.cpath', (string.gsub('\n  '..package.cpath, ';', '\n  ')), '\n')
 end

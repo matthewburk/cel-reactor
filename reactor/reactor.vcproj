@@ -126,13 +126,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="include;include/lua;include/cairo"
-				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;_BIND_TO_CURRENT_CRT_VERSION;$(NOINHERIT)"
+				AdditionalIncludeDirectories="include;include\lua;lib\cairo\src;lib\freetype\src"
+				PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_WARNINGS;CAIRO_WIN32_STATIC_BUILD;_BIND_TO_CURRENT_CRT_VERSION;$(NOINHERIT)"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 				CompileAs="1"
 			/>
 			<Tool
@@ -146,10 +146,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Winmm.lib cairo.lib lua51.lib tk-dbg.lib opengl32.lib"
+				AdditionalDependencies="Winmm.lib freetype.lib opengl32.lib lua51.lib cairo.lib pixman.lib libpng.lib zlib.lib"
 				OutputFile="$(ProjectDir)\..\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="lib"
+				AdditionalLibraryDirectories="lib; lib\cairo\src; lib\freetype\src; lib\pixman\src; lib\libpng\src; lib\zlib\src"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -188,7 +188,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\source\driver.c"
+				RelativePath=".\cairo_L.c"
 				>
 			</File>
 			<File
@@ -196,35 +196,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\source\lua_cairo.c"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_cairo_font.c"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_cairo_pattern.c"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_cairo_surface.c"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_clipboard.c"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_graphics.c"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_graphics_texture.c"
-				>
-			</File>
-			<File
 				RelativePath=".\source\reactor.c"
+				>
+			</File>
+			<File
+				RelativePath=".\source\reactor_graphics.c"
 				>
 			</File>
 		</Filter>
@@ -235,10 +211,6 @@
 			>
 			<File
 				RelativePath=".\source\gl.h"
-				>
-			</File>
-			<File
-				RelativePath=".\source\lua_cairo.h"
 				>
 			</File>
 			<File

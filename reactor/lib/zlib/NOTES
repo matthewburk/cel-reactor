@@ -1,0 +1,4 @@
+zlib 1.2.6
+
+gzguts.h:30 - Changed '#ifdef __TURBOC__' to '#if defined(_MSC_VER) || defined(__TURBOC__)'
+  as per the "quick fix" descibed on the zlib-devel mailing list.  Stupid Freeboze...
