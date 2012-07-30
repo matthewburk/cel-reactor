@@ -15,6 +15,7 @@ return function(root)
   local words = {}
 
   for i, face in ipairs(faces) do
+    face.textcolor = cel.color.rgb(0, 0, 0)
     words[i] = cel.label.new('Hello', face)
   end
 

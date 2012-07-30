@@ -41,14 +41,28 @@ do --extended cairo functions
       cr:close_path();
     end
   end
+--[[
+function cairox.roundrect(cr, x, y, w, h, r)
+  if not r then
+    cr:rectangle(x, y, w, h);
+  else
+    local degrees = math.pi / 180.0;
+    cr:new_sub_path();
+    cr:arc(x + w - r, y + r, r, -90 * degrees, 0 * degrees);
+    cr:arc(x + w - r, y + h - r, r, 0 * degrees, 90 * degrees);
+    cr:arc(x + r, y + h - r, r, 90 * degrees, 180 * degrees);
+    cr:arc(x + r, y + r, r, 180 * degrees, 270 * degrees);
+    cr:close_path();
+  end
 end
-
+--]]
+end
 
 local _ENV = {
   color = cel.color.rgb(0, 0, 0),
   bordercolor = cel.color.rgb(1, 1, 1),
   textcolor = cel.color.tint(cel.color.rgb(0, 1, 1), .7),
-  description = false,
+  metadescription = false,
   X=0,
   Y=0,
 }
@@ -56,7 +70,7 @@ local _ENV = {
 do --drawlinks
   --TODO need to fix dirty rect stystem, it does not work in all cases
   local function updaterect(t, r)
-    local ur = _ENV.description.updaterect
+    local ur = _ENV.metadescription.updaterect
     if r.r < ur.l or r.b < ur.t or r.l > ur.r or r.t > ur.b then
       return false
     end
@@ -107,10 +121,10 @@ do --rdrawlinks
       local t = t[i]
       local face = t.face.select and t.face:select(t) or t.face
       if face.rdraw then
-        reactor.graphics.pushmatrix()
-        reactor.graphics.clipltrb(t.clip.l, t.clip.t, t.clip.r, t.clip.b)
+        app.window.graphics.pushmatrix()
+        app.window.graphics.clipltrb(t.clip.l, t.clip.t, t.clip.r, t.clip.b)
         --TODO set clip
-        reactor.graphics.translate(t.x, t.y)
+        app.window.graphics.translate(t.x, t.y)
 
         local color, bordercolor, textcolor = _ENV.color, _ENV.bordercolor, _ENV.textcolor
 
@@ -127,7 +141,7 @@ do --rdrawlinks
         face.rdraw(_ENV, face, t) 
         _ENV.color, _ENV.bordercolor, _ENV.textcolor = color, bordercolor, textcolor
 
-        reactor.graphics.popmatrix() 
+        app.window.graphics.popmatrix() 
       end
     end
   end
@@ -143,7 +157,7 @@ do --cel face
   face.borderwidth = false
   face.shape = 'rect'
   face.image = {
-    texture = reactor.graphics.texture.create(32, 32),
+    texture = app.window.graphics.texture.create(32, 32),
     l = 2,
   }
 
@@ -158,7 +172,7 @@ do --cel face
     cr:stroke()
 
     surface:flush()
-    reactor.graphics.updatetexture(face.image.texture, surface:get_data())
+    app.window.graphics.updatetexture(face.image.texture, surface:get_data())
     cr:destroy()
     surface:destroy()
   end
@@ -166,9 +180,9 @@ do --cel face
   function face.rdraw(_ENV, f, t)
     if f.image then
       --if f.color then
-        reactor.graphics.setcolor(_ENV.color)
+        app.window.graphics.setcolor(_ENV.color)
       --end
-      reactor.graphics.draw9grid(f.image.texture, 0, 0, t.w, t.h, f.image.l)
+      app.window.graphics.draw9grid(f.image.texture, 0, 0, t.w, t.h, f.image.l)
     end
 
     return _ENV.rdrawlinks(t)
@@ -210,125 +224,28 @@ require((...)..'.plot')
 require((...)..'.slider')
 require((...)..'.menu')
 
-do
-  local stretch = cel.getlinker('fill.aspect') 
-  local texture
-  local surface
-  local cr
-  local surfacew = 0
-  local surfaceh = 0
+return function(cr, t, metadescription)
+  _ENV.metadescription = metadescription
 
-  return {
-    ---[[
-    draw = function()
-      reactor.graphics.pushstate2d(app.window.w, app.window.h)
-      reactor.graphics.clear()
-      reactor.graphics.setcolorf(1, 1, 1)
+  local r = metadescription.updaterect
 
-      _ENV.description = cel.describe()
-      local t = _ENV.description.description
+  cr:save()
+  do 
+    cairo.rectangle(cr, r.l, r.t, r.r-r.l, r.b-r.t)
+    cairo.clip(cr)
+    cairo.rectangle(cr, t.x, t.y, t.w, t.h)
+    cairo.clip(cr)
 
-      if surfacew ~= t.w or surfaceh ~= t.h then
-        surfacew, surfaceh = t.w, t.h
-        if texture then texture:destroy() end
-        if surface then surface:destroy() end
-        if cr then cr:destroy() end
+    cairo.translate(cr, t.x, t.y)
+    cairo.rectangle(cr, 0, 0, t.w, t.h)
 
-        texture = reactor.graphics.texture.create(t.w, t.h)
-        surface = cairo.surface.create(t.w, t.h)
-        cr = cairo.create(surface)
-      end
+    cairo.set_source_rgb(cr, 0, 0, 0)
+    cairo.fill(cr)
 
-      local r = _ENV.description.updaterect
+    cairo.set_line_width(cr, 1)
 
-      do cairo.save(cr)
-        cairo.rectangle(cr, r.l, r.t, r.r-r.l, r.b-r.t)
-        cairo.clip(cr)
-        cairo.rectangle(cr, t.x, t.y, t.w, t.h)
-        cairo.clip(cr)
-
-        cairo.translate(cr, t.x, t.y)
-        cairo.rectangle(cr, 0, 0, t.w, t.h)
-
-        cairo.set_source_rgb(cr, 0, 0, 0)
-        cairo.fill(cr)
-
-        cairo.set_line_width(cr, 1)
-
-        _ENV.drawlinks(cr, t)
-      end cairo.restore(cr)
-
-      
-
-      surface:flush()
-      local sdata, sw, sh = surface:get_data()
-      reactor.graphics.updatetexture(texture, sdata, sw, sh, r.l, r.t, r.r-r.l, r.b-r.t)
-
-      do
-        local x, y, aw, ah = stretch(app.window.w, app.window.h, 0, 0, t.w, t.h, t.w/t.h)
-
-        if x > 0 then
-          reactor.graphics.fillrect(0, 0, x, ah)
-          reactor.graphics.fillrect(x+aw, 0, x+1, ah)
-        elseif y > 0 then
-          reactor.graphics.fillrect(0, 0, aw, y)
-          reactor.graphics.fillrect(0, y+ah, aw, y+1)
-        end
-
-        reactor.graphics.drawtexture(texture, x, y, aw, ah)--, 0, 0, t.w, t.h)
-      end
-
-      reactor.graphics.popstate()
-    end,
-    --]]
-    --[[
-    draw = function()
-      collectgarbage('stop')
-      reactor.graphics.pushstate2d(reactor.w, reactor.h)
-      reactor.graphics.clear()
-      reactor.graphics.setcolorf(1, 1, 1)
-
-      _ENV.description = cel.describe()
-      local t = _ENV.description.description
-
-      reactor.graphics.clipltrb(t.clip.l, t.clip.t, t.clip.r, t.clip.b)
-      reactor.graphics.pushmatrix()
-      reactor.graphics.loadidentity()
-      --reactor.graphics.translate(t.x+.375, t.y+.375)
-      reactor.graphics.setcolorf(1, 1, 1)
-      _ENV.rdrawlinks(t)
-      reactor.graphics.popmatrix()
-
-      reactor.graphics.popstate()
-      collectgarbage('restart')
-    end
-    --]]
-  }
-end
---[[
-function _ENV.lerp(a, b, p)
-  return a + p * (b - a)
+    _ENV.drawlinks(cr, t)
+  end 
+  cr:restore()
 end
 
-function _ENV.smoothstep(a, b, p)
-  return lerp(a, b, p*p*(3-2*p))
-end
-
-function _ENV.rlerp(a, b, c)
-  return (c - a)/(b - a);
-end
-
-function cairox.roundrect(cr, x, y, w, h, r)
-  if not r then
-    cr:rectangle(x, y, w, h);
-  else
-    local degrees = math.pi / 180.0;
-    cr:new_sub_path();
-    cr:arc(x + w - r, y + r, r, -90 * degrees, 0 * degrees);
-    cr:arc(x + w - r, y + h - r, r, 0 * degrees, 90 * degrees);
-    cr:arc(x + r, y + h - r, r, 90 * degrees, 180 * degrees);
-    cr:arc(x + r, y + r, r, 180 * degrees, 270 * degrees);
-    cr:close_path();
-  end
-end
---]]

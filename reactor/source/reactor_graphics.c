@@ -16,7 +16,7 @@ static int graphics_clip_xywh(lua_State *L) {
   int y = (GLint)luaL_checknumber(L, 2);
   int w = (GLint)luaL_checknumber(L, 3);
   int h = (GLint)luaL_checknumber(L, 4);
-  glScissor(x, reactor.h - (y + h), w, h);
+  glScissor(x, window.h - (y + h), w, h);
   if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
@@ -26,7 +26,7 @@ static int graphics_clip_ltrb(lua_State *L) {
   int t = (GLint)luaL_checknumber(L, 2);
   int r = (GLint)luaL_checknumber(L, 3);
   int b = (GLint)luaL_checknumber(L, 4);  
-  glScissor(l, reactor.h - b, r - l, b - t);
+  glScissor(l, window.h - b, r - l, b - t);
   if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
@@ -232,23 +232,11 @@ static int graphics_popstate(lua_State* L) {
   return 0;
 }
 
-static int graphics_getwidth(lua_State* L) {
-  lua_pushinteger(L, reactor.w);
-  return 1;
-}
-
-static int graphics_getheight(lua_State* L) {
-  lua_pushinteger(L, reactor.h);
-  return 1;
-}
-
 static int graphics_clear(lua_State* L) {
   glClear( GL_COLOR_BUFFER_BIT );if (glGetError()) return luaL_error(L, "%d", glGetError());
   return 0;
 }
 
-
- 
 //texture or texturerect
 //x -] destination rect
 //y
@@ -771,24 +759,22 @@ extern void luaopen_reactor_graphics_texture(lua_State* L);
 int luaopen_reactor_graphics(lua_State* L) {
   { 
     static const luaL_reg module_functions[] = {
-      {"getwidth", graphics_getwidth},
-      {"getheight", graphics_getheight},
       {"setcolor", graphics_setcolor},    
       {"setcolorf", graphics_setcolorf},   
       {"clipxywh", graphics_clip_xywh},
       {"clipltrb", graphics_clip_ltrb},    
       {"fillrect", graphics_fillrect},
-      //{"strokerect", graphics_strokerect},
       {"pushstate2d", graphics_pushstate2d},
-      //{"pushstate3d", graphics_pushstate3d},
       {"popstate", graphics_popstate},
       {"clear", graphics_clear},        
       {"drawtexture", graphics_draw_texture},
       {"draw9grid", graphics_draw_texture_9grid},
-      {"draw9gridborders", graphics_draw_texture_9grid_borders},
+      {"draw9gridborders", graphics_draw_texture_9grid_borders},   
       
-      
+      //{"createtexture", graphics_create_texture},
+      //{"destroytexture", graphics_destroy_texture},
       {"updatetexture", graphics_update_texture},
+
       {"rotate", glRotate_L},
       {"translate", glTranslate_L},
       {"scale", glScale_L},

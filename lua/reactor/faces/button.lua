@@ -7,7 +7,7 @@ face.color = 'current'
 face.bordercolor = cel.color.rgb(.4, .4, .4)
 face.borderwidth = 1
 face.image = {
-  texture = reactor.graphics.texture.create(32, 32),
+  texture = app.window.graphics.texture.create(32, 32),
   l = 5,
 }
 
@@ -19,7 +19,7 @@ do --draw to texture
   cairo.set_source_rgb(cr, 1, 1, 1)
   cairo.stroke(cr)
   surface:flush()
-  reactor.graphics.updatetexture(face.image.texture, surface:get_data())
+  app.window.graphics.updatetexture(face.image.texture, surface:get_data())
   cr:destroy()
   surface:destroy()
 end

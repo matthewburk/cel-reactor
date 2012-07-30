@@ -346,8 +346,7 @@ int luaopen_cairo( lua_State* L )
   luaopen_cairo_pattern( L );
   luaopen_cairo_font( L );
 
-  //return( 1 );
-  return 0;
+  return( 1 );
 }
 
 /**
@@ -2020,11 +2019,11 @@ static int cairo_font_face_create_l( lua_State* L )
   lua_setmetatable( L, -2 );
 
   if ( FT_New_Face( m_ftlibrary, filename, 0, &lcff->ftface ) ) {
-    luaL_error( L, "FT_New_Face() failed" );
+    luaL_error( L, "Failed to load font from file %s", filename );
   }
 
   if ( !( lcff->crface = cairo_ft_font_face_create_for_ft_face( lcff->ftface, 0 ) ) ) {
-    luaL_error( L, "cairo_ft_font_face_create_for_ft_face() failed" );
+    luaL_error( L, "cairo_ft_font_face_create_for_ft_face() failed for font %s", filename );
   }
 
   return( 1 );

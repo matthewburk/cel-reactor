@@ -12,17 +12,17 @@ face.domaincolor = cel.color.rgb(1, 1, 1)
 
 local _w, _h = 512, 512
 
-face.texture = reactor.graphics.texture.create(_w, _h)
+face.texture = app.window.graphics.texture.create(_w, _h)
 face.surface = cairo.surface.create(_w, _h)
 face.cr = cairo.create(face.surface)
 
 function face.rdraw(_ENV, f, t)
   face.cairodraw(_ENV, f.cr, f, t, _w, _h)
 
-  reactor.graphics.updatetexture(f.texture, f.surface)
+  app.window.graphics.updatetexture(f.texture, f.surface)
 
-  reactor.graphics.setcolorf(1, 1, 1)
-  reactor.graphics.drawtexture(f.texture, 0, 0, t.w, t.h)
+  app.window.graphics.setcolorf(1, 1, 1)
+  app.window.graphics.drawtexture(f.texture, 0, 0, t.w, t.h)
 
   return _ENV.rdrawlinks(t)
 end

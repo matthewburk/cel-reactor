@@ -1,12 +1,39 @@
+--window={title='apitest', w=400, h=400}
+
 local cel = require 'cel'
 
 --make root cel a fixed size, it will scale, comment out and root is sized to app.window size
-app.window.root:setlimits(1920/2, nil, 800, nil)
 
+--iphone retina
+--app.window.root:setlimits(320*4, 320*4, 480*2, 480*2)
+--iphone app.window.root:setlimits(320, 320, 480, 480)
+
+--[[
 function app.window:draw()
   app.window.root:draw()
 end
+--]]
 
+
+--[[maximum fps animation
+function app.update(millis)  
+  app.window:redraw()
+end
+--]]
+
+--[[wait at least 30ms between frames, countdown started just before app.update is called
+function app.update(millis)  
+  app.window:redraw()
+  return 30 
+end
+--]]
+
+--[[
+function app.ontick(millis)
+end
+--]]
+
+--[==[
 local plots = cel.window {
   w = 400, h = 400,  
   function(window)
@@ -24,13 +51,13 @@ local plots = cel.window {
 
     latency:setrange(0, 50, 10)
     latency:setdomain(-5000, 0, 1000)
-    latency:setpollinterval(16)
+    latency:setpollinterval(10)
     latency:start()
 
     local memcount = cel.plot.new(0, 0, function(time) return collectgarbage('count') end)
     memcount:setrange(0, 1024*8, 1024)
     memcount:setdomain(-60000 , 0, 5000) 
-    memcount:setpollinterval(50)
+    memcount:setpollinterval(30)
     memcount:start()
 
 
@@ -56,11 +83,12 @@ function app.window:onkeydown(key, ...)
   elseif key == 'f2' then
     app.window:fullscreen(false)
   elseif key == 'escape' then
-    reactor.quit()
+    app.quit()
   elseif key == 'f9' then
     plots:link(app.window.root, 'center'):relink() 
   end
 end
+--]==]
 
 local sandbox = cel.mutexpanel.new(100, 100)
 
@@ -81,9 +109,9 @@ local function addmodule(name)
       sandbox:select(subject)
 
       local sub = require(name)
-      local begtime = reactor.timermillis()
+      local begtime = app.getelapsedtime()
       sub(subject)
-      dprint('TIME = ', (reactor.timermillis() - begtime)/1000)
+      dprint('TIME = ', (app.getelapsedtime() - begtime)/1000)
     else
       sandbox:select(subject)
     end
@@ -142,3 +170,6 @@ app.window.root:addlinks {
     { sandbox, link = 'fill'; flex=1; },
   },
 }
+
+
+

@@ -1,3 +1,113 @@
+#if 0
+/**
+ * 
+ */
+void reactor_window_getclipboard( char** text )
+{
+  HGLOBAL hglobal = 0;
+  char* buffer = 0;
+
+  BUGFISH_ENTER();
+
+  BUGFISH_ASSERT( text );
+
+  if ( !IsClipboardFormatAvailable( CF_TEXT ) ) {
+    BUGFISH_RETURN_VOID();
+  }
+
+  if ( !OpenClipboard( m_window.hwnd ) ) {
+    BUGFISH_RETURN_VOID();
+  }
+
+  if ( !( hglobal = GetClipboardData( CF_TEXT ) ) ) {
+    BUGFISH_ASSERT( !"GetClipboardData() failed" );
+  }
+
+  if ( !( buffer = (char*)GlobalLock( hglobal ) ) ) {
+    BUGFISH_ASSERT( !"GlobalLock() failed" );
+  }
+
+  if ( !( *text = strdup( buffer ) ) ) {
+    BUGFISH_ASSERT( !"strdup() failed" );
+  }
+
+  GlobalUnlock( hglobal );
+
+  CloseClipboard();
+
+  BUGFISH_RETURN_VOID();
+}
+
+/**
+ * 
+ */
+void reactor_window_setclipboard( const char* text )
+{
+  HGLOBAL hglobal = 0;
+  char* buffer = 0;
+
+  BUGFISH_ENTER();
+
+  BUGFISH_ASSERT( text );
+
+  if ( !OpenClipboard( m_window.hwnd ) ) {
+    BUGFISH_RETURN_VOID();
+  }
+
+  EmptyClipboard();
+
+  if ( !( hglobal = GlobalAlloc( GHND, strlen( text ) + 1 ) ) ) {
+    BUGFISH_ASSERT( !"GlobalAlloc() failed" );
+  }
+
+  if ( !( buffer = (char*)GlobalLock( hglobal ) ) ) {
+    BUGFISH_ASSERT( !"GlobalLock() failed" );
+  }
+
+  strncpy( buffer, text, strlen( text ) );
+
+  GlobalUnlock( hglobal );
+
+  SetClipboardData( CF_TEXT, hglobal );
+
+  CloseClipboard();
+
+  BUGFISH_RETURN_VOID();
+}
+
+/**
+ * 
+ */
+static int reactor_window_getclipboard_l( lua_State* L )
+{
+  char* text = 0;
+  luaL_Buffer b;
+
+  reactor_window_getclipboard( &text );
+
+  if ( text ) {
+    luaL_buffinit( L, &b );
+    luaL_addstring( &b, text );
+    luaL_pushresult( &b );
+
+    free( text );
+
+    return( 1 );
+  }
+
+  return( 0 );
+}
+
+/**
+ * 
+ */
+static int reactor_window_setclipboard_l( lua_State* L )
+{
+  reactor_window_setclipboard( luaL_checkstring( L, 1 ) );
+
+  return( 0 );
+}
+#endif
 
 #include <stdlib.h>
 #include <signal.h>
@@ -6,30 +116,44 @@
 #include <lauxlib.h>
 #include <lualib.h>
 #include <assert.h>
-#include "reactor.h"
 #include <windows.h>
+#include <windowsx.h>
+#include <stdio.h>
+#include "reactor.h"
+#include "gl.h"
 
-extern int luaopen_reactor_graphics(lua_State* L);
-extern int luaopen_reactor_clipboard(lua_State* L);
+#define APP_WINDOW_CLASSNAME "reactor_window"
+#define APP_WINDOW_CREATE ( WM_APP + 1 )
+#define APP_WINDOW_QUIT ( WM_APP + 2 )
+#define APP_WINDOW_REDRAW (WM_APP + 3)
+#define APP_TICK (WM_APP + 4)
+
+struct window window = {0};
+static DWORD createtime;
 
 static lua_State* L = 0;
 static int windowref;
+static int appref;
 
-struct reactor reactor = {0};
+static int reactor_traceback (lua_State *L) {
+  if (!lua_isstring(L, 1))  {
+    return 1;  
+  }
 
-static int traceback (lua_State *L) {
-  if (!lua_isstring(L, 1))  /* 'message' not a string? */
-    return 1;  /* keep it intact */
-  lua_getfield(L, LUA_GLOBALSINDEX, "debug");
+  lua_getglobal(L, "debug");
+
   if (!lua_istable(L, -1)) {
     lua_pop(L, 1);
     return 1;
   }
+
   lua_getfield(L, -1, "traceback");
+
   if (!lua_isfunction(L, -1)) {
     lua_pop(L, 2);
     return 1;
   }
+
   lua_pushvalue(L, 1);  /* pass error message */
   lua_pushinteger(L, 2);  /* skip this function and traceback */
   lua_call(L, 2, 1);  /* call debug.traceback */
@@ -40,9 +164,7 @@ static int reactor_pcall(lua_State *L, int narg, int nresults) {
   int status;
   int top = lua_gettop(L);
   int base = top - narg;  /* function index */
-  //TODO pushing traceback causes huge memory leak
-  lua_getglobal(L, "errorfunc");
-  //lua_pushcfunction(L, traceback);  /* push traceback function */
+  lua_getglobal(L, "reactor_traceback");
   lua_insert(L, base);  /* put it under chunk and args */
   status = lua_pcall(L, narg, nresults, base);
   lua_remove(L, base);  /* remove traceback function */
@@ -57,21 +179,57 @@ static int reactor_pcall(lua_State *L, int narg, int nresults) {
   return status;
 }
 
-void reactor_winevent(const char* name) {
+static unsigned long reactor_getelapsedtime(void) {
+  return timeGetTime() - createtime;
+}
+
+static int reactor_getelapsedtime_L(lua_State* L) {
+  lua_pushnumber(L, reactor_getelapsedtime());  
+  return 1;
+}
+
+static int reactor_quit_L(lua_State* L) {
+  PostQuitMessage(0);  
+  return 0;
+}
+
+extern int luaopen_reactor_graphics(lua_State* L);
+extern int luaopen_reactor_clipboard(lua_State* L);
+extern int luaopen_cairo(lua_State* L);
+
+static int window_redraw_L(lua_State* L) {
+  if (!window.redraw) {
+    window.redraw=1;
+    PostMessage( window.hwnd, APP_WINDOW_REDRAW, 0, 0 );
+  }
+  return 0;
+}
+
+static int window_getclientrect_L(lua_State* L) {
+  RECT rect;
+  POINT point;
+  GetClientRect(window.hwnd, &rect);
+  ClientToScreen(window.hwnd, &point);  
+  lua_pushnumber(L, point.x);
+  lua_pushnumber(L, point.y);
+  lua_pushnumber(L, rect.right-rect.left);
+  lua_pushnumber(L, rect.bottom-rect.top);
+  return 4;
+}
+
+
+void pushL_windowevent(const char* name) {
   int nargs = 0;
-  if ( !strcmp(name, "create") ) {      
-    reactor_driver_get_windowrect(&reactor.x, &reactor.y, &reactor.w, &reactor.h);  
+  if ( !strcmp(name, "create") ) {          
     return;
   }
   else if (!strcmp(name, "resize")  ){    
-    reactor_driver_get_windowrect(&reactor.x, &reactor.y, &reactor.w, &reactor.h);      
-
     lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
     lua_getfield(L, -1, "onresize");    
    
     if (lua_isfunction(L, -1)) { 
-      lua_pushinteger(L, reactor.w); nargs++;
-      lua_pushinteger(L, reactor.h); nargs++;
+      lua_pushinteger(L, window.w); nargs++;
+      lua_pushinteger(L, window.h); nargs++;
       reactor_pcall(L, nargs, 0);
       lua_pop(L, 1);
     }
@@ -83,67 +241,10 @@ void reactor_winevent(const char* name) {
   } 
 }
 
-void reactor_command(const char* command) {
-  //case APP_EVENTKIND_CLIPBOARDCOPY:
-  //  {
-  //  
-  //    lua_getglobal(L, "reactor");
-  //    lua_pushliteral(L, "command");
-  //    lua_gettable(L, -2);
-  //   
-  //    if (lua_isfunction(L, -1)) { 
-  //      lua_pushliteral(L, "copy"); nargs++;
-  //    
-  //      reactor_pcall(L, nargs, 0);
-  //      lua_pop(L, 1);
-  //    }
-  //    else {
-  //      lua_pop(L, 2);
-  //    }
-
-  //    return;
-  //  }
-
-  //  case APP_EVENTKIND_CLIPBOARDCUT:
-  //  {
-  //  
-  //    lua_getglobal(L, "reactor");
-  //    lua_pushliteral(L, "command");
-  //    lua_gettable(L, -2);
-  //   
-  //    if (lua_isfunction(L, -1)) { 
-  //      lua_pushliteral(L, "cut"); nargs++;
-  //    
-  //      reactor_pcall(L, nargs, 0);
-  //      lua_pop(L, 1);
-  //    }
-  //    else {
-  //      lua_pop(L, 2);
-  //    }
-
-  //    return;
-  //  }
-  //  case APP_EVENTKIND_CLIPBOARDPASTE:
-  //  {
-  //    lua_getglobal(L, "reactor");
-  //    lua_pushliteral(L, "command");
-  //    lua_gettable(L, -2);
-  //   
-  //    if (lua_isfunction(L, -1)) { 
-  //      lua_pushliteral(L, "paste"); nargs++;
-  //    
-  //      reactor_pcall(L, nargs, 0);
-  //      lua_pop(L, 1);
-  //    }
-  //    else {
-  //      lua_pop(L, 2);
-  //    }
-
-  //    return;
-  //  }
+void pushL_command(const char* command) {
 }
 
-void reactor_mousedblclick(int x, int y, const char* button, int alt, int ctrl, int shift) {
+void pushL_mousedblclick(int x, int y, const char* button, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onmousedoubleclick");
@@ -164,7 +265,7 @@ void reactor_mousedblclick(int x, int y, const char* button, int alt, int ctrl, 
   }
 }
 
-void reactor_mousedown(int x, int y, const char* button, int alt, int ctrl, int shift) {
+void pushL_mousedown(int x, int y, const char* button, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onmousedown");
@@ -185,7 +286,7 @@ void reactor_mousedown(int x, int y, const char* button, int alt, int ctrl, int 
   }
 }
 
-void reactor_mouseup(int x, int y, const char* button, int alt, int ctrl, int shift) {
+void pushL_mouseup(int x, int y, const char* button, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onmouseup");
@@ -206,7 +307,7 @@ void reactor_mouseup(int x, int y, const char* button, int alt, int ctrl, int sh
   }
 }
 
-void reactor_mousewheel(int x, int y, int delta, int step, int alt, int ctrl, int shift) {
+void pushL_mousewheel(int x, int y, int delta, int step, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onmousewheel");
@@ -229,7 +330,7 @@ void reactor_mousewheel(int x, int y, int delta, int step, int alt, int ctrl, in
   }
 }
 
-void reactor_mousemove(int x, int y, int alt, int ctrl, int shift) {
+void pushL_mousemove(int x, int y, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onmousemove");
@@ -246,7 +347,7 @@ void reactor_mousemove(int x, int y, int alt, int ctrl, int shift) {
   }
 }
 
-void reactor_char(int c) {
+void pushL_char(int c) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onchar");
@@ -262,15 +363,13 @@ void reactor_char(int c) {
   }
 }
 
-void reactor_mouseexit(void) {
-  //TODO
+void pushL_mouseexit(void) {
 }
 
-void reactor_mouseenter(void) {
-  //TODO
+void pushL_mouseenter(void) {
 }
 
-void reactor_keydown(const char* key, int alt, int ctrl, int shift) {
+void pushL_keydown(const char* key, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onkeydown");
@@ -289,7 +388,7 @@ void reactor_keydown(const char* key, int alt, int ctrl, int shift) {
   }     
 }
 
-void reactor_keypress(const char* key, int alt, int ctrl, int shift) {
+void pushL_keypress(const char* key, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onkeydown");
@@ -308,7 +407,7 @@ void reactor_keypress(const char* key, int alt, int ctrl, int shift) {
   }     
 }
 
-void reactor_keyup(const char* key, int alt, int ctrl, int shift) {
+void pushL_keyup(const char* key, int alt, int ctrl, int shift) {
   int nargs = 0;
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onkeyup");
@@ -326,14 +425,14 @@ void reactor_keyup(const char* key, int alt, int ctrl, int shift) {
   }     
 }
 
-void reactor_paint(void) {
+void pushL_draw(void) {
   assert(L);
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "draw");
      
   if (lua_isfunction(L, -1)) { 
     if (reactor_pcall(L, 0, 0)) {
-      reactor_driver_quit();
+      PostQuitMessage(0);  
     }
     lua_pop(L, 1);
   }
@@ -342,275 +441,118 @@ void reactor_paint(void) {
   }
 }
 
-void reactor_update(void) {
-  assert(L);
-  
-  
+int pushL_update(int currentmillis) {
+  int ret = 0;
+  lua_rawgeti(L, LUA_REGISTRYINDEX, appref);
+  lua_getfield(L, -1, "update");
 
-  //lua_getglobal(L, "reactor");
-  //lua_pushliteral(L, "update");
-  //lua_gettable(L, -2);
-
-  //if (lua_isfunction(L, -1)) { 	  
-  //  reactor_pcall(L, 0, 0);
-  //  lua_pop(L, 1);
-  //}
-  //else {
-  //  lua_pop(L, 2);
-  //}
+  if (lua_isfunction(L, -1)) { 	
+    lua_pushnumber(L, currentmillis);
+    reactor_pcall(L, 1, 1);
+    ret = lua_tointeger(L, -1);
+    lua_pop(L, 2);
+  }
+  else {
+    lua_pop(L, 2);
+  }
   
-  lua_getglobal(L, "reactor");
+  return currentmillis-reactor_getelapsedtime() + ret;
+}
+
+void pushL_tick(void) {
+  int ret = 0;
+  lua_rawgeti(L, LUA_REGISTRYINDEX, appref);
   lua_getfield(L, -1, "ontick");  
 
   if (lua_isfunction(L, -1)) { 	    
-    lua_pushnumber(L, reactor_driver_millis()); 
+    lua_pushnumber(L, reactor_getelapsedtime()); 
     reactor_pcall(L, 1, 0);
     lua_pop(L, 1);
   }
   else {
     lua_pop(L, 2);
+  }  
+}
+
+static int open_window_L(lua_State* L) {
+  { //window
+    static const luaL_reg app_window_functions_L[] = {    
+      {"getclientrect", window_getclientrect_L},
+      {"redraw", window_redraw_L},
+      {0, 0}
+    };
+
+    lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
+    luaL_register(L, 0, app_window_functions_L);
+
+    //set window.graphics
+    lua_pushliteral(L, "graphics");
+    luaopen_reactor_graphics(L);
+    lua_settable(L, -3);
+  }
+  return 0;
+}
+
+//1 - app name
+//2 - app full path
+//3 - app args table 
+//4 - reactor path
+static int open_reactor_L(lua_State* L) {
+
+  //package.preload.cairo = luaopen_cairo
+  lua_getglobal(L, "package");
+  lua_getfield(L, -1, "preload");
+  lua_pushcfunction(L, luaopen_cairo);
+  lua_setfield(L, -2, "cairo");
+
+  lua_settop(L, 4);
+
+  //reactor
+  lua_newtable(L);
+  lua_setglobal(L, "reactor");
+
+  //set reactor.path
+  lua_getglobal(L, "reactor");
+  lua_pushvalue(L, 4);
+  lua_setfield(L, -2, "path");
+  
+  { //app
+    static const luaL_reg app_functions_L[] = {
+      {"quit", reactor_quit_L},  //required
+      {"getelapsedtime", reactor_getelapsedtime_L}, //required
+      {0, 0}
+    };
+
+    //app
+    luaL_register(L, "app", app_functions_L);
+    lua_pushvalue(L, -1);
+    appref = luaL_ref(L, LUA_REGISTRYINDEX);
+
+    //app.name 
+    lua_pushvalue(L, 1);
+    lua_setfield(L, -2, "name");
+
+    //app.path
+    lua_pushvalue(L, 2);
+    lua_setfield(L, -2, "path");
+
+    //app.args
+    lua_pushvalue(L, 3);
+    lua_setfield(L, -2, "args");
   }
 
-  return;
-}
+  lua_settop(L, 0);
 
-static int reactor_timermillis_L(lua_State* L) {
-  lua_pushnumber(L, reactor_driver_millis());  
-  return 1;
-}
-
-static int reactor_quit_L(lua_State* L) {
-  reactor_driver_quit();
-  return 0;
-}
-
-static int reactor_getclientrect_L(lua_State* L) {
-  reactor_driver_get_windowrect(&reactor.x, &reactor.y, &reactor.w, &reactor.h); 
-  lua_pushnumber(L, reactor.x);
-  lua_pushnumber(L, reactor.y);
-  lua_pushnumber(L, reactor.w);
-  lua_pushnumber(L, reactor.h);
-  return 4;
-}
-
-static int reactor_localtime_L(lua_State* L) {
-  int h, m, s, ms;
-  reactor_driver_localtime(&h, &m, &s, &ms);
-  lua_pushnumber(L, h);
-  lua_pushnumber(L, m);
-  lua_pushnumber(L, s);
-  lua_pushnumber(L, ms);
-  return 4;
-}
-
-static int reactor_systemtime_L(lua_State* L) {
-  int h, m, s, ms;
-  reactor_driver_systemtime(&h, &m, &s, &ms);
-  lua_pushnumber(L, h);
-  lua_pushnumber(L, m);
-  lua_pushnumber(L, s);
-  lua_pushnumber(L, ms);
-  return 4;
-}
-
-static int reactor_fullscreen_L(lua_State* L) {  
-  reactor_driver_fullscreen(lua_toboolean(L, 1));
-  return 0;
-}
-
-extern int luaopen_cairo(lua_State* L);
-
-static int luaopen_reactor(lua_State* L) 
-{
-  static const luaL_reg reactor_L[] = {
-    {"quit", reactor_quit_L},  
-    {"timermillis", reactor_timermillis_L},
-    {"localtime", reactor_localtime_L},        
-    {"systemtime", reactor_systemtime_L},        
-    {"getclientrect", reactor_getclientrect_L},
-    {"fullscreen", reactor_fullscreen_L},        
-    {0, 0}
-  };
-
-  static const luaL_reg window_functions_L[] = {
-    {"getclientrect", reactor_getclientrect_L},
-    {"fullscreen", reactor_fullscreen_L},        
-    {0, 0}
-  };
-
-  char app_path[MAX_PATH] = {0};
-  int reactorloadindex;
-
-  GetFullPathName(lua_tostring(L, 1), sizeof(app_path), app_path, NULL);
-
-  lua_newtable(L);
-  lua_pushvalue(L, 1);
-  lua_setfield(L, -2, "name");
-
-  lua_pushstring(L, app_path);
-  lua_setfield(L, -2, "path");
-
-  lua_setglobal(L, "app");
-
-
-  lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
-  luaL_register(L, 0, window_functions_L);
-  lua_pop(L, 1);
-
+  lua_pushcfunction(L, open_window_L);
+  lua_call(L, 0, 0);
 
   lua_getglobal(L, "require");
   lua_pushliteral(L, "reactor");
-  reactor_pcall(L, 1, 1);
+  lua_call(L, 1, 1);
 
-  reactorloadindex = lua_gettop(L);
-
-  lua_getglobal(L, "reactor");
-  luaL_register(L, 0, reactor_L);
-
-  lua_pushvalue(L, 2);
-  lua_setfield(L, -2, "path");
-
-  //lua_pushliteral(L, "w");
-  //lua_pushnumber(L, reactor.w);
-  //lua_settable(L, -3);
-
-  //lua_pushliteral(L, "h");
-  //lua_pushnumber(L, reactor.h);
-  //lua_settable(L, -3);
-  
-  lua_pushliteral(L, "graphics");
-  luaopen_reactor_graphics(L);
-  lua_settable(L, -3);
-
-  luaopen_cairo(L); 
-
-  lua_settop(L, reactorloadindex);
-  reactor_pcall(L, 0, 0); //call function returned from require 'reactor'
+  lua_call(L, 0, 0); //call function returned from require 'reactor'
 
   return(0);
-}
-
-void reactor_exit(void) {
-  lua_close(L);
-}
-
-#include <windows.h>
-#include <windowsx.h>
-#include <stdio.h>
-#include <assert.h>
-#include "reactor.h"
-#include "gl.h"
-
-#define APP_WINDOW_CLASSNAME "app_window_t"
-#define APP_WINDOW_CREATE ( WM_APP + 1 )
-#define APP_WINDOW_QUIT ( WM_APP + 2 )
-
-static struct window {
-  HWND hwnd;
-  HDC hdc;
-  HGLRC hglrc;
-  HCURSOR hcursor;
-  int created;
-  int fullscreen;
-  int activated;
-  int tracking;
-  int x;
-  int y;
-  int w;
-  int h;
-  DWORD createtime;
-} window;
-
-int reactor_driver_quit(void) {
-  PostQuitMessage(0);  
-  return 1;
-}
-
-int reactor_driver_displaysetttings(void){
-  DEVMODE devmode = {0};
-  devmode.dmSize = sizeof( DEVMODE );
-  EnumDisplaySettings( 0, ENUM_CURRENT_SETTINGS, &devmode );
-  //todo return x, y, w, h
-  return 1;
-}
-
-unsigned long reactor_driver_millis(void) {
-  return timeGetTime() - window.createtime;
-}
-
-void reactor_driver_systemtime(int* hour, int* min, int* sec, int* milli) {
-  SYSTEMTIME time;
-  GetSystemTime(&time);
-  *hour = time.wHour;
-  *min = time.wMinute;
-  *sec = time.wSecond;
-  *milli = time.wMilliseconds;  
-}
-
-void reactor_driver_localtime(int* hour, int* min, int* sec, int* milli) {
-  SYSTEMTIME time;
-  GetSystemTime(&time);
-  *hour = time.wHour;
-  *min = time.wMinute;
-  *sec = time.wSecond;
-  *milli = time.wMilliseconds;  
-}
-
-void reactor_driver_get_windowrect(int* x, int* y, int* w, int* h) {
-  *x = window.x;
-  *y = window.y;
-  *w = window.w;
-  *h = window.h;
-}
-
-
-int reactor_driver_fullscreen(int fullscreen) {
-  int visible = 0;
-  RECT rect = {0}; 
-  DEVMODE devmode = {0};
-  int x, y, w, h; 
-
-  devmode.dmSize = sizeof( DEVMODE );
-  EnumDisplaySettings( 0, ENUM_CURRENT_SETTINGS, &devmode );
-
-  x = devmode.dmPosition.x;
-  y = devmode.dmPosition.y;
-  w = devmode.dmPelsWidth;
-  h = devmode.dmPelsHeight;
-
-  if (fullscreen && !window.fullscreen) {
-    window.fullscreen = 1;
-    visible = IsWindowVisible( window.hwnd );   
-    if ( visible ) {
-      ShowWindow( window.hwnd, SW_HIDE );      
-    }    
-    SetRect( &rect, x, y, x+w, y+h);
-    AdjustWindowRect( &rect, WS_POPUP, 0 );
-    SetWindowLongPtr( window.hwnd, GWL_STYLE, WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS );
-    SetWindowPos( window.hwnd, HWND_TOP,
-                  rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
-                  SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOCOPYBITS | SWP_FRAMECHANGED );
-    if ( visible ) {
-      ShowWindow( window.hwnd, SW_RESTORE );        
-    }
-  }
-  else if (!fullscreen && window.fullscreen) {
-    window.fullscreen = 0;
-    visible = IsWindowVisible( window.hwnd );   
-    if ( visible ) {
-      ShowWindow( window.hwnd, SW_HIDE );      
-    }
-    SetRect( &rect, x, y, x+w, y+h);
-    AdjustWindowRect( &rect, WS_OVERLAPPEDWINDOW, 0 );
-    SetWindowLongPtr( window.hwnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS );
-    SetWindowPos( window.hwnd, HWND_TOP,
-                  rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
-                  SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOCOPYBITS | SWP_FRAMECHANGED );
-    if ( visible ) {
-      ShowWindow( window.hwnd, SW_RESTORE );        
-    }
-  }
-  return 1;
 }
 
 static const char* _translate_keyboard_key( WPARAM wparam ) {
@@ -720,10 +662,15 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
   TRACKMOUSEEVENT tme = {0};
 
   switch ( msg ) {
-    case APP_WINDOW_CREATE:
+    case APP_WINDOW_CREATE: {
+      RECT rect;
+      GetClientRect(hwnd, &rect);
+      window.w = rect.right-rect.left;
+      window.h = rect.bottom-rect.top;
       window.created = 1;
-      reactor_winevent("create");      
+      pushL_windowevent("create");      
       return 0;
+                            }
 
     case WM_ACTIVATEAPP:
       if ( wparam ) {
@@ -731,12 +678,16 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
         SetForegroundWindow(hwnd);
         LockSetForegroundWindow( LSFW_LOCK );
         InvalidateRect(hwnd, 0, 0);
-        if (window.created) reactor_winevent("activate");
+        if (window.created) pushL_windowevent("activate");
       }
       else {
         window.activated = 0;
-        if (window.created) reactor_winevent("deactivate");
+        if (window.created) pushL_windowevent("deactivate");
       }          
+      return 0;
+
+    case APP_TICK:      
+      pushL_tick();      
       return 0;
 
     case WM_DESTROY:      
@@ -745,10 +696,10 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_SHOWWINDOW:
       if (wparam) {
-        if (window.created) reactor_winevent("show");
+        if (window.created) pushL_windowevent("show");
       } 
       else {
-        if (window.created) reactor_winevent("hide");
+        if (window.created) pushL_windowevent("hide");
       }
       return 0;
 
@@ -756,7 +707,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       if ( !IsIconic( hwnd ) ) {
         window.x = (int)(short)LOWORD( lparam );
         window.y = (int)(short)HIWORD( lparam );
-        if (window.created) reactor_winevent("move");        
+        if (window.created) pushL_windowevent("move");        
       }
       return 0;    
 
@@ -765,11 +716,9 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
         window.w = LOWORD( lparam );
         window.h = HIWORD( lparam );
         if (window.created) {
-          reactor_winevent("resize");    
-          reactor_update();
-          reactor_paint();        
+          pushL_windowevent("resize");              
+          pushL_draw();        
           SwapBuffers(window.hdc);  
-          glFinish();
         }
       }
       return 0;
@@ -780,22 +729,21 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
     case WM_PAINT:
       if ( GetUpdateRect(hwnd, 0, FALSE) ) {
         ValidateRect(hwnd, 0 );
-        reactor_paint();        
+        pushL_draw();        
         SwapBuffers(window.hdc);  
-        //glFinish();
       }
       return 0;
 
     case WM_APPCOMMAND:
       switch ( GET_APPCOMMAND_LPARAM( lparam ) ) {
         case APPCOMMAND_COPY: 
-          reactor_command("copy");
+          pushL_command("copy");
           break;
         case APPCOMMAND_CUT:   
-          reactor_command("cut");
+          pushL_command("cut");
           break;
         case APPCOMMAND_PASTE: 
-          reactor_command("paste");
+          pushL_command("paste");
           break;
         default:
           return DefWindowProc(hwnd, msg, wparam, lparam);
@@ -803,21 +751,21 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       return 1;
     
     case WM_MBUTTONDBLCLK:
-      reactor_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
+      pushL_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
       return 0;
 
     case WM_LBUTTONDBLCLK:
-      reactor_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
+      pushL_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
       return 0;
 
     case WM_RBUTTONDBLCLK:
-      reactor_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
+      pushL_mousedblclick(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -825,7 +773,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_MBUTTONDOWN:
       SetCapture( hwnd );
-      reactor_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
+      pushL_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -833,7 +781,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_LBUTTONDOWN:
       SetCapture( hwnd );
-      reactor_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
+      pushL_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -841,7 +789,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_RBUTTONDOWN:
       SetCapture( hwnd );
-      reactor_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
+      pushL_mousedown(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -849,7 +797,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_MBUTTONUP:
       ReleaseCapture();
-      reactor_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
+      pushL_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "middle", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -857,7 +805,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_LBUTTONUP:
       ReleaseCapture();
-      reactor_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
+      pushL_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "left", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -865,7 +813,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_RBUTTONUP:    
       ReleaseCapture();
-      reactor_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
+      pushL_mouseup(GET_X_LPARAM( lparam ), GET_Y_LPARAM( lparam ), "right", 
         GetKeyState( VK_MENU ) & 0x8000, 
         GetKeyState( VK_CONTROL ) & 0x8000, 
         GetKeyState( VK_SHIFT ) & 0x8000);
@@ -873,13 +821,13 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_CHAR:
       if ( ( 32 <= ( wparam & 0xFF ) ) && ( 126 >= ( wparam & 0xFF ) ) ) {
-        reactor_char(wparam & 0xFF);
+        pushL_char(wparam & 0xFF);
       }
       return 0;    
 
     case WM_MOUSELEAVE:
       window.tracking = 0;
-      reactor_mouseexit();
+      pushL_mouseexit();
       return 0;
 
     case WM_MOUSEMOVE:
@@ -894,10 +842,10 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
         TrackMouseEvent( &tme );
 
-        reactor_mouseenter();
+        pushL_mouseenter();
       }
 
-      reactor_mousemove(GET_X_LPARAM(lparam ), GET_Y_LPARAM(lparam ), 
+      pushL_mousemove(GET_X_LPARAM(lparam ), GET_Y_LPARAM(lparam ), 
         GetKeyState( VK_MENU ) & 0x8000,
         GetKeyState( VK_CONTROL ) & 0x8000,
         GetKeyState( VK_SHIFT ) & 0x8000);      
@@ -912,7 +860,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
         pt.x = GET_X_LPARAM( lparam );
         pt.y = GET_Y_LPARAM( lparam );
         ScreenToClient(hwnd, &pt);
-        reactor_mousewheel(pt.x, pt.y, 
+        pushL_mousewheel(pt.x, pt.y, 
           GET_WHEEL_DELTA_WPARAM( wparam ) / WHEEL_DELTA,
           step,
           GetKeyState( VK_MENU ) & 0x8000,
@@ -924,17 +872,17 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
     case WM_KEYDOWN:
     case WM_SYSKEYDOWN:
       if ( KF_REPEAT & HIWORD( lparam ) ) {
-        reactor_keypress(_translate_keyboard_key( wparam ),
+        pushL_keypress(_translate_keyboard_key( wparam ),
           GetKeyState( VK_MENU ) & 0x8000, 
           GetKeyState( VK_CONTROL ) & 0x8000, 
           GetKeyState( VK_SHIFT ) & 0x8000);
       }
       else {
-        reactor_keydown(_translate_keyboard_key( wparam ),
+        pushL_keydown(_translate_keyboard_key( wparam ),
           GetKeyState( VK_MENU ) & 0x8000, 
           GetKeyState( VK_CONTROL ) & 0x8000, 
           GetKeyState( VK_SHIFT ) & 0x8000);
-        reactor_keypress(_translate_keyboard_key( wparam ),
+        pushL_keypress(_translate_keyboard_key( wparam ),
           GetKeyState( VK_MENU ) & 0x8000, 
           GetKeyState( VK_CONTROL ) & 0x8000, 
           GetKeyState( VK_SHIFT ) & 0x8000);
@@ -942,13 +890,13 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       if ( GetKeyState( VK_CONTROL ) & 0x8000 ) {
         switch ( wparam ) {
           case 0x43:
-            reactor_command("copy");
+            pushL_command("copy");
             break;
           case 0x58:
-            reactor_command("cut");            
+            pushL_command("cut");            
             break;
           case 0x56:
-            reactor_command("paste");            
+            pushL_command("paste");            
             break;         
         }        
       }
@@ -956,7 +904,7 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
     case WM_KEYUP:
     case WM_SYSKEYUP:  
-      reactor_keyup(_translate_keyboard_key( wparam ),
+      pushL_keyup(_translate_keyboard_key( wparam ),
           GetKeyState( VK_MENU ) & 0x8000, 
           GetKeyState( VK_CONTROL ) & 0x8000, 
           GetKeyState( VK_SHIFT ) & 0x8000);
@@ -964,6 +912,10 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
   }
 
   return DefWindowProc(hwnd, msg, wparam, lparam);
+}
+
+static void CALLBACK timecallback(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2) {
+  PostMessage(window.hwnd, APP_TICK, 0, 0);
 }
 
 static int _poll_nowait(void) {
@@ -976,21 +928,6 @@ static int _poll_nowait(void) {
     DispatchMessage( &msg );
   } 
   return 1;
-}
-
-static int _poll_wait(void) {
-  MSG msg = {0};
-  while ( 0 < GetMessage( &msg, 0, 0, 0 ) ) {
-    TranslateMessage( &msg );
-    DispatchMessage( &msg );
-    return _poll_nowait();
-  }
-  return 0;
-}
-
-static void _destroy_window() {
-  wglDeleteContext(window.hglrc);
-  DestroyWindow(window.hwnd);
 }
 
 static void _create_glwindow( const char* title, int cw, int ch ) {
@@ -1074,51 +1011,30 @@ static void _create_glwindow( const char* title, int cw, int ch ) {
   SendMessage( window.hwnd, APP_WINDOW_CREATE, 0, 0 );    
 }
 
-/*
-int main( int argc, char* argv[] ) {
-
-  char name[MAX_PATH];
-  argv[0]= GetModuleFileName(NULL,name,sizeof(name)) ? name : NULL;
-
-  timeBeginPeriod(1);
-  window.createtime = timeGetTime();  
-  _create_glwindow("reactor", 800, 600);      
-  reactor_init(argc, argv);
-  while ( _poll_nowait() ) {
-    reactor_update();
-    RedrawWindow(window.hwnd, NULL, NULL, RDW_INVALIDATE);    
-  }   
-  reactor_exit();  
-  _destroy_window();
-  timeEndPeriod(1);
-  return 0;
+static void _destroy_glwindow() {
+  wglDeleteContext(window.hglrc);
+  DestroyWindow(window.hwnd);
 }
-*/
-
-static char appmainfile[MAX_PATH];
 
 int main( int argc, char* argv[] ) {
+  int i = 0;
   char* appname=0;
-  char reactorname[MAX_PATH] = {0};
-  char reactordir[MAX_PATH] = {0};
+  static char reactorname[MAX_PATH] = {0};
+  static char reactordir[MAX_PATH] = {0};
+  static char app_path[MAX_PATH] = {0};
 
   GetModuleFileName(0, reactorname, sizeof(reactorname));
   strncpy(reactordir, reactorname, strrchr(reactorname, '\\') - reactorname);
 
-  /*
-  filename = malloc(strlen(appname)+strlen("\\main.lua")+1);
-  sprintf(filename, "%s\\main.lua", appname);
-  */
-
   timeBeginPeriod( 1 );
 
-  window.createtime = timeGetTime();
+  createtime = timeGetTime();
 
   L = lua_open();
   luaL_openlibs(L);
   
-  lua_pushcfunction(L, traceback);
-  lua_setglobal(L, "errorfunc");
+  lua_pushcfunction(L, reactor_traceback);
+  lua_setglobal(L, "reactor_traceback");
   
   if (argv[2]) {
     char* title = argv[1];
@@ -1142,35 +1058,58 @@ int main( int argc, char* argv[] ) {
     _create_glwindow(argv[1], 800, 600);  
   }
 
-  lua_pushcfunction(L, luaopen_reactor);
-  lua_pushstring(L, argv[1]);
-  lua_pushstring(L, reactordir);
-  reactor_pcall(L, 2, 0);
+  GetFullPathName(argv[1], sizeof(app_path), app_path, NULL);
 
-  strncpy(appmainfile, argv[1], sizeof(appmainfile));
-  strcat(appmainfile, "\\main.lua");
+  lua_pushcfunction(L, open_reactor_L);
+  lua_pushstring(L, argv[1]); //1 app name
+  lua_pushstring(L, app_path); //2 app full path 
+  lua_newtable(L);//3 app args
 
-  if (luaL_loadfile(L, appmainfile)) {
-    printf("%s", lua_tostring(L, -1));
-    lua_pop(L, 1);  
+  for (i=2; i<argc; i++) {
+    lua_pushstring(L, argv[i]);
+    lua_rawseti(L, -2, i-1);
   }
-  else {
-    int i = 0;
-    for (i=2; i<argc; i++) {
-      lua_pushstring(L, argv[i]);
+
+  lua_pushstring(L, reactordir); //4 reactor dir
+
+  if (!reactor_pcall(L, 4, 0)) {
+    int millis = 0;
+
+    timeSetEvent(15, 0, timecallback, 0, TIME_PERIODIC);
+
+    while ( _poll_nowait() ) {
+      int currentmillis = reactor_getelapsedtime();
+
+      if (millis <= 0) {          
+        millis = pushL_update(currentmillis);   
+      }
+
+      if (window.redraw) {            
+        window.redraw = 0;
+        RedrawWindow(window.hwnd, NULL, NULL, RDW_INVALIDATE|RDW_INTERNALPAINT); 
+      }
+      
+      if (!_poll_nowait()) {
+        break; //quit app
+      }
+
+      if (millis > 0 ) {
+        int endmillis = currentmillis + millis;
+        DWORD waitret;            
+        waitret = MsgWaitForMultipleObjectsEx(0, 0, millis, QS_ALLINPUT, MWMO_ALERTABLE);
+        if (WAIT_TIMEOUT == waitret) {              
+          millis=0;      
+        }
+        else {              
+          currentmillis = reactor_getelapsedtime();
+          millis=endmillis-currentmillis;              
+        }            
+      }
     }
-    reactor_pcall(L, i-2, 0);
-  }
-
-  while ( _poll_nowait() ) {
-    reactor_update();
-    RedrawWindow(window.hwnd, NULL, NULL, RDW_INVALIDATE);    
   }   
   
-  _destroy_window();
-
+  _destroy_glwindow();
   lua_close(L);
-
   timeEndPeriod( 1 );
 
   return 0;

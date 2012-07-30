@@ -1,8 +1,6 @@
-require 'stdinit' (app.name)
-
-reactor = {}
-
 return function()
+  require 'stdinit' (app.name)
+
   function _G.lerp(a, b, p)
     return a + p * (b - a)
   end
@@ -15,7 +13,64 @@ return function()
     return (c - a)/(b - a);
   end
 
+  local _app = app
+  app = {}
+
+  do
+    local observers = {}
+
+    do
+      function _app.notify(event, ...)
+        local t = observers[event]
+        if t then
+          for f in pairs(t) do
+            f(...)
+          end
+        end
+      end
+
+      function _app.onevent(event, f)
+        local t = observers[event] 
+        if not t then
+          t = {}
+          observers[event] = t
+        end
+
+        t[f] = true
+       
+        return function()
+          t[f] = nil
+        end
+      end
+
+      local reservedkeys = {
+        ontick='tick',
+      }
+
+      setmetatable(app, {
+          __index=_app,
+          __newindex=function(t, k, v)
+            if reservedkeys[k] then
+              k = reservedkeys[k]
+              _app.onevent(k, v)
+            else
+              rawset(app, k, v)
+            end
+          end,
+        })
+    end
+  end
+
+ 
+  function _app.update(millis)
+    if rawget(app, 'update') then
+      return app.update(millis)
+    end
+    return 1000
+  end
+
   if window then
+    local cairo = require 'cairo'
     local _window = window
     local window = {}
 
@@ -226,6 +281,8 @@ return function()
     function _window.onchar(c)
       driver.char(c)
       window:notify('char', c)
+
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onkeydown(key, rep, alt, ctrl, shift)
@@ -235,38 +292,46 @@ return function()
 
       driver.keypress(key, alt, ctrl, shift)
       window:notify('keydown', key, rep, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onkeyup(key, alt, ctrl, shift)
       driver.keyup(key, alt, ctrl, shift)
       window:notify('keyup', key, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmouseenter()
       window:notify('mouseenter')
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmouseexit()
       window:notify('mouseexit')
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmousemove(x, y, alt, ctrl, shift)
       driver.mousemove(windowtoroot(x, y))
       window:notify('mousemove', x, y, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmousedoubleclick(button, x, y, alt, ctrl, shift)
       window:notify('mousedoubleclick', button, x, y, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmousedown(button, x, y, alt, ctrl, shift)
       driver.mousedown(windowtoroot(x, y, button, alt, ctrl, shift))
       window:notify('mousedown', button, x, y, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmouseup(button, x, y, alt, ctrl, shift)
       driver.mouseup(windowtoroot(x, y, button, alt, ctrl, shift))
       window:notify('mouseup', button, x, y, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.onmousewheel(delta, step, x, y, alt, ctrl, shift)
@@ -283,29 +348,45 @@ return function()
         driver.mousewheel(windowtoroot(x, y, direction, step, alt, ctrl, shift))
       end
       window:notify('mousewheel', delta, step, x, y, alt, ctrl, shift)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     function _window.oncommand( command )
       driver.command(c)
-      reactor.notify('command', command)
+      window:notify('command', command)
+      if driver.descriptionchanged() then app.window:redraw() end
     end
 
     do
       local lastdrawms = 0
       function _window.draw()
-        local predrawms = reactor.timermillis()
-        if window.draw then
+        local predrawms = app.getelapsedtime()
+        if rawget(window, 'draw') then
           window:draw()
+        else
+          app.window.root:draw()
         end
-        local ms = reactor.timermillis()
+        local ms = app.getelapsedtime()
 
         window:notify('draw', ms-lastdrawms, ms-predrawms)
         lastdrawms = ms
       end
     end
 
-    function reactor.ontick(millis)
+    function _app.ontick(millis)
       driver.tick(millis)
+      _app.notify('tick', millis)
+      if driver.descriptionchanged() then app.window:redraw() end
+    end
+
+    --redefine _app.update since an app.window is present
+    function _app.update(millis)
+      if rawget(app, 'update') then
+        local ret = app.update(millis)
+        if driver.descriptionchanged() then app.window:redraw() end
+        return ret
+      end
+      return 1000
     end
 
     do
@@ -320,8 +401,6 @@ return function()
       function driver.loadfont(name, weight, slant, size)
         name = names[name] or name 
 
-        dprint('driver.loadfont', name)
-
         local cr = cairo.create(cairo.surface.create(0, 0))
         local cairofont = cairo.font.create(name)
 
@@ -329,7 +408,7 @@ return function()
         cr:set_font_size(size)
 
         local ascent, descent, lineheight = cr:font_extents()
-        local _, _, emwidth, emheight, emadvance = cr:text_extents(' ')
+        local _, _, emwidth, emheight, emadvance = cr:text_extents('M')
 
         local font = {
           cairofont = cairofont,
@@ -344,7 +423,7 @@ return function()
           emheight = emheight,
           emadvance = emadvance,
           metrics = setmetatable({}, {__index = function(glyphmetrics, utf8codepoint)
-            local xbr, ybr, w, h, xadv, yadv = cr:text_extents(utf8codepoint)      
+            local xbr, ybr, w, h, xadv, yadv = cr:text_extents(utf8codepoint)    
             glyphmetrics[utf8codepoint] = {
               utf8codepoint = utf8codepoint,
               advance = xadv,
@@ -364,23 +443,76 @@ return function()
     do --driver.clipboard
       function driver.clipboard(command, data)
         if command == 'get' then
-          return reactor.getclipboardtext()
+          return app.getclipboardtext()
         elseif command == 'put' then
-          reactor.setclipboardtext(data)
+          app.setclipboardtext(data)
         end
       end
     end
 
     app.window = window
-    local faces = require('reactor.faces')
+    local cairodraw = require('reactor.faces')
 
-    function driver.root.draw()
-      return faces.draw()
+    do
+      local texture
+      local surface
+      local cr
+      local surfacew = 0
+      local surfaceh = 0
+      local graphics = app.window.graphics
+
+      function driver.root.draw()
+        if app.window.w <= 0 or app.window.h <= 0 then
+          return
+        end
+
+        graphics.pushstate2d(app.window.w, app.window.h)
+        graphics.clear()
+        graphics.setcolorf(1, 1, 1)
+
+        local t, metadescription = cel.describe()
+
+        if surfacew ~= t.w or surfaceh ~= t.h then
+          surfacew, surfaceh = t.w, t.h
+          if texture then texture:destroy() end
+          if surface then surface:destroy() end
+          if cr then cr:destroy() end
+          texture = graphics.texture.create(t.w, t.h)
+          surface = cairo.surface.create(t.w, t.h)
+          cr = cairo.create(surface)
+        end
+
+
+        cairodraw(cr, t, metadescription)
+
+        surface:flush()
+        local sdata, sw, sh = surface:get_data()
+        local r = metadescription.updaterect
+        graphics.updatetexture(texture, sdata, sw, sh, r.l, r.t, r.r-r.l, r.b-r.t)
+
+        do
+          local x, y, aw, ah = cel.getlinker('fill.aspect')(app.window.w, app.window.h, 0, 0, t.w, t.h, t.w/t.h)
+
+          if x > 0 then
+            graphics.fillrect(0, 0, x, ah)
+            graphics.fillrect(x+aw, 0, x+1, ah)
+          elseif y > 0 then
+            graphics.fillrect(0, 0, aw, y)
+            graphics.fillrect(0, y+ah, aw, y+1)
+          end
+
+          graphics.drawtexture(texture, x, y, aw, ah)--, 0, 0, t.w, t.h)
+        end
+
+        graphics.popstate()
+      end
     end
 
     --TODO window.root should be linked to driver.root so we don't mess with onresize
     window.root = driver.root:takefocus() --TODO it should havefocus by default, fix bug in cel
 
     _window.onresize(_window.w, _window.h)
+
+    assert(loadfile(app.path..'/main.lua'))()
   end
 end
