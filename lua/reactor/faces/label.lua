@@ -12,21 +12,21 @@ face.layout = {
 
 function face.cairodraw(_ENV, cr, f, t)
   if f.color then
-    cairo.rectangle(cr, 0, 0, t.w, t.h)
-    cairo.set_source_color(cr, _ENV.color)
-    cairo.fill(cr)
+    cr:rectangle(0, 0, t.w, t.h)
+    cr:set_source_color(_ENV.color)
+    cr:fill()
   end
 
   if f.textcolor and t.text then
-    cairo.set_source_color(cr, _ENV.textcolor)
-    cairo.drawstring(cr, t.font, t.penx, t.peny, t.text)
+    cr:set_source_color(_ENV.textcolor)
+    cr:drawstring(t.font, t.penx, t.peny, t.text)
   end
 
   if f.borderwidth and f.bordercolor then
-    cairo.set_line_width(cr, f.borderwidth)
-    cairo.set_source_color(cr, _ENV.bordercolor)
-    cairo.rectangle(cr, 0, 0, t.w, t.h)
-    cairo.stroke(cr)
+    cr:set_line_width(f.borderwidth)
+    cr:set_source_color(_ENV.bordercolor)
+    cr:rectangle(0, 0, t.w, t.h)
+    cr:stroke()
   end
 
   return _ENV.drawlinks(cr, t)

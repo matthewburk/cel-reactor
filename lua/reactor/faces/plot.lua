@@ -35,9 +35,9 @@ function face.cairodraw(_ENV, cr, f, t, w, h)
   h = h or t.h
 
   if f.color then
-    cairo.set_source_color(cr, _ENV.color)
-    cairo.rectangle(cr, 0, 0, w, h)
-    cairo.fill(cr)
+    cr:set_source_color(_ENV.color)
+    cr:rectangle(0, 0, w, h)
+    cr:fill()
   end
 
   local now = cel.timer()
@@ -47,7 +47,7 @@ function face.cairodraw(_ENV, cr, f, t, w, h)
   local rangesize = data.range[2] - data.range[1]
   local scalew, scaleh = w/domainsize, h/rangesize
 
-  --cairo.cel_show_textlt(cr, f.font, 10, 10, string.format("%.0f", data[data.n][2]))
+  --cr:cel_show_textlt(f.font, 10, 10, string.format("%.0f", data[data.n][2]))
 
   if f.rangecolor then
     cr:save()
@@ -58,8 +58,8 @@ function face.cairodraw(_ENV, cr, f, t, w, h)
       end
     cr:restore()
 
-    cairo.set_source_color(cr, f.rangecolor)
-    cairo.set_line_width(cr, .5)
+    cr:set_source_color(f.rangecolor)
+    cr:set_line_width(.5)
     cr:stroke()
   end
 
@@ -77,7 +77,7 @@ function face.cairodraw(_ENV, cr, f, t, w, h)
       end
     cr:restore()
 
-    cairo.set_source_color(cr, f.domaincolor)
+    cr:set_source_color(f.domaincolor)
     cr:save()
       cr:set_line_width(.5)
       cr:set_dash(1, 3)

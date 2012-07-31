@@ -1,3 +1,4 @@
+
 return function()
   require 'stdinit' (app.name)
 
@@ -446,6 +447,49 @@ return function()
           return app.getclipboardtext()
         elseif command == 'put' then
           app.setclipboardtext(data)
+        end
+      end
+    end
+
+    do --extended cairo functions
+      local mt = cairo.crmetatable
+      local torgb = cel.color.torgb
+
+      function mt.set_source_color(cr, color)
+        cr:set_source_rgba(torgb(color))
+      end
+
+      function mt.drawstring(cr, font, x, y, text)
+        cr:set_font_face(font.cairofont)
+        cr:set_font_size(font.size)
+        cr:save()
+        cr:move_to(x, y)
+        cr:show_text(text)
+        cr:restore()
+      end
+
+      --x, y specify left top of string
+      function mt.drawstringlt(cr, font, x, y, text) 
+        local _, _, xmin = font:measure(text)
+        cr:set_font_face(font.cairofont)
+        cr:set_font_size(font.size)
+        cr:save()
+        cr:move_to(x - xmin, y + font.ascent)
+        cr:show_text(text)
+        cr:restore()
+      end
+
+      function mt.roundrect(cr, x, y, w, h, r)
+        if not r then
+          cr:rectangle(x, y, w, h);
+        else
+          local degrees = math.pi / 180.0;
+          cr:new_sub_path();
+          cr:arc(x + w - r, y + r, r, -90 * degrees, 0 * degrees);
+          cr:arc(x + w - r, y + h - r, r, 0 * degrees, 90 * degrees);
+          cr:arc(x + r, y + h - r, r, 90 * degrees, 180 * degrees);
+          cr:arc(x + r, y + r, r, 180 * degrees, 270 * degrees);
+          cr:close_path();
         end
       end
     end

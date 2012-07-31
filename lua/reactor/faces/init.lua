@@ -1,63 +1,5 @@
 local cel = require 'cel'
 
-do --extended cairo functions
-  local torgb = cel.color.torgb
-
-  function cairo.set_source_color(cr, color)
-    cairo.set_source_rgba(cr, torgb(color))
-  end
-
-  function cairo.drawstring(cr, font, x, y, text)
-    cairo.set_font_face(cr, font.cairofont)
-    cairo.set_font_size(cr, font.size)
-    cairo.save(cr)
-    cairo.move_to(cr, x, y)
-    cairo.show_text(cr, text)
-    --cairo.show_text(cr, text, i, j)
-    cairo.restore(cr)
-  end
-
-  --x, y specify left top of string
-  function cairo.drawstringlt(cr, font, x, y, text) 
-    local _, _, xmin = font:measure(text)
-    cairo.set_font_face(cr, font.cairofont)
-    cairo.set_font_size(cr, font.size)
-    cairo.save(cr)
-    cairo.move_to(cr, x - xmin, y + font.ascent)
-    cairo.show_text(cr, text)
-    cairo.restore(cr)
-  end
-
-  function cairo.roundrect(cr, x, y, w, h, r)
-    if not r then
-      cr:rectangle(x, y, w, h);
-    else
-      local degrees = math.pi / 180.0;
-      cr:new_sub_path();
-      cr:arc(x + w - r, y + r, r, -90 * degrees, 0 * degrees);
-      cr:arc(x + w - r, y + h - r, r, 0 * degrees, 90 * degrees);
-      cr:arc(x + r, y + h - r, r, 90 * degrees, 180 * degrees);
-      cr:arc(x + r, y + r, r, 180 * degrees, 270 * degrees);
-      cr:close_path();
-    end
-  end
---[[
-function cairox.roundrect(cr, x, y, w, h, r)
-  if not r then
-    cr:rectangle(x, y, w, h);
-  else
-    local degrees = math.pi / 180.0;
-    cr:new_sub_path();
-    cr:arc(x + w - r, y + r, r, -90 * degrees, 0 * degrees);
-    cr:arc(x + w - r, y + h - r, r, 0 * degrees, 90 * degrees);
-    cr:arc(x + r, y + h - r, r, 90 * degrees, 180 * degrees);
-    cr:arc(x + r, y + r, r, 180 * degrees, 270 * degrees);
-    cr:close_path();
-  end
-end
---]]
-end
-
 local _ENV = {
   color = cel.color.rgb(0, 0, 0),
   bordercolor = cel.color.rgb(1, 1, 1),
@@ -83,10 +25,10 @@ do --drawlinks
       if true or t.refresh or updaterect(t, t.clip) then 
         local face = t.face.select and t.face:select(t) or t.face
         if face.cairodraw then 
-          cairo.save(cr)
-          cairo.rectangle(cr, t.x, t.y, t.w, t.h)
-          cairo.clip(cr)
-          cairo.translate(cr, t.x, t.y)
+          cr:save()
+          cr:rectangle(t.x, t.y, t.w, t.h)
+          cr:clip()
+          cr:translate(t.x, t.y)
 
           local color, bordercolor, textcolor = _ENV.color, _ENV.bordercolor, _ENV.textcolor
 
@@ -108,7 +50,7 @@ do --drawlinks
           _ENV.Y = Y
           _ENV.color, _ENV.bordercolor, _ENV.textcolor = color, bordercolor, textcolor
 
-          cairo.restore(cr)
+          cr:restore()
         end
       end
     end
@@ -190,20 +132,20 @@ do --cel face
   
   function face.cairodraw(_ENV, cr, f, t)
     if f.shape then
-      cairo.rectangle(cr, 0, 0, t.w, t.h)
+      cr:rectangle(0, 0, t.w, t.h)
 
       if f.color then
-        cairo.set_source_color(cr, _ENV.color)
-        cairo.fill_preserve(cr)
+        cr:set_source_color(_ENV.color)
+        cr:fill_preserve()
       end
 
       if f.bordercolor and f.borderwidth then
-        cairo.set_source_color(cr, _ENV.bordercolor)
-        cairo.set_line_width(cr, f.borderwidth)
-        cairo.stroke(cr)
+        cr:set_source_color(_ENV.bordercolor)
+        cr:set_line_width(f.borderwidth)
+        cr:stroke()
       end
 
-      cairo.new_path(cr)
+      cr:new_path()
     end
 
     return _ENV.drawlinks(cr, t)
@@ -225,24 +167,25 @@ require((...)..'.slider')
 require((...)..'.menu')
 
 return function(cr, t, metadescription)
+  assert(cr)
   _ENV.metadescription = metadescription
 
   local r = metadescription.updaterect
 
   cr:save()
   do 
-    cairo.rectangle(cr, r.l, r.t, r.r-r.l, r.b-r.t)
-    cairo.clip(cr)
-    cairo.rectangle(cr, t.x, t.y, t.w, t.h)
-    cairo.clip(cr)
+    cr:rectangle(r.l, r.t, r.r-r.l, r.b-r.t)
+    cr:clip()
+    cr:rectangle(t.x, t.y, t.w, t.h)
+    cr:clip()
 
-    cairo.translate(cr, t.x, t.y)
-    cairo.rectangle(cr, 0, 0, t.w, t.h)
+    cr:translate(t.x, t.y)
+    cr:rectangle(0, 0, t.w, t.h)
 
-    cairo.set_source_rgb(cr, 0, 0, 0)
-    cairo.fill(cr)
+    cr:set_source_rgb(0, 0, 0)
+    cr:fill()
 
-    cairo.set_line_width(cr, 1)
+    cr:set_line_width(1)
 
     _ENV.drawlinks(cr, t)
   end 

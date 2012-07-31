@@ -9,34 +9,34 @@ face.tickcolor = cel.color.rgb(0, 1, 1)
 function face.cairodraw(_ENV, cr, f, t)
   if f.shape then
     local yr = 1.5
-    cairo.rectangle(cr, t.thumbsize/2, t.h/2-yr, t.w-t.thumbsize, yr*2)
+    cr:rectangle(t.thumbsize/2, t.h/2-yr, t.w-t.thumbsize, yr*2)
 
     if f.color then
-      cairo.set_source_color(cr, _ENV.color)
-      cairo.fill_preserve(cr)
+      cr:set_source_color(_ENV.color)
+      cr:fill_preserve()
     end
 
     if f.bordercolor and f.borderwidth then
-      cairo.set_source_color(cr, _ENV.bordercolor)
-      cairo.set_line_width(cr, f.borderwidth)
-      cairo.stroke(cr)
+      cr:set_source_color(_ENV.bordercolor)
+      cr:set_line_width(f.borderwidth)
+      cr:stroke()
     end
 
-    cairo.new_path(cr)
+    cr:new_path()
   end
 
-  cairo.set_source_color(cr, f.tickcolor)
+  cr:set_source_color(f.tickcolor)
 
-  cairo.rectangle(cr, t.w/2, 0, 1, t.h)
+  cr:rectangle(t.w/2, 0, 1, t.h)
 
   local step = t.step * ((t.w-t.thumbsize)/(t.maxvalue-t.minvalue))
   for x=step+t.thumbsize/2, t.w-t.thumbsize, step do
-    cairo.save(cr)
-    cairo.translate(cr, x, t.h/2)
-    cairo.scale(cr, 5, 5)
-    cairo.rectangle(cr, -.5, -.5, 1, 1)
-    cairo.fill(cr)
-    cairo.restore(cr)
+    cr:save()
+    cr:translate(x, t.h/2)
+    cr:scale(5, 5)
+    cr:rectangle(-.5, -.5, 1, 1)
+    cr:fill()
+    cr:restore()
   end
 
   return _ENV.drawlinks(cr, t)

@@ -22,20 +22,20 @@ face.layout = {
 function face.cairodraw(_ENV, cr, f, t)
 
   if f.textcolor and t.text then
-    cairo.set_source_color(cr, _ENV.textcolor)
+    cr:set_source_color(_ENV.textcolor)
     for i, line in ipairs(t.lines) do
       --uncomment this optimization later
       --if t.y + line.y < t.clip.b  and t.y + line.y + line.h > t.clip.t then
-      cairo.drawstring(cr, t.font, line.penx, line.peny, line.text)
+      cr:drawstring(t.font, line.penx, line.peny, line.text)
       --end
     end
   end
 
   if f.borderwidth and f.bordercolor then
-    cairo.set_line_width(cr, f.borderwidth)
-    cairo.set_source_color(cr, _ENV.bordercolor)
-    cairo.rectangle(cr, 0, 0, t.w, t.h)
-    cairo.stroke(cr)
+    cr:set_line_width(f.borderwidth)
+    cr:set_source_color(_ENV.bordercolor)
+    cr:rectangle(0, 0, t.w, t.h)
+    cr:stroke()
   end
 
   return _ENV.drawlinks(cr, t)

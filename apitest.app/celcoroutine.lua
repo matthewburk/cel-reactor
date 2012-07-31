@@ -29,7 +29,9 @@ return function(root)
     'Make a selection',
     cel.textbutton {
       text = 'real',
-      onclick = cel.resumefork,
+      onclick = function(textbtn)
+        cel.resumefork(textbtn, textbtn)
+      end
     },
     cel.textbutton.new('B'),
     cel.textbutton.new('C'),

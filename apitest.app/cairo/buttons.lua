@@ -31,7 +31,7 @@ do
     local x, y, w, h = t.x, t.y, t.w, t.h
     local border = f.border
 
-    cairo.set_source_color(cr, f.color)
+    cr:set_source_color(f.color)
     
 
     cr:save()

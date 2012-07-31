@@ -81,26 +81,26 @@ function thumb.cairodraw(_ENV, cr, f, t, size)
   local size = size or t.host.host.size
 
   if f.color then
-    cairo.set_source_color(cr, _ENV.color)
-    cairo.rectangle(cr, 0, 0, t.w, t.h)
-    cairo.fill(cr)
+    cr:set_source_color(_ENV.color)
+    cr:rectangle(0, 0, t.w, t.h)
+    cr:fill()
   end
 
   if f.borderwidth and f.bordercolor then
-    cairo.set_line_width(cr, f.borderwidth)
-    cairo.set_source_color(cr, _ENV.bordercolor)
-    cairo.rectangle(cr, 0, 0, t.w, t.h)
-    cairo.stroke(cr)
+    cr:set_line_width(f.borderwidth)
+    cr:set_source_color(_ENV.bordercolor)
+    cr:rectangle(0, 0, t.w, t.h)
+    cr:stroke()
   end
 
   if f.accentcolor then
-    cairo.set_source_color(cr, f.accentcolor)
-    cairo.save(cr)
-    cairo.translate(cr, t.w/2, t.h/2)
-    cairo.scale(cr, size, size)
-    cairo.arc(cr, 0, 0, .1, 0, 2 * math.pi);
-    cairo.fill(cr)
-    cairo.restore(cr)
+    cr:set_source_color(f.accentcolor)
+    cr:save()
+    cr:translate(t.w/2, t.h/2)
+    cr:scale(size, size)
+    cr:arc(0, 0, .1, 0, 2 * math.pi);
+    cr:fill()
+    cr:restore()
   end
 
   return _ENV.drawlinks(cr, t)

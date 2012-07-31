@@ -74,21 +74,21 @@ do --window.handle
 
   function face.cairodraw(_ENV, cr, f, t)
     if f.color then
-      cairo.set_source_color(cr, _ENV.color)
-      cairo.rectangle(cr, 0, 0, t.w, t.h)
-      cairo.fill(cr)
+      cr:set_source_color(_ENV.color)
+      cr:rectangle(0, 0, t.w, t.h)
+      cr:fill()
     end
 
     if t.host.title and f.textcolor then
-      cairo.set_source_color(cr, _ENV.textcolor)
-      cairo.drawstringlt(cr, f.font, 4, 4, t.host.title)
+      cr:set_source_color(_ENV.textcolor)
+      cr:drawstringlt(f.font, 4, 4, t.host.title)
     end
 
     if f.borderwidth and f.bordercolor then
-      cairo.set_line_width(cr, f.borderwidth)
-      cairo.set_source_color(cr, _ENV.bordercolor)
-      cairo.rectangle(cr, 0, 0, t.w, t.h)
-      cairo.stroke(cr)
+      cr:set_line_width(f.borderwidth)
+      cr:set_source_color(_ENV.bordercolor)
+      cr:rectangle(0, 0, t.w, t.h)
+      cr:stroke()
     end
 
     return _ENV.drawlinks(cr, t)

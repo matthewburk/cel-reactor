@@ -43,15 +43,15 @@ do --menu.slot
     if t.submenu then
       local linker = cel.getlinker('right.center')
       local x, y, w, h = linker(t.w, t.h, 0, 0, t.h/3, t.h/3, t.h/4, 0)
-      cairo.set_source_rgb(cr, 0, 0, 1)
-      cairo.rectangle(cr, x, y, w, h)
-      cairo.fill(cr)
+      cr:set_source_rgb(0, 0, 1)
+      cr:rectangle(x, y, w, h)
+      cr:fill()
     end
 
     if t.mousefocusin or t.submenu == 'active' then
-      cairo.set_source_rgba(cr, 0, 1, 1, .3)
-      cairo.rectangle(cr, 0, 0, t.w, t.h)
-      cairo.fill(cr)
+      cr:set_source_rgba(0, 1, 1, .3)
+      cr:rectangle(0, 0, t.w, t.h)
+      cr:fill()
     end
   end
 end
