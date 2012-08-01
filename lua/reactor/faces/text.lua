@@ -8,6 +8,10 @@ face.borderwidth = false
 
 face.layout = {
   wrap='word',
+  padding = {
+    l=function(w, h, font) return math.floor(font.metrics[' '].advance/2) end,
+    r=function(w, h, font) return math.floor(.9+font.metrics[' '].advance/2) end,
+  },
 }
 
 function face.cairodraw(_ENV, cr, f, t)

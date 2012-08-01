@@ -13,8 +13,7 @@ face.layout = {
   wrap = 'line',
   justification = 'center',
   padding = {
-    fitx = 'bbox',
-    l = function(w, h, font) return font.ascent * .5 end, --TODO need font em
+    l=function(w, h, font) return font.metrics[' '].advance end,
     t = function(w, h, font) return h*.35 end,
   },
 }

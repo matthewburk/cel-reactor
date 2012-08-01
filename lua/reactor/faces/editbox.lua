@@ -18,8 +18,8 @@ do
 
   face.layout = {
     padding = {
-      l = 0, r = 2, --make room for caret at end
-      t = 0, b = 0,
+      l=function(w, h, font) return math.floor(font.metrics[' '].advance/2) end,
+      r=function(w, h, font) return math.floor(.9+font.metrics[' '].advance/2) end,
     },
   }
 
