@@ -352,8 +352,8 @@ return function()
       if driver.descriptionchanged() then app.window:redraw() end
     end
 
-    function _window.oncommand( command )
-      driver.command(c)
+    function _window.oncommand(command)
+      driver.command(command)
       window:notify('command', command)
       if driver.descriptionchanged() then app.window:redraw() end
     end
@@ -392,14 +392,14 @@ return function()
 
     do
       local names = {
-        code = string.format('%s/data/fonts/%s', reactor.path, 'FixedsysExcelsiorIIIb.ttf'),
-        monospace = string.format('%s/data/fonts/%s', reactor.path, '/ttf-bitstream-vera-1.10/VeraMono.ttf'),
-        serif = string.format('%s/data/fonts/%s', reactor.path, '/ttf-bitstream-vera-1.10/VeraSe.ttf'),
-        sansserif = string.format('%s/data/fonts/%s', reactor.path, '/ttf-bitstream-vera-1.10/Vera.ttf'),
-        default = string.format('%s/data/fonts/%s', reactor.path, 'arial.ttf'),
+        code = string.format('%s/data/fonts/%s', app.path, 'FixedsysExcelsiorIIIb.ttf'),
+        monospace = string.format('%s/data/fonts/%s', app.path, '/ttf-bitstream-vera-1.10/VeraMono.ttf'),
+        serif = string.format('%s/data/fonts/%s', app.path, '/ttf-bitstream-vera-1.10/VeraSe.ttf'),
+        sansserif = string.format('%s/data/fonts/%s', app.path, '/ttf-bitstream-vera-1.10/Vera.ttf'),
+        default = string.format('%s/data/fonts/%s', app.path, 'arial.ttf'),
       }
 
-      function driver.loadfont(name, weight, slant, size)
+      function driver.loadfont(name, size)
         name = names[name] or name 
 
         local cr = cairo.create(cairo.surface.create(0, 0))
@@ -410,12 +410,13 @@ return function()
 
         local ascent, descent, lineheight = cr:font_extents()
         local _, _, emwidth, emheight, emadvance = cr:text_extents('M')
+        _, _, _, _, emadvance = cr:text_extents(' ')
 
         local font = {
           cairofont = cairofont,
           name = name,
-          weight = weight,
-          slant = slant,
+          --weight = weight, TODO add this
+          --slant = slant, TODO add this
           size = size,
           lineheight = math.ceil(lineheight),
           ascent = math.ceil(ascent),
@@ -444,9 +445,9 @@ return function()
     do --driver.clipboard
       function driver.clipboard(command, data)
         if command == 'get' then
-          return app.getclipboardtext()
+          return app.window.getclipboardtext()
         elseif command == 'put' then
-          app.setclipboardtext(data)
+          app.window.setclipboardtext(data)
         end
       end
     end
@@ -557,6 +558,6 @@ return function()
 
     _window.onresize(_window.w, _window.h)
 
-    assert(loadfile(app.path..'/main.lua'))()
+    require( 'main' )
   end
 end

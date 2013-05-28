@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="reactor">
+</Property><Property Name="Solution File" Value="D:\Documents\projects\cel-reactor\reactor\reactor.sln">
+</Property><Property Name="Date" Value="Sunday, August 19, 2012">
+</Property><Property Name="Time" Value="15:36 PM">
+</Property></Properties><Event ErrorLevel="0" Project="reactor" Source="reactor.vcproj" Description="Converting project file 'D:\Documents\projects\cel-reactor\reactor\reactor.vcproj'.">
+</Event><Event ErrorLevel="1" Project="reactor" Source="reactor.vcproj" Description="VCWebServiceProxyGeneratorTool is no longer supported. The tool has been removed from your project settings.">
+</Event><Event ErrorLevel="1" Project="reactor" Source="reactor.vcproj" Description="MSB8012: $(TargetName) ('reactor') does not match the Linker's OutputFile property value 'dist\reactord.exe' ('reactord') in project configuration 'Debug|Win32'. This may cause your project to build incorrectly. To correct this, please make sure that $(TargetName) property value matches the value specified in %(Link.OutputFile).">
+</Event><Event ErrorLevel="1" Project="reactor" Source="reactor.vcproj" Description="MSB8012: $(TargetPath) ('D:\Documents\projects\cel-reactor\reactor\dist\reactor.exe') does not match the Linker's OutputFile property value 'dist\reactord.exe' ('D:\Documents\projects\cel-reactor\reactor\dist\reactord.exe') in project configuration 'Debug|Win32'. This may cause your project to build incorrectly. To correct this, please make sure that $(TargetPath) property value matches the value specified in %(Link.OutputFile).">
+</Event><Event ErrorLevel="1" Project="reactor" Source="reactor.vcproj" Description="MSB8012: $(TargetPath) ('D:\Documents\projects\cel-reactor\reactor\dist\reactor.exe') does not match the Linker's OutputFile property value 'D:\Documents\projects\cel-reactor\reactor\\..\reactor.exe' ('D:\Documents\projects\cel-reactor\reactor\reactor.exe') in project configuration 'Release|Win32'. This may cause your project to build incorrectly. To correct this, please make sure that $(TargetPath) property value matches the value specified in %(Link.OutputFile).">
+</Event><Event ErrorLevel="0" Project="reactor" Source="reactor.vcproj" Description="Done converting to new project file 'D:\Documents\projects\cel-reactor\reactor\reactor.vcxproj'.">
+</Event><Event ErrorLevel="3" Project="reactor" Source="reactor.vcproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="" Source="reactor.sln" Description="Solution converted successfully">
+</Event><Event ErrorLevel="3" Project="" Source="reactor.sln" Description="Converted">
+</Event></UpgradeLog>

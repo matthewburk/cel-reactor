@@ -1,112 +1,5 @@
 #if 0
-/**
- * 
- */
-void reactor_window_getclipboard( char** text )
-{
-  HGLOBAL hglobal = 0;
-  char* buffer = 0;
 
-  BUGFISH_ENTER();
-
-  BUGFISH_ASSERT( text );
-
-  if ( !IsClipboardFormatAvailable( CF_TEXT ) ) {
-    BUGFISH_RETURN_VOID();
-  }
-
-  if ( !OpenClipboard( m_window.hwnd ) ) {
-    BUGFISH_RETURN_VOID();
-  }
-
-  if ( !( hglobal = GetClipboardData( CF_TEXT ) ) ) {
-    BUGFISH_ASSERT( !"GetClipboardData() failed" );
-  }
-
-  if ( !( buffer = (char*)GlobalLock( hglobal ) ) ) {
-    BUGFISH_ASSERT( !"GlobalLock() failed" );
-  }
-
-  if ( !( *text = strdup( buffer ) ) ) {
-    BUGFISH_ASSERT( !"strdup() failed" );
-  }
-
-  GlobalUnlock( hglobal );
-
-  CloseClipboard();
-
-  BUGFISH_RETURN_VOID();
-}
-
-/**
- * 
- */
-void reactor_window_setclipboard( const char* text )
-{
-  HGLOBAL hglobal = 0;
-  char* buffer = 0;
-
-  BUGFISH_ENTER();
-
-  BUGFISH_ASSERT( text );
-
-  if ( !OpenClipboard( m_window.hwnd ) ) {
-    BUGFISH_RETURN_VOID();
-  }
-
-  EmptyClipboard();
-
-  if ( !( hglobal = GlobalAlloc( GHND, strlen( text ) + 1 ) ) ) {
-    BUGFISH_ASSERT( !"GlobalAlloc() failed" );
-  }
-
-  if ( !( buffer = (char*)GlobalLock( hglobal ) ) ) {
-    BUGFISH_ASSERT( !"GlobalLock() failed" );
-  }
-
-  strncpy( buffer, text, strlen( text ) );
-
-  GlobalUnlock( hglobal );
-
-  SetClipboardData( CF_TEXT, hglobal );
-
-  CloseClipboard();
-
-  BUGFISH_RETURN_VOID();
-}
-
-/**
- * 
- */
-static int reactor_window_getclipboard_l( lua_State* L )
-{
-  char* text = 0;
-  luaL_Buffer b;
-
-  reactor_window_getclipboard( &text );
-
-  if ( text ) {
-    luaL_buffinit( L, &b );
-    luaL_addstring( &b, text );
-    luaL_pushresult( &b );
-
-    free( text );
-
-    return( 1 );
-  }
-
-  return( 0 );
-}
-
-/**
- * 
- */
-static int reactor_window_setclipboard_l( lua_State* L )
-{
-  reactor_window_setclipboard( luaL_checkstring( L, 1 ) );
-
-  return( 0 );
-}
 #endif
 
 #include <stdlib.h>
@@ -179,6 +72,100 @@ static int reactor_pcall(lua_State *L, int narg, int nresults) {
   return status;
 }
 
+
+void reactor_window_setclipboard( const char* text )
+{
+  HGLOBAL hglobal = 0;  
+  void* data = 0;
+  int size = 0;
+
+  if ( !OpenClipboard( window.hwnd ) ) {
+    return;
+  }
+
+  EmptyClipboard();
+
+  size = MultiByteToWideChar(CP_UTF8, 0, text, -1, NULL, 0);
+
+  if ( !( hglobal = GlobalAlloc( GHND, size*sizeof(WCHAR)) ) ) {
+    return;
+  }
+
+  if ( !( data = GlobalLock( hglobal ) ) ) {
+    return;
+  }
+
+  MultiByteToWideChar(CP_UTF8, 0, text, -1, data, size);
+
+  GlobalUnlock( hglobal );
+  
+  SetClipboardData( CF_UNICODETEXT, hglobal );
+
+  CloseClipboard();
+}
+
+static int reactor_window_setclipboard_L( lua_State* L )
+{
+  reactor_window_setclipboard( luaL_checkstring( L, 1 ) );
+  return( 0 );
+}
+
+void reactor_window_getclipboard( char** text )
+{
+  HGLOBAL hglobal = 0;
+  char* buffer = 0;
+  void* data = 0;
+
+  if ( !IsClipboardFormatAvailable( CF_UNICODETEXT ) ) {
+    return;
+  }
+
+  if ( !OpenClipboard( window.hwnd ) ) {
+    return;
+  }
+
+  if ( !( hglobal = GetClipboardData( CF_UNICODETEXT ) ) ) {
+    return;
+  }
+
+  if ( !( data = GlobalLock( hglobal ) ) ) {
+    return;
+  }
+
+  {
+	int size_needed = WideCharToMultiByte(CP_UTF8, 0, data, -1, NULL, 0, NULL, NULL);
+
+	*text = (char*)malloc(size_needed);
+
+	WideCharToMultiByte(CP_UTF8, 0, data, -1, *text, size_needed, NULL, NULL);
+  }
+    
+  GlobalUnlock( hglobal );
+
+  CloseClipboard();
+}
+
+static int reactor_window_getclipboard_L( lua_State* L ) {
+  char* text = 0;
+  luaL_Buffer b;
+
+  reactor_window_getclipboard( &text );
+
+  if ( text ) {
+    luaL_buffinit( L, &b );
+    luaL_addstring( &b, text );
+    luaL_pushresult( &b );
+
+    free( text );
+
+    return( 1 );
+  }
+
+  return( 0 );
+}
+
+
+
 static unsigned long reactor_getelapsedtime(void) {
   return timeGetTime() - createtime;
 }
@@ -242,6 +229,18 @@ void pushL_windowevent(const char* name) {
 }
 
 void pushL_command(const char* command) {
+  int nargs = 0;
+  lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
+  lua_getfield(L, -1, "oncommand");
+
+  if (lua_isfunction(L, -1)) { 
+    lua_pushstring(L, command); nargs++;
+    reactor_pcall(L, nargs, 0);
+    lua_pop(L, 1);
+  }
+  else {
+    lua_pop(L, 2);
+  }
 }
 
 void pushL_mousedblclick(int x, int y, const char* button, int alt, int ctrl, int shift) {
@@ -349,11 +348,17 @@ void pushL_mousemove(int x, int y, int alt, int ctrl, int shift) {
 
 void pushL_char(int c) {
   int nargs = 0;
+  char buffer[8] = {0};
   lua_rawgeti(L, LUA_REGISTRYINDEX, windowref);
   lua_getfield(L, -1, "onchar");
+  
+  {
+	  WideCharToMultiByte(CP_UTF8, 0, &(WCHAR)c, 1, buffer, sizeof(buffer), NULL, NULL);
+  }
 
   if (lua_isfunction(L, -1)) { 
-    lua_pushfstring(L, "%c", c); nargs++;
+    //lua_pushfstring(L, "%c", c); nargs++;
+	lua_pushstring(L, buffer); nargs++;
 
     reactor_pcall(L, nargs, 0);
     lua_pop(L, 1);
@@ -479,6 +484,8 @@ static int open_window_L(lua_State* L) {
     static const luaL_reg app_window_functions_L[] = {    
       {"getclientrect", window_getclientrect_L},
       {"redraw", window_redraw_L},
+	  {"getclipboardtext", reactor_window_getclipboard_L},
+	  {"setclipboardtext", reactor_window_setclipboard_L},
       {0, 0}
     };
 
@@ -686,7 +693,8 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       }          
       return 0;
 
-    case APP_TICK:      
+    case APP_TICK:  
+	  window.timerposted = 0;
       pushL_tick();      
       return 0;
 
@@ -820,9 +828,10 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
       return 0;    
 
     case WM_CHAR:
-      if ( ( 32 <= ( wparam & 0xFF ) ) && ( 126 >= ( wparam & 0xFF ) ) ) {
-        pushL_char(wparam & 0xFF);
-      }
+	
+      if ( ( 32 <= ( wparam & 0xFF ) )) {
+		pushL_char(wparam);  
+      }	  
       return 0;    
 
     case WM_MOUSELEAVE:
@@ -882,10 +891,6 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
           GetKeyState( VK_MENU ) & 0x8000, 
           GetKeyState( VK_CONTROL ) & 0x8000, 
           GetKeyState( VK_SHIFT ) & 0x8000);
-        pushL_keypress(_translate_keyboard_key( wparam ),
-          GetKeyState( VK_MENU ) & 0x8000, 
-          GetKeyState( VK_CONTROL ) & 0x8000, 
-          GetKeyState( VK_SHIFT ) & 0x8000);
       }
       if ( GetKeyState( VK_CONTROL ) & 0x8000 ) {
         switch ( wparam ) {
@@ -915,12 +920,23 @@ static LRESULT CALLBACK _window_proc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 }
 
 static void CALLBACK timecallback(UINT uTimerID, UINT uMsg, DWORD_PTR dwUser, DWORD_PTR dw1, DWORD_PTR dw2) {
+	if (window.timerposted) {
+		return;
+	}
+	window.timerposted = 1;
   PostMessage(window.hwnd, APP_TICK, 0, 0);
 }
 
 static int _poll_nowait(void) {
   MSG msg = {0};
-  while ( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) ) {
+  while ( PeekMessage( &msg, 0, WM_KEYFIRST, WM_MOUSELAST, PM_REMOVE ) ) {  
+    if ( WM_QUIT == msg.message ) {
+      return 0;
+    }
+    TranslateMessage( &msg );
+    DispatchMessage( &msg );
+  } 
+  if ( PeekMessage( &msg, 0, 0, 0, PM_REMOVE ) ) {  
     if ( WM_QUIT == msg.message ) {
       return 0;
     }
@@ -1096,7 +1112,7 @@ int main( int argc, char* argv[] ) {
       if (millis > 0 ) {
         int endmillis = currentmillis + millis;
         DWORD waitret;            
-        waitret = MsgWaitForMultipleObjectsEx(0, 0, millis, QS_ALLINPUT, MWMO_ALERTABLE);
+        waitret = MsgWaitForMultipleObjectsEx(0, 0, millis, QS_ALLEVENTS, MWMO_ALERTABLE|MWMO_INPUTAVAILABLE);
         if (WAIT_TIMEOUT == waitret) {              
           millis=0;      
         }

@@ -1,1 +1,1 @@
-reactor.exe apitest.app "window={title='apitest', w=400, h=400}"
+reactor.exe apitest.app "window={title='apitest', w=800, h=800}"

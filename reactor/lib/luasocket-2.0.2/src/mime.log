@@ -1,0 +1,23 @@
+﻿Build started 1/5/2013 6:42:41 PM.
+     1>Project "D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\mime.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "src\mime.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "src\mime.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\include\lua /nologo /W4 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D MIME_EXPORTS /D "MIME_API=__declspec(dllexport)" /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"src\\" /Fd"src\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt src\mime.c
+         mime.c
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"src\mime.dll" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\..\lib lua51.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"src\mime.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\src\mime.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"src\mime.lib" /MACHINE:X86 /DLL src\mime.obj
+            Creating library src\mime.lib and object src\mime.exp
+         mime.vcxproj -> D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\src\mime.dll
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"src\mime.dll;#2" /manifest src\mime.dll.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "src\mime.unsuccessfulbuild".
+         Touching "src\mime.lastbuildstate".
+     1>Done Building Project "D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\mime.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.67

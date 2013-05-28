@@ -1,9 +1,44 @@
 local cel = require 'cel'
 
+app.colors = {
+  red=cel.color.rgb(1, 0, 0),
+  yellow=cel.color.rgb(1, 1, 0),
+  green=cel.color.rgb(0, 1, 0),
+  blue=cel.color.rgb(0, 0, 1),
+
+  blue5=cel.color.setsaturation(cel.color.rgb(0, 0, 1), .5),
+
+  cyan=cel.color.rgb(0, 1, 1),
+  cyan5=cel.color.setsaturation(cel.color.rgb(0, 1, 1), .5),
+  cyan8=cel.color.setsaturation(cel.color.rgb(0, 1, 1), .8),
+
+  black=cel.color.rgb(0, 0, 0),
+  gray1=cel.color.rgb(.1, .1, .1),
+  gray2=cel.color.rgb(.2, .2, .2),
+  gray3=cel.color.rgb(.3, .3, .3),
+  gray4=cel.color.rgb(.4, .4, .4),
+  gray5=cel.color.rgb(.5, .5, .5),
+  gray6=cel.color.rgb(.6, .6, .6),
+  gray7=cel.color.rgb(.7, .7, .7),
+  gray8=cel.color.rgb(.8, .8, .8),
+  gray9=cel.color.rgb(.9, .9, .9),
+  white=cel.color.rgb(1, 1, 1),
+
+  
+  oceanblue=cel.color.rgb8(0, 136, 204),
+}
+
+app.colors.themecolor = app.colors.oceanblue
+app.colors.themebordercolor = app.colors.white
+app.colors.themetextcolor = app.colors.white
+app.colors.themecomplement = cel.color.getcomplement(app.colors.themecolor, nil, .6, 1)
+app.colors.themecomplementlight = cel.color.getcomplement(app.colors.themecolor, nil, .8, 1)
+
 local _ENV = {
-  color = cel.color.rgb(0, 0, 0),
-  bordercolor = cel.color.rgb(1, 1, 1),
-  textcolor = cel.color.tint(cel.color.rgb(0, 1, 1), .7),
+  color = app.colors.themecolor,
+  bordercolor = app.colors.themebordercolor,
+  textcolor = app.colors.themetextcolor,
+
   metadescription = false,
   X=0,
   Y=0,
@@ -92,7 +127,7 @@ end
 do --cel face
   local face = cel.getface('cel')
 
-  face.font = cel.loadfont('default', 12)
+  face.font = cel.loadfont('default', 14)
   face.color = false
   face.bordercolor = false
   face.textcolor = false
@@ -161,10 +196,12 @@ require((...)..'.textbutton')
 require((...)..'.editbox')
 require((...)..'.window')
 require((...)..'.scroll')
+require((...)..'.listbox')
 require((...)..'.grip')
 require((...)..'.plot')
 require((...)..'.slider')
 require((...)..'.menu')
+require((...)..'.accordion')
 
 return function(cr, t, metadescription)
   assert(cr)

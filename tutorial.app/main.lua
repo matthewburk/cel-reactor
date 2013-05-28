@@ -1,16 +1,13 @@
-require 'stdinit' (app.name)
 require 'strict'
 
-local celdriver = require 'celdriver'
 local cel = require 'cel'
 
----[[
+--[[
 celdriver.resize(1920/1.5, 1080/1.5)
 
 function reactor.resized()
   celdriver.resize(1920/1.5, 1080/1.5)
 end
---]]
 
 function reactor.keydown(key, ...)
   celdriver.keydown(key, ...)
@@ -25,6 +22,7 @@ function reactor.keydown(key, ...)
   end
 end
 
+--]]
 do --faces
   cel.getface('cel'):new {
     fillcolor = cel.color.rgb(0, 1, 1),
@@ -143,10 +141,10 @@ local function loadtut(tut, name)
       local iscomment, comment = string.match(line, '^(%s*)%-%-(.*)')
       if iscomment then
         if not commentbox then
-          commentbox = cel.text.new(comment, '@comment')
+          commentbox = cel.text.new(comment, '@comment'):wrap('word')
           local font = cel.getface('label', '@code').font
-          local slothost = cel.slot.new(font:measureadvance(iscomment), 0, 5)
-          local slot = cel.slot.new(5, 5, 5, 5, 0, 0, '@commentbox'):link(slothost, 'width')
+          local slothost = cel.slot.new(nil, font:measureadvance(iscomment), 0, 5)
+          local slot = cel.slot.new('@commentbox', 5, 5, 5, 5, 0, 0 ):link(slothost, 'width')
             
 
           lines[#lines + 1] = slothost
@@ -217,6 +215,8 @@ local function loadtut(tut, name)
 end
 
 function tut:run()
+  assert(reactor_traceback)
+  local ok, msg = xpcall(function()
   loadtut(self, 'tldr')
   loadtut(self, 'intro')
   loadtut(self, 'faces')
@@ -231,6 +231,11 @@ function tut:run()
   loadtut(self, 'label')
   loadtut(self, 'textbutton')
   self:reset()
+end, reactor_traceback)
+
+  if not ok then
+    error(msg)
+  end
 end
 
 
@@ -274,7 +279,7 @@ do
         },
       },
     }
-  }:link(celdriver.root, 'fill')
+  }:link(app.window.root, 'fill')
 
   tut:start()
 end

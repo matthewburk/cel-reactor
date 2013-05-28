@@ -17,6 +17,7 @@ extern struct window {
   int activated;
   int tracking;
   int redraw;
+  int timerposted;
   int x;
   int y;
   int w;

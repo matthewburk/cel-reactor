@@ -47,17 +47,17 @@
 @if errorlevel 1 goto :END
 @popd
 
-@pushd pixman\src
-@call build.bat %MYCONFIG%
-@if errorlevel 1 goto :END
-@popd
+@rem @pushd pixman\src
+@rem @call build.bat %MYCONFIG%
+@rem @if errorlevel 1 goto :END
+@rem @popd
 
 @pushd freetype\src
 @call build.bat %MYCONFIG%
 @if errorlevel 1 goto :END
 @popd
 
-@pushd cairo\src
+@pushd cairo-1.12.14\src
 @call build.bat %MYCONFIG%
 @if errorlevel 1 goto :END
 @popd

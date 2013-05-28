@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------
 -- LuaJIT compiler dump module.
 --
--- Copyright (C) 2005-2011 Mike Pall. All rights reserved.
+-- Copyright (C) 2005-2013 Mike Pall. All rights reserved.
 -- Released under the MIT license. See Copyright Notice in luajit.h
 ----------------------------------------------------------------------------
 --
@@ -54,7 +54,7 @@
 
 -- Cache some library functions and objects.
 local jit = require("jit")
-assert(jit.version_num == 20000, "LuaJIT core/library version mismatch")
+assert(jit.version_num == 20001, "LuaJIT core/library version mismatch")
 local jutil = require("jit.util")
 local vmdef = require("jit.vmdef")
 local funcinfo, funcbc = jutil.funcinfo, jutil.funcbc
@@ -76,20 +76,47 @@ local active, out, dumpmode
 
 ------------------------------------------------------------------------------
 
+local symtabmt = { __index = false }
 local symtab = {}
 local nexitsym = 0
 
--- Fill symbol table with trace exit addresses.
-local function fillsymtab(nexit)
+-- Fill nested symbol table with per-trace exit stub addresses.
+local function fillsymtab_tr(tr, nexit)
+  local t = {}
+  symtabmt.__index = t
+  if jit.arch == "mips" or jit.arch == "mipsel" then
+    t[traceexitstub(tr, 0)] = "exit"
+    return
+  end
+  for i=0,nexit-1 do
+    local addr = traceexitstub(tr, i)
+    t[addr] = tostring(i)
+  end
+  local addr = traceexitstub(tr, nexit)
+  if addr then t[addr] = "stack_check" end
+end
+
+-- Fill symbol table with trace exit stub addresses.
+local function fillsymtab(tr, nexit)
   local t = symtab
   if nexitsym == 0 then
     local ircall = vmdef.ircall
-    for i=0,#ircall do t[ircalladdr(i)] = ircall[i] end
+    for i=0,#ircall do
+      local addr = ircalladdr(i)
+      if addr ~= 0 then t[addr] = ircall[i] end
+    end
   end
-  if nexit > nexitsym then
+  if nexitsym == 1000000 then -- Per-trace exit stubs.
+    fillsymtab_tr(tr, nexit)
+  elseif nexit > nexitsym then -- Shared exit stubs.
     for i=nexitsym,nexit-1 do
       local addr = traceexitstub(i)
-      if addr == nil then nexit = 1000000; break end
+      if addr == nil then -- Fall back to per-trace exit stubs.
+	fillsymtab_tr(tr, nexit)
+	setmetatable(symtab, symtabmt)
+	nexit = 1000000
+	break
+      end
       t[addr] = tostring(i)
     end
     nexitsym = nexit
@@ -111,7 +138,7 @@ local function dump_mcode(tr)
   out:write("---- TRACE ", tr, " mcode ", #mcode, "\n")
   local ctx = disass.create(mcode, addr, dumpwrite)
   ctx.hexdump = 0
-  ctx.symtab = fillsymtab(info.nexit)
+  ctx.symtab = fillsymtab(tr, info.nexit)
   if loop ~= 0 then
     symtab[addr+loop] = "LOOP"
     ctx:disass(0, loop)
@@ -258,7 +285,6 @@ local function ctlsub(c)
   if c == "\n" then return "\\n"
   elseif c == "\r" then return "\\r"
   elseif c == "\t" then return "\\t"
-  elseif c == "\r" then return "\\r"
   else return format("\\%03d", byte(c))
   end
 end
@@ -347,12 +373,33 @@ local function dump_snap(tr)
 end
 
 -- Return a register name or stack slot for a rid/sp location.
-local function ridsp_name(ridsp)
+local function ridsp_name(ridsp, ins)
   if not disass then disass = require("jit.dis_"..jit.arch) end
-  local rid = band(ridsp, 0xff)
-  if ridsp > 255 then return format("[%x]", shr(ridsp, 8)*4) end
+  local rid, slot = band(ridsp, 0xff), shr(ridsp, 8)
+  if rid == 253 or rid == 254 then
+    return (slot == 0 or slot == 255) and " {sink" or format(" {%04d", ins-slot)
+  end
+  if ridsp > 255 then return format("[%x]", slot*4) end
   if rid < 128 then return disass.regname(rid) end
   return ""
+end
+
+-- Dump CALL* function ref and return optional ctype.
+local function dumpcallfunc(tr, ins)
+  local ctype
+  if ins > 0 then
+    local m, ot, op1, op2 = traceir(tr, ins)
+    if band(ot, 31) == 0 then -- nil type means CARG(func, ctype).
+      ins = op1
+      ctype = formatk(tr, op2)
+    end
+  end
+  if ins < 0 then
+    out:write(format("[0x%x](", tonumber((tracek(tr, ins)))))
+  else
+    out:write(format("%04d (", ins))
+  end
+  return ctype
 end
 
 -- Recursively gather CALL* args and dump them.
@@ -413,26 +460,28 @@ local function dump_ir(tr, dumpsnap, dumpreg)
       end
     elseif op ~= "NOP   " and op ~= "CARG  " and
 	   (dumpreg or op ~= "RENAME") then
+      local rid = band(ridsp, 255)
       if dumpreg then
-	out:write(format("%04d %-5s ", ins, ridsp_name(ridsp)))
+	out:write(format("%04d %-6s", ins, ridsp_name(ridsp, ins)))
       else
 	out:write(format("%04d ", ins))
       end
       out:write(format("%s%s %s %s ",
-		       band(ot, 128) == 0 and " " or ">",
+		       (rid == 254 or rid == 253) and "}" or
+		       (band(ot, 128) == 0 and " " or ">"),
 		       band(ot, 64) == 0 and " " or "+",
 		       irtype[t], op))
       local m1, m2 = band(m, 3), band(m, 3*4)
       if sub(op, 1, 4) == "CALL" then
+	local ctype
 	if m2 == 1*4 then -- op2 == IRMlit
 	  out:write(format("%-10s  (", vmdef.ircall[op2]))
-	elseif op2 < 0 then
-	  out:write(format("[0x%x](", tonumber((tracek(tr, op2)))))
 	else
-	  out:write(format("%04d (", op2))
+	  ctype = dumpcallfunc(tr, op2)
 	end
 	if op1 ~= -1 then dumpcallargs(tr, op1) end
 	out:write(")")
+	if ctype then out:write(" ctype ", ctype) end
       elseif op == "CNEW  " and op2 == -1 then
 	out:write(formatk(tr, op1))
       elseif m1 ~= 3 then -- op1 != IRMnone
@@ -563,9 +612,16 @@ local function dump_texit(tr, ex, ngpr, nfpr, ...)
 	if i % 8 == 0 then out:write("\n") end
       end
     end
-    for i=1,nfpr do
-      out:write(format(" %+17.14g", regs[ngpr+i]))
-      if i % 4 == 0 then out:write("\n") end
+    if jit.arch == "mips" or jit.arch == "mipsel" then
+      for i=1,nfpr,2 do
+	out:write(format(" %+17.14g", regs[ngpr+i]))
+	if i % 8 == 7 then out:write("\n") end
+      end
+    else
+      for i=1,nfpr do
+	out:write(format(" %+17.14g", regs[ngpr+i]))
+	if i % 4 == 0 then out:write("\n") end
+      end
     end
   end
 end

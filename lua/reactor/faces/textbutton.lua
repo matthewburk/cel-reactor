@@ -1,40 +1,42 @@
 local cel = require 'cel'
 
---require 'cel.textbutton'
-
 local face = cel.getface('textbutton')
 
 face.textcolor = 'current'
 face.color = 'current'
-face.bordercolor = cel.color.rgb(.4, .4, .4)
-face.borderwidth = 1
+face.bordercolor = app.colors.themebordercolor
+face.borderwidth = 2
 
 face.layout = {
   wrap = 'line',
   justification = 'center',
   padding = {
-    l=function(w, h, font) return font.metrics[' '].advance end,
+    l=function(w, h, font) return font.metrics['M'].advance end,
     t = function(w, h, font) return h*.35 end,
   },
 }
 
 function face.cairodraw(_ENV, cr, f, t)
+ 
+  local bw = f.borderwidth and f.borderwidth/2 or 0
+  --cr:roundrect(1+bw, 1+bw, t.w-bw-bw-2, t.h-bw-bw-2, (math.min(t.w, t.h)-2)/2)
+  cr:rectangle(1+bw, 1+bw, t.w-bw-bw-2, t.h-bw-bw-2)
+  cr:set_source_color(_ENV.color)
+  cr:fill_preserve()
 
   if f.textcolor and t.text then
     cr:set_source_color(_ENV.textcolor)
     for i, line in ipairs(t.lines) do
-      --uncomment this optimization later
-      --if t.y + line.y < t.clip.b  and t.y + line.y + line.h > t.clip.t then
       cr:drawstring(t.font, line.penx, line.peny, line.text)
-      --end
     end
   end
 
   if f.borderwidth and f.bordercolor then
     cr:set_line_width(f.borderwidth)
     cr:set_source_color(_ENV.bordercolor)
-    cr:rectangle(0, 0, t.w, t.h)
     cr:stroke()
+  else
+    cr:new_path()
   end
 
   return _ENV.drawlinks(cr, t)
@@ -42,22 +44,21 @@ end
 
 do
   face['%pressed'] = face:new {
-    color = cel.color.tint(face.color, .5),
-    bordercolor = cel.color.rgb(0, 1, 1),
+    color = app.colors.themecomplementlight,
+    bordercolor = app.colors.themebordercolor,
   }
 
   face['%mousefocusin'] = face:new {
-    color = cel.color.tint(face.color, .5),
-    bordercolor = cel.color.rgb(0, 1, 1),
+    color = app.colors.themecomplementlight,
   }
   
   do
     local face = face['%mousefocusin']
 
     face['%pressed'] = face:new {
-      textcolor = cel.color.rgb(.2, .2, .2),
-      color = cel.color.rgb(0, .8, .8),
-      bordercolor = cel.color.rgb(0, 1, 1),
+      textcolor = app.colors.themetextcolor,
+      color = app.colors.themecomplement,
+      bordercolor = app.colors.themebordercolor,
       borderwidth = 2,
     }
   end

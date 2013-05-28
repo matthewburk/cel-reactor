@@ -1540,6 +1540,16 @@ static int cairo_pattern_add_color_stop_rgb_l( lua_State* L );
 static int cairo_pattern_add_color_stop_rgba_l( lua_State* L );
 static int cairo_pattern_get_color_stop_count_l( lua_State* L );
 static int cairo_pattern_get_color_stop_rgba_l( lua_State* L );
+static int cairo_pattern_set_extend_l( lua_State* L );
+static int cairo_pattern_get_extend_l( lua_State* L );
+
+static char* cairo_pattern_extend_lst[] = {
+  "none",
+  "repeat",
+  "reflect",
+  "pad",
+  0
+};
 
 /**
  * 
@@ -1556,6 +1566,8 @@ int luaopen_cairo_pattern( lua_State* L )
     {"add_color_stop_rgba", cairo_pattern_add_color_stop_rgba_l},
     {"get_color_stop_count", cairo_pattern_get_color_stop_count_l},
     {"get_color_stop_rgba", cairo_pattern_get_color_stop_rgba_l},
+    {"set_extend", cairo_pattern_set_extend_l},
+    {"get_extend", cairo_pattern_get_extend_l},
     {0, 0}
   };
 
@@ -1595,6 +1607,24 @@ lua_cairo_pattern_t* lua_cairo_pattern_check( lua_State* L, int narg )
   }
 
   return( lcp );
+}
+
+/**
+ * 
+ */
+static int cairo_pattern_set_extend_l( lua_State* L ) {
+  lua_cairo_pattern_t* lcp = lua_cairo_pattern_check( L, 1 );
+  cairo_pattern_set_extend(lcp->pattern, luaL_checkoption( L, 2, "none", cairo_pattern_extend_lst ));
+  return 0;
+}
+
+/**
+ * 
+ */
+static int cairo_pattern_get_extend_l( lua_State* L ) {
+  lua_cairo_pattern_t* lcp = lua_cairo_pattern_check( L, 1 );
+  lua_pushstring( L, cairo_pattern_extend_lst[cairo_pattern_get_extend(lcp->pattern)] );
+  return 1;
 }
 
 /**

@@ -15,7 +15,7 @@ end
 
 if jit then
   dprint('jit', jit.status())
-  jit.opt.start('maxside=10', 'hotloop=5', 'loopunroll=32', 'maxsnap=500', 'tryside=5')
+  jit.opt.start(3)
 else
   dprint('no jit :(')
 end

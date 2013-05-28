@@ -3,7 +3,7 @@ local cel = require 'cel'
 local face = cel.getface('window')
 face.textcolor = false
 face.color = false
-face.bordercolor = cel.color.rgb(.2, .2, .2)
+face.bordercolor = app.colors.gray2
 face.borderwidth = 4
 face.radius = false
 
@@ -39,11 +39,11 @@ face.flow = {
 }
 
 face['%focus'] = face:new {
-  bordercolor = cel.color.rgb(0, 1, 1),
+  bordercolor = app.colors.gray2,
 }
 
 face['%mousefocusin'] = face:new {
-  bordercolor = cel.color.rgb(.4, .4, .4),
+  bordercolor = app.colors.gray4,
 }
 
 function face.select(face, t)
@@ -57,12 +57,13 @@ end
 
 do --window.handle
   local face = cel.getface('window.handle')
-  face.color = cel.color.rgb(.4, .4, .4)
+  face.color = app.colors.gray2
   face.font = cel.loadfont('arial:bold')
+  face.textcolor = app.colors.oceanblue
 
   face['%focus'] = face:new {
-    textcolor = cel.color.rgb(.2, .2, .2),
-    color = cel.color.rgb(0, 1, 1),
+    textcolor = app.colors.gray2,
+    color = app.colors.oceanblue,
   }
 
   function face.select(face, t)
@@ -79,7 +80,7 @@ do --window.handle
       cr:fill()
     end
 
-    if t.host.title and f.textcolor then
+    if t.host.title then -- and f.textcolor then
       cr:set_source_color(_ENV.textcolor)
       cr:drawstringlt(f.font, 4, 4, t.host.title)
     end
@@ -97,7 +98,7 @@ end
 
 do --window.client
   local face = cel.getface('window.client')
-  face.color = cel.color.rgb(.2, .2, .2)
+  face.color = app.colors.themecolor
   face.bordercolor = false
   face.borderwidth = false
 end

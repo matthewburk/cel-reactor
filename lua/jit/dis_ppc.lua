@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------
 -- LuaJIT PPC disassembler module.
 --
--- Copyright (C) 2005-2010 Mike Pall. All rights reserved.
+-- Copyright (C) 2005-2013 Mike Pall. All rights reserved.
 -- Released under the MIT/X license. See Copyright Notice in luajit.h
 ----------------------------------------------------------------------------
 -- This is a helper module used by the LuaJIT machine code dumper module.
@@ -35,12 +35,29 @@ local map_crops = {
   [150] = "isync",
 }
 
+local map_rlwinm = setmetatable({
+  shift = 0, mask = -1,
+},
+{ __index = function(t, x)
+    local rot = band(rshift(x, 11), 31)
+    local mb = band(rshift(x, 6), 31)
+    local me = band(rshift(x, 1), 31)
+    if mb == 0 and me == 31-rot then
+      return "slwiRR~A."
+    elseif me == 31 and mb == 32-rot then
+      return "srwiRR~-A."
+    else
+      return "rlwinmRR~AAA."
+    end
+  end
+})
+
 local map_rld = {
   shift = 2, mask = 7,
   [0] = "rldiclRR~HM.", "rldicrRR~HM.", "rldicRR~HM.", "rldimiRR~HM.",
   {
     shift = 1, mask = 1,
-    [0] = "rldclRR~HM.", "rldcrRR~HM.",
+    [0] = "rldclRR~RM.", "rldcrRR~RM.",
   },
 }
 
@@ -342,7 +359,7 @@ local map_pri = {
   "subficRRI",	false,		"cmpl_iYLRU",	"cmp_iYLRI",
   "addicRRI",	"addic.RRI",	"addi|liRR0I",	"addis|lisRR0I",
   "b_KBJ",	"sc",		 "bKJ",		map_crops,
-  "rlwimiRR~AAA.", "rlwinmRR~AAA.", false,	"rlwnmRR~RAA.",
+  "rlwimiRR~AAA.", map_rlwinm,	false,		"rlwnmRR~RAA.",
   "oriNRR~U",	"orisRR~U",	"xoriRR~U",	"xorisRR~U",
   "andi.RR~U",	"andis.RR~U",	map_rld,	map_ext,
   "lwzRRD",	"lwzuRRD",	"lbzRRD",	"lbzuRRD",
@@ -464,23 +481,13 @@ local function disass_ins(ctx)
 	cn = band(bo, 2) == 0 and "dnz" or "dz"
 	if band(bo, 0x10) == 0 then
 	  cn = cn..(band(bo, 8) == 0 and "f" or "t")
-	  if band(bo, 1) ~= 0 then
-	    name = name..(band(op, 0x8000) ~= 0 and "-" or "+")
-	  end
-	elseif band(bo, 8) ~= 0 then
-	  name = name..(band(bo, 1) == 0 and "-" or "+")
-	elseif band(bo, 1) ~= 0 then
-	  name = name..(band(op, 0x8000) ~= 0 and "-" or "+")
 	end
 	if band(bo, 0x10) == 0 then x = condfmt(cond) end
+	name = name..(band(bo, 1) == band(rshift(op, 15), 1) and "-" or "+")
       elseif band(bo, 0x10) == 0 then
 	cn = map_cond[band(cond, 3) + (band(bo, 8) == 0 and 4 or 0)]
-	if band(bo, 2) ~= 0 then
-	  name = name..(band(bo, 1) == 0 and "-" or "+")
-	elseif band(bo, 1) ~= 0 then
-	  name = name..(band(op, 0x8000) ~= 0 and "-" or "+")
-	end
 	if cond > 3 then x = "cr"..rshift(cond, 2) end
+	name = name..(band(bo, 1) == band(rshift(op, 15), 1) and "-" or "+")
       end
       name = gsub(name, "_", cn)
     elseif p == "J" then
@@ -569,10 +576,16 @@ local function disass_(code, addr, out)
   create_(code, addr, out):disass()
 end
 
+-- Return register name for RID.
+local function regname_(r)
+  if r < 32 then return map_gpr[r] end
+  return "f"..(r-32)
+end
 
 -- Public module functions.
 module(...)
 
 create = create_
 disass = disass_
+regname = regname_
 

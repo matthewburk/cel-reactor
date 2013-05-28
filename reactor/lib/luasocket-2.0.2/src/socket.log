@@ -1,0 +1,56 @@
+﻿Build started 1/5/2013 6:42:41 PM.
+     1>Project "D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\socket.vcxproj" on node 3 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "./src\socket.lastbuildstate".
+       InitializeBuildStatus:
+         Creating "./src\socket.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /I..\..\include\lua /nologo /W3 /WX- /O2 /Oy- /D WIN32 /D NDEBUG /D _WINDOWS /D _USRDLL /D LUASOCKET_EXPORTS /D "LUASOCKET_API=__declspec(dllexport)" /D _WINDLL /D _MBCS /Gm- /EHsc /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"./src\\" /Fd"./src\vc100.pdb" /Gd /TC /analyze- /errorReport:prompt src\auxiliar.c src\buffer.c src\except.c src\inet.c src\io.c src\luasocket.c src\options.c src\select.c src\tcp.c src\timeout.c src\udp.c src\wsocket.c
+         auxiliar.c
+     1>src\auxiliar.c(59): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>src\auxiliar.c(96): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+     1>src\auxiliar.c(110): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+         buffer.c
+         except.c
+         inet.c
+     1>src\inet.c(265): warning C4996: 'sscanf': This function or variable may be unsafe. Consider using sscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(325) : see declaration of 'sscanf'
+         io.c
+         luasocket.c
+         options.c
+     1>src\options.c(37): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+                 C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\include\stdio.h(371) : see declaration of 'sprintf'
+         select.c
+         tcp.c
+         timeout.c
+         udp.c
+         wsocket.c
+         Generating Code...
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"./src\socket.dll" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\..\lib lua51.lib ws2_32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"./src\socket.dll.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\src\socket.pdb" /SUBSYSTEM:WINDOWS /OPT:REF /OPT:ICF /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"./src\socket.lib" /MACHINE:X86 /DLL ./src\auxiliar.obj
+         ./src\buffer.obj
+         ./src\except.obj
+         ./src\inet.obj
+         ./src\io.obj
+         ./src\luasocket.obj
+         ./src\options.obj
+         ./src\select.obj
+         ./src\tcp.obj
+         ./src\timeout.obj
+         ./src\udp.obj
+         ./src\wsocket.obj
+            Creating library ./src\socket.lib and object ./src\socket.exp
+         socket.vcxproj -> D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\./src\socket.dll
+       Manifest:
+         c:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /outputresource:"./src\socket.dll;#2" /manifest ./src\socket.dll.intermediate.manifest
+       FinalizeBuildStatus:
+         Deleting file "./src\socket.unsuccessfulbuild".
+         Touching "./src\socket.lastbuildstate".
+     1>Done Building Project "D:\projects\cel-reactor\reactor\lib\luasocket-2.0.2\socket.vcxproj" (rebuild target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.92
