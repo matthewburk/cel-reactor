@@ -47,10 +47,9 @@
 @if errorlevel 1 goto :END
 @popd
 
-@rem @pushd pixman\src
-@rem @call build.bat %MYCONFIG%
-@rem @if errorlevel 1 goto :END
-@rem @popd
+@pushd pixman\pixman
+make -f Makefile.win32 CFG=release
+@popd
 
 @pushd freetype\src
 @call build.bat %MYCONFIG%
