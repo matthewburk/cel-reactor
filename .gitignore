@@ -19,3 +19,6 @@ reactor/lib/pixman/pixman/release/*.obj
 reactor/lib/pixman/pixman/release/*.obj
 reactor/lib/luasocket-2.0.2/src/*.obj
 reactor/lib/luasocket-2.0.2/src/*.lib
+*.sdf
+*.vcxproj.filters
+*.vcxproj.user
