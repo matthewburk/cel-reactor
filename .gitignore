@@ -22,3 +22,6 @@ reactor/lib/luasocket-2.0.2/src/*.lib
 *.sdf
 *.vcxproj.filters
 *.vcxproj.user
+*.ipch
+*.suo
+reactor/dist
