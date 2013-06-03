@@ -25,3 +25,4 @@ reactor/lib/luasocket-2.0.2/src/*.lib
 *.ipch
 *.suo
 reactor/dist
+fail.out

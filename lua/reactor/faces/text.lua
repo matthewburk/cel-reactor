@@ -4,7 +4,7 @@ local face = cel.getface('text')
 face.textcolor = 'current'
 face.color = false
 face.bordercolor = false
-face.borderwidth = false
+face.borderwidth = false 
 
 face.layout = {
   padding = {

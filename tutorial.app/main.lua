@@ -2,27 +2,6 @@ require 'strict'
 
 local cel = require 'cel'
 
---[[
-celdriver.resize(1920/1.5, 1080/1.5)
-
-function reactor.resized()
-  celdriver.resize(1920/1.5, 1080/1.5)
-end
-
-function reactor.keydown(key, ...)
-  celdriver.keydown(key, ...)
-  if key == 'space' then
-    cel.printdescription()
-  elseif key == 'f1' then
-    reactor.fullscreen(true)
-  elseif key == 'f2' then
-    reactor.fullscreen(false)
-  elseif key == 'escape' then
-    reactor.quit()
-  end
-end
-
---]]
 do --faces
   cel.getface('cel'):new {
     fillcolor = cel.color.rgb(0, 1, 1),
@@ -125,10 +104,15 @@ local function loadtut(tut, name)
   if tut.window.listbox then
     tut.window.listbox:unlink()
   end
-  tut.window.listbox = cel.listbox.new(0, 0, '@code')
-  tut.window.listbox:link(tut.window, 'fill')
 
-  local listbox = tut.window.listbox
+  tut.window.listbox = cel.scroll {
+    step=cel.scroll.colstep,
+  }:link(tut.window, 'fill')
+
+
+
+  local list = cel.list.new(0, 0, '@code')
+    :link(tut.window.listbox, 'fill')
 
   do
     local firstpause = true
@@ -161,16 +145,16 @@ local function loadtut(tut, name)
           lines[#lines + 1] = button
 
           function button:onclick()
-            local i = listbox:indexof(self)
+            local i = list:indexof(self)
             self:unlink()
-            listbox:selectall(true)
-            local hbar = cel.new(2, 1, '@divider'):link(listbox, 'width', 10)
-            listbox:flux(function()
+            list:selectall(true)
+            local hbar = cel.new(2, 1, '@divider'):link(list, 'width', 10)
+            list:flux(function()
               for i, line in ipairs(button.lines) do
-                line:link(listbox, 'width')
+                line:link(list, 'width')
               end
             end)
-            listbox:scrollto(0, hbar.y)
+            tut.window.listbox:scrollto(0, hbar.y)
             tut:resume()
           end
 
@@ -191,9 +175,9 @@ local function loadtut(tut, name)
       end
     end
 
-    listbox:flux(function()
+    list:flux(function()
       for i, line in ipairs(header) do
-        line:link(listbox, 'width')
+        line:link(list, 'width')
       end
     end)
   end

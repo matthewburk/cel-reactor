@@ -16,16 +16,12 @@ return function(root)
     end,
 
     cel.scroll {
-      subject = {
-        fillwidth = false;
-        fillheight = false;
-        cel.col {
-          function(col)
-            for i=1, 80000 do
-              new('test'):link(col, linker)
-            end
+      cel.col {
+        function(col)
+          for i=1, 80000 do
+            new('test'):link(col, linker)
           end
-        },
+        end
       },
     },
   }:link(root)

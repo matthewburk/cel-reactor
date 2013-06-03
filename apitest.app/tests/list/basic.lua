@@ -4,6 +4,10 @@ return function(root)
 
   local items = cel.list.new()
 
+  function items:onchange(...)
+    print(self, ...)
+  end
+
   for i = 1, 20 do
     local btn = cel.textbutton.new('item '..i):link(items)
     items:setslotface(btn, cel.colorface(app.colors.green))
@@ -21,7 +25,8 @@ return function(root)
       link = 'fill',
 
       cel.scroll {
-        subject = {items, fillwidth=true},
+        {items, link='fill'},
+        step = cel.scroll.colstep,
       },
 
     }:adddefaultcontrols(),

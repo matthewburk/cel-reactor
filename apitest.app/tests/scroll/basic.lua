@@ -4,9 +4,7 @@ return function(root)
 
   do
     local scroll = cel.scroll {
-      subject = {
-        cel.textbutton.new('some text for testing'):resize(300, 300) 
-      },
+      cel.textbutton.new('some text for testing'):resize(300, 300) 
     }
 
     local border = cel.row {
@@ -56,9 +54,7 @@ return function(root)
 
   do
     local scroll = cel.scroll {
-      subject = {
-        cel.textbutton.new('some text for testing'):resize(800, 800) 
-      },
+      cel.textbutton.new('some text for testing'):resize(800, 800) 
     }
 
     local border = cel.row {

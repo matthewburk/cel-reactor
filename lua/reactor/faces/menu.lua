@@ -8,8 +8,8 @@ do --menu.slot
     margin = {
       l = 0,
       r = 30,
-      t = function(w, h) return h*.25 end; 
-      b = function(w, h) return h*.25 end;
+      t = 5,--function(w, h) return h*.25 end; 
+      b = 5,--function(w, h) return h*.25 end;
     },
   }
 

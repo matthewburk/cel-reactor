@@ -402,6 +402,8 @@ return function()
       function driver.loadfont(name, size)
         name = names[name] or name 
 
+        size = math.modf(96/72 * size) --convert point to pixels
+
         local cr = cairo.create(cairo.surface.create(0, 0))
         local cairofont = cairo.font.create(name)
 
@@ -409,8 +411,8 @@ return function()
         cr:set_font_size(size)
 
         local ascent, descent, lineheight = cr:font_extents()
-        local _, _, emwidth, emheight, emadvance = cr:text_extents('M')
-        _, _, _, _, emadvance = cr:text_extents(' ')
+        --local _, _, emwidth, emheight, emadvance = cr:text_extents('M')
+        local _, _, _, _, emadvance = cr:text_extents(' ')
 
         local font = {
           cairofont = cairofont,
@@ -421,8 +423,8 @@ return function()
           lineheight = math.ceil(lineheight),
           ascent = math.ceil(ascent),
           descent = math.ceil(descent),
-          emwidth = emwidth, 
-          emheight = emheight,
+          emwidth = size, 
+          emheight = size,
           emadvance = emadvance,
           metrics = setmetatable({}, {__index = function(glyphmetrics, utf8codepoint)
             local xbr, ybr, w, h, xadv, yadv = cr:text_extents(utf8codepoint)    

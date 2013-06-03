@@ -19,7 +19,7 @@ textbutton:settext(textbutton:gettext() .. ' world')
 pause()
 
 --Wraps string.format aroud settext
-textbutton:printf('penx %d, peny %d', textbutton:getbaseline())
+textbutton:printf('penx %d, peny %d', textbutton:getpenorigin())
 pause()
 
 --Textbutton has a minw and minh to ensure text doesn't get clipped
