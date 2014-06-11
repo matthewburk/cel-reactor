@@ -1,4 +1,3 @@
---Yes I did, but you may have missed how awsome they are. 
 local cel = require 'cel'
 
 return function(root)
@@ -6,26 +5,24 @@ return function(root)
   --The linkers we have used up to this point have been mundane.  Every gui 
   --library has some way to align top/bottom/left/right/center and variations
   --of those.  These are useful, so much that there are predefined linkers
-  --for doing just that.  But cel linkers can do much more.
+  --for doing just that.  But linkers have more flexibility.
   
   --To demonstrate another useful way to use a linker we will use a grip.
   --A grip is a simple cel that can 'grip' cels (including itself) and then
   --move them when the mouse is moved the grip will move the gripped cel.
   local grip = cel.grip.new(100, 100)
-  local zed = cel {
-    w = 300; h = 300; face = cel.colorface(cel.color.rgb(1, 1, 0, .5));
-    { link = 'fill'; grip},
-    { link = 'center'; 'THIS CEL IS THE GRIP TARGET'},
+
+  local zed = cel { w=300, h=300, face='#ffff00', 
+    { link = 'fill', grip },
+    { link = 'center', 'THIS CEL IS THE GRIP TARGET'},
   }:link(root)
 
-  --grip zed
+  --make grip drag zed.
   grip:grip(zed)
-
-  --now drag zed around with the mouse.
   pause()
 
   --a grip has other modes as well, this will move the top-right corner of the
-  --cel.  
+  --zed.  
   grip:relink('right.top'):resize(20, 20)
   grip:grip(zed, 'topright')
   pause()

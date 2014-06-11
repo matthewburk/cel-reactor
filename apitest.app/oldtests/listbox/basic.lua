@@ -12,7 +12,7 @@ return function(root)
       end
     end,
 
-    compile = function(metacel, t)
+    assemble = function(metacel, t)
       if metacel ~= 'cel' then
         local ret = cel[metacel](t)
         if t.__name then cels[t.__name] = ret end
@@ -41,6 +41,7 @@ return function(root)
       link = 'fill',
       app.listbox {
         function(lb)
+          app.textbutton.new('flex button in a listbox'):link(lb, 'fill', 0, 0, {flex=1, minh=100})
           for i = 1, 20 do
             local button = app.textbutton.new('button in a listbox'):link(lb, 'width')
             button.onclick = button.unlink

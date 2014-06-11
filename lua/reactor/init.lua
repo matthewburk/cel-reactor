@@ -390,6 +390,8 @@ return function()
       return 1000
     end
 
+    driver.isutf8 = app.isvalidutf8
+
     do
       local names = {
         code = string.format('%s/data/fonts/%s', app.path, 'FixedsysExcelsiorIIIb.ttf'),
@@ -555,9 +557,12 @@ return function()
       end
     end
 
+    assert(driver.root)
+
     --TODO window.root should be linked to driver.root so we don't mess with onresize
     window.root = driver.root:takefocus() --TODO it should havefocus by default, fix bug in cel
 
+    assert(window.root)
     _window.onresize(_window.w, _window.h)
 
     require( 'main' )

@@ -14,7 +14,7 @@ return function(root)
         --cel.window.new(300, 300),
         function(self)
           self.onchange = function(self, item, index, change)
-          print(self, item, index, change)
+          --print(self, item, index, change)
         end
 
           local _new = cel.textbutton.new
@@ -27,7 +27,7 @@ return function(root)
           local width = cel.getlinker('width') 
           for i = 1, 100 do
             --new('The purpose of this test is to see how wrapping text affects performace when laid out in a sequence.', nil, 'word'):link(self, width)
-            new('It seems that the sequence will resize a few times before settling on a width.', nil, 'word'):link(self, width, nil, nil, {minh=200})
+            new('It seems that the sequence will resize a few times before settling on a width.'):wrap('word'):link(self, width)
             cel.textbutton.new(tostring(self:len())):link(self, width)
             cel.window.new(200, 200):adddefaultcontrols():link(self)
           end

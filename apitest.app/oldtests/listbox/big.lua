@@ -18,7 +18,7 @@ return function(root)
         local tostring = tostring
 
         for i=1, 1000 * 10 do          
-          new('Hi ' .. i):link(listbox)
+          new('Hi 99'):link(listbox)
         end
         print(listbox:len())
       end

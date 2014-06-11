@@ -6,18 +6,13 @@ return function(root)
       w = 400, h = 400,
       function(window)
         window:adddefaultcontrols()
-        WINDOW = window
       end,
       link = 'fill',
 
-      cel.scroll 
-      { 
+      cel.scroll { 
         link='fill',
 
-        step=cel.scroll.colstep,
-
         cel.list {
-          --cel.window.new(300, 300),
           function(self)
             self.onchange = function(self, item, index, change)
             dprint(self, item, index, change)
@@ -32,8 +27,7 @@ return function(root)
             new = cel.text.new
             local width = cel.getlinker('width') 
             for i = 1, 100 do
-              --new('The purpose of this test is to see how wrapping text affects performace when laid out in a sequence.', nil, 'word'):link(self, width)
-              new('It seems that the sequence will resize a few times before settling on a width.'):wrap('word'):link(self, width)
+              new('The purpose of this test is to see how wrapping text affects performace when laid out in a sequence.\nIt seems that the sequence will resize a few times before settling on a width.'):wrap('word'):link(self, width)
               cel.textbutton.new(tostring(self:len())):link(self, width)
               cel.window.new(200, 200):adddefaultcontrols():link(self)
             end

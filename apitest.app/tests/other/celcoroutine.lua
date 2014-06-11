@@ -23,23 +23,25 @@ return function(root)
     text = 'coshow',
   }:link(root, 'center'):relink()
 
-  local choice = cel.col {
-    face = cel.colorface(cel.color.rgb(0, 0, .3)),
-    link = 'width',
-    'Make a selection',
-    cel.textbutton {
-      text = 'real',
-      onclick = function(textbtn)
-        cel.resumefork(textbtn, textbtn)
-      end
-    },
-    cel.textbutton.new('B'),
-    cel.textbutton.new('C'),
-    cel.textbutton.new('D'),
-  }
+  local choice do
+    choice = cel.col {
+      face = cel.colorface(cel.color.rgb(0, 0, .3)),
+      link = 'width',
+      'Make a selection',
+      cel.textbutton {
+        text = 'real',
+        onclick = function(textbtn)
+          cel.resume(choice, textbtn)
+        end
+      },
+      cel.textbutton.new('B'),
+      cel.textbutton.new('C'),
+      cel.textbutton.new('D'),
+    }
+  end
 
   function btn:onclick()
-    local action = cel.fork(choice,
+    local action = cel.coroutine(choice,
     function(choice, yield)
       choice:link(root, 'center')
       local ret = yield('waiting for selection')

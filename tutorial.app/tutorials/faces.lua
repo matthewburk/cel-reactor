@@ -8,30 +8,33 @@ local cel = require 'cel'
 
 return function(root)
   pause()
+  --A cel is assigned a face when it is created.
   
-  print('hello world')
+  --To get a face use cel.getface('<metacel>') where <metacel> is the metacel
+  --the face will render.
+  do
+    --Here we get the face for the cel metacel.
+    --Note that just as all cels inherit from the 'cel' metacel, all faces
+    --inherit from the 'cel' face, and any properties in the cel face are 
+    --present in all faces.
+    local face = cel.getface('cel')
+    print(face, 'all faces inherit from this face')
+  end
   pause()
-  --The first thing to understand is that a cel always has a face, A cel is 
-  --assigned a face when it is created.
-  --
-  --To get a face use cel.getface('metacel')
-  --Here we get the face for the cel metacel.  Just as all cels inherit from
-  --the 'cel' metacel, all faces inherit from the 'cel' face.
-  local face = cel.getface('cel')
-  print(face)
-  print('hello world')
-  --Here we get the face for the label metacel.  All labels will use this face
-  --or a face that inherits from it.
-  --local labelface = cel.getface('label')
-  --print(labelface)
+  do
+    --Here we get the face for the label metacel.  All labels will use this face
+    --or a face that inherits from it.
+    local face = cel.getface('label')
+    print(face, 'label')
+  end
+  pause()
 
-  --face and labelface are special faces becuase they are bound to the metacel.
   --When a new metacel is created a face is created 
   --(if it does not alreay exist) for that metacel, with the same name as the
   --metacel.  These become the default face for a cel created from the metacel,
   --and so are referred to as metafaces.
 
-  --A cel face is shared by Cel and the renderer.  A face can be used to control
+  --A face is shared by cel and the renderer.  A face can be used to control
   --a cel's layout, the font it uses, and presentation related behavior such as
   --animation and hit testing.
   --These entries in the face are reserved for use by Cel:
@@ -41,136 +44,74 @@ return function(root)
   --  flows - a table with named flow functions, names are defined by metacel.
 
   --For this tutorial demo a simple renderer was created that will fill in the
-  --cel using the color in face.fillcolor, and stroke the cel rectangle using
-  --the color in face.linecolor.  If no color is specified then the fill/stroke
-  --is not done.  These properties are not a part of Cel, they are loaded into
-  --the face by the renderer, and have no meaning to Cel.  One could use images
+  --cel using the color in face.color, and stroke the cel rectangle using
+  --the color in face.bordercolor.  
+  --These properties are not a part of cel, they are loaded into
+  --the face by the renderer, and have no meaning to cel.  One could use images
   --or shaders to render a cel, and the face is a context for the renderer to
   --store any information it needs.
-  
+  pause()
+ 
   --Lets take a look at the face.
-  for k, v in pairs(face) do
-    io.write('face['..tostring(k)..']', tostring(v), '\n') io.flush()
-    --print('face['..tostring(k)..']', tostring(v))
+  do
+    for k, v in pairs(cel.getface('cel')) do
+      print('face['..tostring(k)..']', v)
+    end
   end
-  pause()
-
-  --[==[
-  --Notice the face.draw function.  The tutorial renderer looks for a draw
+  --Notice the face.cairodraw function. The tutorial renderer looks for a draw
   --function on a face and calls it, we will supply our own draw function later.
-  --
-  --Next we will create a new face.  A new face
-  --can be created from an existing face and will inherit its properties.
-  local customface = face:new()
-
-  --Lets take a look again.
-  print('-----customface-----')
-  for k, v in pairs(customface) do
-    print('customface['..tostring(k)..']', v)
-  end
   pause()
 
-  --customface only has an __index entry which points to the face that created
-  --it. (A face is its own metatable).  
+  --Next we will create a new face. 
+  --A new face can be created from an existing face and will inherit its
+  --properties.
+  do
+    local face = cel.getface('cel'):new()
 
-  --Since our face inherted from the 'cel' metaface it can be used for any cels.
-  --We can create a new cel with this face and by passing the face in the new 
-  --function.
-  local zed = cel.new(100, 200)
-  local zoe = cel.new(100, 200, customface)
-
-  print('zed.face', zed.face) 
-  print('zoe.face', zoe.face) 
-  pause()
-
-  --Becuase no face was passed to zed, it will use the metaface corresponding to
-  --its metacel. Passing in the metaface produces the same result.  
-  zed = cel.new(100, 200, cel.getface('cel'))
-  print('zed.face', zed.face)
-  pause()
-
-
-  --Since we havent changed anything on customface zed and zoe will look the
-  --same.
-  local row = cel.row {
-    zed, zoe,
-  }:link(root, 'center')
-  pause()
-
-  --Actually you can't see them becuase the draw function we are using looks
-  --for fillcolor and linecolor on the face, if they are not present(false) then
-  --nothing is drawn for the face.  Our renderer is looking for a 4 byte string
-  --for any color, cel.color.encodef() creates a color as a 4 byte string.   
-  --Here we give our customface some colors so we can see it.
-  customface.fillcolor = cel.color.encodef(1, 0, 0)
-  customface.linecolor = cel.color.encodef(1, 1, 1)
-  pause()
-
-  --zed is still invisible.  We can color him up too, but that will affect all
-  --faces.  THIS WILL BE UGLY.
-  face.fillcolor = cel.color.encodef(0, 0, 1)
-  face.linecolor = cel.color.encodef(1, 1, 1)
-  pause()
-
-  --Change it back
-  face.fillcolor = false
-  face.linecolor = false
-  pause()
-
-  --We cannot change the a cel's face once it is set. This is not supported
-  --becuase it would make creating new metacels much more difficult.  For the
-  --same reason any changes made to a cel's face are not tracked by Cel. Also
-  --each face would have to keep a reference to all the cels using that face.
-  --It is way too much overhead for what is basically a gimmick.  It is overall
-  --more efficient and simpler to just create a new cel.  Changing the linecolor
-  --and fillcolor works becuase they are used by the renderer, which looks at
-  --the values every time the cel is drawn.  
-  
-  --Just keep in mind that this tutorial is to help you understand faces.
-  --Changing the entries in a face is not something you would normally do after
-  --it has been intialized.  Later in this tutorial I will show the right way to
-  --use faces.  For now we will continue down this path of crazy :)
-  
-  --Lets get zed out of there and make a new zed we can see.
-  zed:unlink()
-  
-  --Make a new face that inherits from customface
-  local customface2 = customface:new()
-  zed = cel.new(100, 200, customface2):link(row)
-  pause()
-
-  --Change zed's color
-  customface2.fillcolor = cel.color.encodef(0, 0, 1)
-  pause()
-
-  --Ok now we will finally draw our new face differently by redefining the
-  --draw function.  face is the face of the cel being drawn, t is the
-  --description of the cel being drawn.  (The description actually has the face
-  --at t.face, if you want to know why we don't use that look at how
-  --face.select is used in the tutorial renderer, in short face and t.face 
-  --won't always match)
-  function customface.draw(face, t)
-    --draw a circle
-    local radius = math.min(t.w, t.h)/2
-    local cx = t.w/2
-    local cy = t.h/2
-
-    if face.fillcolor then
-      love.graphics.setColor(string.byte(face.fillcolor, 1, 4))
-      love.graphics.circle('fill', cx, cy, radius, radius*2)
+    for k, v in pairs(face) do
+      print('newface['..tostring(k)..']', v)
     end
-    if face.linecolor then
-      love.graphics.setColor(string.byte(face.linecolor, 1, 4))
-      love.graphics.circle('line', cx, cy, radius, radius*2)
-    end
-  end
-  pause()
+    --This face only has an __index entry which points to the face that created
+    --it. (A face is its own metatable).  
+    pause()
 
-  --We are switching modes here, you should understand at this point what a
-  --face is, and how a cel is assigned a face.  When creating your own renderer
-  --you are free to choose what to put in the face and how to render a cel.
-  --Now on to intended/right way to use faces, we won't change the face after
-  --it is initialized anymore.
+    --Since our face inherted directly from the 'cel' metaface, it can be used
+    --for any cel.
+    --We can create a new cel with this face and by passing the face in the 
+    --new function.
+    local zed = cel.new(100, 200)
+    local zoe = cel.new(100, 200, face)
+
+    --A cels' face can be accessed through its face property.
+    print('zed.face', zed.face) 
+    print('zoe.face', zoe.face) 
+    pause()
+
+    --Becuase no face was passed to zed, it will use the metaface corresponding to
+    --its metacel. Passing in the metaface produces the same result.  
+    zed = cel.new(100, 200, cel.getface('cel'))
+    print('zed.face', zed.face)
+    pause()
+
+    --Zed and zoe will look the same, since we havent changed anything on the new face. 
+    --Change the new face so that it fills in red.
+    face.color = cel.color.rgb(1, 0, 0)
+    for k, v in pairs(face) do
+      print('newface['..tostring(k)..']', v)
+    end
+    pause()
+
+    --When zed and zoe are linked to root, zed is not visible, becuase the cel metaface doesn't 
+    --draw anything by default.
+    local row = cel.row {
+      zed, zoe,
+    }:link(root, 'center')
+    pause()
+
+    --Make zed visible by giving it a face that draws something.
+    zed:setface(zoe.face)
+    pause()
+  end
 
   --The purpose of a face is to aid in decoupling rendering from gui logic. It
   --is useful to have a highly cohesive renderer, and it makes sense to 
@@ -182,7 +123,7 @@ return function(root)
   cel.getface('label'):new {      
     --The draw function for a label sets the color to textcolor before drawing
     --the text.
-    textcolor = cel.color.encodef(0, 1, 1), 
+    textcolor = cel.color.rgb(0, 1, 1), 
   }:register('@cyan')
   --The register function allows us to lookup the face by its registered 
   --name.  My convention is to use @ as the first char for face names.  The
@@ -235,6 +176,4 @@ return function(root)
   --This means that a face can be created for a metacel that does not yet 
   --exist.  Creating a new metacel is fairly easy as well, and will be covered
   --in another tutorial.
-  pause()
-  --]==]
 end

@@ -12,7 +12,7 @@ label:settext(label:gettext() .. ' world')
 pause()
 
 --Wraps string.format aroud settext
-label:printf('penx %d, peny %d', label:getbaseline())
+label:printf('penx %d, peny %d', label:getpenorigin())
 pause()
 
 --Cannot be resized, the size of a label is determined by its text and layout.

@@ -1,0 +1,104 @@
+jit	true	CMOV	SSE2	SSE3	SSE4.1	fold	cse	dce	fwd	dse	narrow	loop	abc	sink	fuse
+package.path	
+  apitest.app/?.lua
+  apitest.app/?/init.lua
+  .\?.lua
+  d:\projects\cel-reactor\lua\?.lua
+  d:\projects\cel-reactor\lua\?\init.lua
+  
+package.cpath	
+  apitest.app/?_L.dll
+  apitest.app/?.dll
+  .\?.dll
+  d:\projects\cel-reactor\?.dll
+  d:\projects\cel-reactor\loadall.dll	
+
+ERROR loading font	d:\projects\cel-reactor\lua\reactor\init.lua:408: Failed to load font from file arial:bold
+nil	 TIME = 	0.572
+strings	0.092000000000001
+buildtree	0.216
+13003
+nil	 TIME = 	0.308
+clicked	tree	8161
+minimize	tree	8161
+clicked	tree	8178
+minimize	tree	8178
+clicked	tree	8186
+minimize	tree	8186
+clicked	tree	8186
+maximize	tree	8186
+clicked	tree	8193
+minimize	tree	8193
+clicked	tree	8193
+maximize	tree	8193
+clicked	tree	8199
+minimize	tree	8199
+clicked	tree	8199
+maximize	tree	8199
+clicked	tree	8199
+minimize	tree	8199
+clicked	tree	8199
+maximize	tree	8199
+clicked	tree	8207
+minimize	tree	8207
+clicked	tree	8207
+maximize	tree	8207
+clicked	tree	8207
+minimize	tree	8207
+clicked	tree	8193
+minimize	tree	8193
+clicked	tree	8221
+minimize	tree	8221
+clicked	tree	8186
+minimize	tree	8186
+clicked	tree	8161
+maximize	tree	8161
+clicked	tree	8161
+minimize	tree	8161
+clicked	tree	8149
+minimize	tree	8149
+clicked	tree	8517
+minimize	tree	8517
+clicked	tree	8790
+minimize	tree	8790
+clicked	tree	8848
+minimize	tree	8848
+clicked	tree	11599
+minimize	tree	11599
+clicked	tree	11607
+minimize	tree	11607
+clicked	tree	12907
+minimize	tree	12907
+clicked	tree	12907
+maximize	tree	12907
+clicked	tree	12914
+minimize	tree	12914
+nil	 TIME = 	0.028
+list	textbutton[item 1]	0	true
+list	textbutton[item 2]	1	true
+list	textbutton[item 3]	2	true
+list	textbutton[item 4]	3	true
+list	textbutton[item 5]	4	true
+list	textbutton[item 6]	5	true
+list	textbutton[item 7]	6	true
+list	textbutton[item 8]	7	true
+list	textbutton[item 9]	8	true
+list	textbutton[item 10]	9	true
+list	textbutton[item 11]	10	true
+list	textbutton[item 12]	11	true
+list	textbutton[item 13]	12	true
+list	textbutton[item 14]	13	true
+list	textbutton[item 15]	14	true
+list	textbutton[item 16]	15	true
+list	textbutton[item 17]	16	true
+list	textbutton[item 18]	17	true
+list	textbutton[item 19]	18	true
+list	textbutton[item 20]	19	true
+list	label[this]	0	true
+list	label[is]	1	true
+list	label[a]	2	true
+list	label[listbox with text]	3	true
+list	label[pretty]	4	true
+list	label[basic]	5	true
+list	label[stuff]	6	true
+nil	 TIME = 	0.387

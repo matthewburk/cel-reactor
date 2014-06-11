@@ -1,42 +1,41 @@
---The abridged overview.
+--High level overview of Cel (does not cover embedding)
 
---Cel is the name of the library, all moudles in Cel are lowercase.
+--Load the cel library.
 local cel = require 'cel'
 
 --This function is called by the tutorial loader.
 return function(root)
 pause()
 
---create a red cel 100px width 100px height
-local zed = cel.new(100, 100, cel.colorface(cel.color.rgb(1, 0, 0)))
+--Create a red cel 100 width 100 height
+local zed = cel.new(100, 100, '#ff0000')
 
---access properties of a cel, these are read-only
+--Access properties of a cel, these are read-only
 print('zed.w', zed.w, 'zed.h', zed.h)
 pause()
 
---link cels (put zed inside root), the link (zed) is centered in the host(root).
+--Link zed to root.
 zed:link(root, 'center')
 pause()
 
---A linker (such as 'center') is enforced continuously, until it is removed.
---So we can't move zed off-center
+--zed cannot be moved becuase a linker (such as 'center') is always enforced.
 zed:move(0, 0)
 pause()
 
---can change the size of zed though
+--We can change the size of zed becuase the 'center' linker only forces the
+--position of zed.
 zed:resize(200, 200)
 pause()
 
---relink a cel (the cel was centered, now on the left)
+--relink zed, zed will still be linked to root, but the linker will be 'left'.
 zed:relink('left')
 pause()
 
---relink with no arguments removes linker
+--relink with no arguments removes the linker, and now we can move zed.
 zed:relink()
 
---now we can move zed around unrestrained
 for i=1, 40 do
-  cel.doafter(100*i, function()
+  cel.doafter(20*i, function()
     zed:moveby(1, 1)
   end)
 end
@@ -46,15 +45,14 @@ pause()
 zed:unlink()
 pause()
 
---Submodules of cel are loaded on demand.  
---label is a submodule of cel.  it defines a label.
+--Submodules of cel are loaded on demand.
+--local label = require 'cel.label' is optional, I don't use it.
 local label = cel.label.new('Hello World')
 
 label:link(root, 'center')
 pause()
 
---row is a cel whose links will be arranged in a row.
---By default it will resize to fit all links
+--A row is a cel that will arrange its links in a row.
 local row = cel.row.new():link(root, 'top')
 
 for i = 1,10 do
@@ -104,41 +102,38 @@ local window = cel.window {
 }:link(root)
 pause()
 
---When linking you can pass additional parameters to the linker.  The 'fill' 
---linker will add a left/right margin equal to the first param, and a top/bottom
---margin equal to teh second param.
-window:relink('fill')
-pause()
-
+--When linking you can pass additional parameters to the linker.  The 
+--'fill.margin' linker will add a left/right margin equal to the first param,
+--and a top/bottom margin equal to teh second param.
 --The two values passed to the linker are called xval and yval respectively.  
 --Most of the predefined linkers will change behavior by specifying an xval or
 --yval.
-window:relink('fill', 5, 15)
+window:relink('fill.margin', 5, 15)
 pause()
 
 window:unlink()
 
---A regular listbox 
-local listbox = cel.listbox {
-  'This', 'is', 'a', 'regular', 'text-based', 'listbox',
+--A list
+local list = cel.list {
+  'This', 'is', 'a', 'list',
   --You can also define onevent functions in a cel initializer table.  The 
   --onchange event is commonly implemented.
-  onchange = function(listbox, ...)
-    print('listbox.onchange', ...)
+  onchange = function(list, ...)
+    print('list.onchange', ...)
   end  
 }:link(root, 'fill')
 pause()
 
-listbox:unlink()
+list:unlink()
 
---Any cel can be a host, here we put textbuttons into a listbox
-local listbox = cel.listbox {
-  onchange = function(listbox, ...)
-    print('listbox.onchange', ...)
+--Any cel can be a host, here we put textbuttons into a list
+local list = cel.list {
+  onchange = function(list, ...)
+    print('list.onchange', ...)
   end, 
-  function(lb)
-    for i = 1,100 do
-      local button = cel.textbutton.new(tostring(i)):link(lb, 'width')
+  function(list)
+    for i = 1,10 do
+      local button = cel.textbutton.new(tostring(i)):link(list, 'width')
       --unlink the button when it is clicked, the first parmeter sent
       --to onclick is the button, so we can just point onclick right to 
       --unlink
@@ -148,13 +143,17 @@ local listbox = cel.listbox {
 }:link(root, 'fill')
 pause()
 
---I mean really any cels can be linked, I'll add a window to the listbox.
---You can event move the window around
-window:link(listbox)
-listbox:scrollto(0, math.huge)
+--I mean really any cels can be linked, I'll add a window to the list.
+--You can even move the window around
+window:link(list)
 pause()
 
-
-
+--Cels can be composed by linking, link list to a scroll to get a scrollable
+--list.
+cel.scroll {
+  link='fill',
+  --When list is linked to this scroll cel it is automatically unlinked first.
+  list,
+}:link(root, 'fill')
 pause()
 end 

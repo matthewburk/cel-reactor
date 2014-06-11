@@ -5,13 +5,13 @@ return function(root)
   local n = 3
 
   do
-    local col = cel.col.new(0, cel.colorface(app.colors.white)):link(root, 'center')
+    local col = cel.col.new(0, '#ffffff'):link(root, 'center')
 
     col.__debug = false
     for i = 1, n do
       --local window = cel.window.new(w, h, tostring(i)):link(col)
       --window:adddefaultcontrols()
-      local grip = cel.grip.new(w, h, cel.colorface(cel.color.hsl(math.random(360), 1, .5))):link(col)
+      local grip = cel.grip.new(w, h, cel.color.hsl(math.random(360), 1, .5)):link(col)
       grip:grip(grip)
     end
 
@@ -162,7 +162,7 @@ return function(root)
   --[[
   do
     local w, h = 100, 100
-    local col = cel.col.new(0, cel.colorface(app.colors.white)):link(root, 'center')
+    local col = cel.col.new(0, '#ffffff'):link(root, 'center')
 
     col.__debug = false
     for i = 1, 3 do

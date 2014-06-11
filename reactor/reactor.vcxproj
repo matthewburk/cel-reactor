@@ -116,6 +116,7 @@
     <ClCompile Include="source\gl.c" />
     <ClCompile Include="source\reactor.c" />
     <ClCompile Include="source\reactor_graphics.c" />
+    <ClCompile Include="source\utf8.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\gl.h" />

@@ -16,11 +16,9 @@ return function(root)
       w=200, h=200,
       link='fill',
 
-      cel.scroll { 
-        subject={
-          fillwidth=true,
-          cel.text.new(table.concat(t, ' ')):wrap('word'),
-        }
+      cel.scroll {
+        link='fill',
+        cel.text.new(table.concat(t, ' ')):wrap('word'),
       }
     }
   }

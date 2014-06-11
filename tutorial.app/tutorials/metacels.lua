@@ -7,20 +7,18 @@ return function(root)
   --A cel type is defined by a what is called metacel.  A metacel defines the
   --metatable of a cel and creates cels.
   --
-  --In Cel metcels are normally hidden behind a factory, when you require 'cel'
+  --In Cel metacels are normally hidden behind a factory, when you require 'cel'
   --what you get back is the 'cel' factory.  By convention the factory/module
   --has the same name as the metacel. Lets get another factory.
-  local buttonfactory = require 'cel.button'
+  --
+  --As a convenience the cel factory will require sub modules automatically,
+  --so there is no need to require('cel.button')
 
-  --An lets make a button
-  local button = buttonfactory.new(100, 100)
-
-  --Since a button is a cel we can link it to another cel.
-  button:link(root, 'center')
+  --Create a button.
+  local button = cel.button.new(100, 100):link(root, 'center')
   pause()
 
-  --As a convenience the cel factory will require sub modules automatically.
-  --Here we create a label, cel will require 'cel.label' for us.
+  --Create a label.
   local label = cel.label.new('A label')
 
   --Make a labeled button, TADA!
@@ -36,7 +34,7 @@ return function(root)
   button:unlink()
   pause()
 
-  --So putting a label in a button is pretty handy, but scanning the code to see
+  --Putting a label in a button is pretty handy, but scanning the code to see
   --that relationship is not very handy.  For this reason Cel supports a 
   --more declaritive style for creating cels.  Here is how to declare a label.
   local label = cel.label {
@@ -54,13 +52,11 @@ return function(root)
   }
   pause()
 
-  --The named parameters should be fairly obvious, consult the api documentation
-  --for detailed descriptions.  
-
   --Lets make a labeled button.  Any cels contained in the array part of the
   --table are linked to the cel being constructed.
   local button = cel.button {
-    w = 200, h = 200,
+    w = 200,
+    h = 200,
     label,
   }
 
@@ -83,7 +79,7 @@ return function(root)
 
   --This is another variation, with the same result.
   cel.button {
-    link = 'center'; w = 200; h = 200;
+    link = 'center', w = 200, h = 200,
     cel.label {
       text = 'hello',
     }
@@ -94,7 +90,7 @@ return function(root)
   --is created (actually thats what the cel metacel does, most metacels do not
   --override that behavior, but they can).
   cel.button {
-    link = 'center'; w = 200; h = 200;
+    link = 'center', w = 200, h = 200,
     'hellO',
     '_____',
   }:link(root, 'bottom')
@@ -105,11 +101,11 @@ return function(root)
 
   --If you want to control the linker on a per link basis you can do this:
   cel.button {
-    link = 'center'; w = 200; h = 200;
-    { link = 'left.center'; 'left.center'},
-    { link = 'right.center'; 'right.center'},
-    { link = 'center.top'; 'center.top'},
-    { link = 'center.bottom'; 'center.bottom'},
+    link = 'center', w = 200, h = 200,
+    { link = 'left.center', 'left.center'},
+    { link = 'right.center', 'right.center'},
+    { link = 'center.top', 'center.top'},
+    { link = 'center.bottom', 'center.bottom'},
   }:link(root, 'fill')
   pause()
 

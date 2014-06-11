@@ -180,6 +180,18 @@ static int reactor_quit_L(lua_State* L) {
   return 0;
 }
 
+
+
+#include "utf8.c"
+static int reactor_isvalidutf8(lua_State* L) {
+	int len = 0;
+	const char* str = luaL_checklstring(L, 1, &len);
+
+	lua_pushboolean(L, u8_isvalid(str, len));
+	return 1;
+
+}
+
 extern int luaopen_reactor_graphics(lua_State* L);
 extern int luaopen_reactor_clipboard(lua_State* L);
 extern int luaopen_cairo(lua_State* L);
@@ -527,6 +539,7 @@ static int open_reactor_L(lua_State* L) {
     static const luaL_reg app_functions_L[] = {
       {"quit", reactor_quit_L},  //required
       {"getelapsedtime", reactor_getelapsedtime_L}, //required
+	  {"isvalidutf8", reactor_isvalidutf8},
       {0, 0}
     };
 
