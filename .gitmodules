@@ -1,3 +1,3 @@
 [submodule "cel"]
 	path = lua/cel
-	url = git://github.com/matthewburk/cel.git
+	url = https://github.com/matthewburk/cel
